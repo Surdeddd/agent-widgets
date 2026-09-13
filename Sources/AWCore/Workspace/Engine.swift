@@ -26,7 +26,7 @@ public struct Engine: Sendable {
     public static func isEngineRoot(_ url: URL) -> Bool {
         var isDirectory: ObjCBool = false
         let hasTemplates = FileManager.default.fileExists(
-            atPath: url.appendingPathComponent("Templates/app").path,
+            atPath: url.appendingPathComponent("Templates").path,
             isDirectory: &isDirectory
         ) && isDirectory.boolValue
         return hasTemplates && FileManager.default.fileExists(atPath: url.appendingPathComponent("Kit/Package.swift").path)

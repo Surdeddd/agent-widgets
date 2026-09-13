@@ -78,8 +78,9 @@ public struct WorkspaceConfig: Codable, Equatable, Sendable {
         if let local, FileManager.default.fileExists(atPath: local.path) {
             merged = merged.merged(with: try readJSON(local))
         }
+        let defaults = JSONValue.object(["teamID": .string(""), "signingIdentity": .string("")])
         do {
-            return try JSONDecoder().decode(WorkspaceConfig.self, from: merged.canonicalData())
+            return try JSONDecoder().decode(WorkspaceConfig.self, from: defaults.merged(with: merged).canonicalData())
         } catch {
             throw AWError.invalidJSON(file: base.lastPathComponent, reason: DecodingErrorFormatter.describe(error))
         }

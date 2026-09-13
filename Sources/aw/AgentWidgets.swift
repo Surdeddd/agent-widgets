@@ -11,6 +11,6 @@ struct AgentWidgets: AsyncParsableCommand {
             ru: "Нативные виджеты macOS руками AI-агентов."
         ),
         version: EngineVersion.current,
-        subcommands: [DoctorCommand.self]
+        subcommands: [InitCommand.self, DoctorCommand.self]
     )
 }

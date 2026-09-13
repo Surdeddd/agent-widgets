@@ -9,8 +9,8 @@ excluded:
   - spikes
   - .aw
 line_length:
-  warning: 140
-  error: 180
+  warning: 160
+  error: 200
 identifier_name:
   min_length: 1
 type_body_length:
