@@ -1,0 +1,16 @@
+# agent-widgets
+
+> Native macOS desktop widgets (WidgetKit + SwiftUI) built by AI agents. The agent writes a Codable model, a SwiftUI view and an optional feed script; the `aw` CLI (or its MCP server) scaffolds, renders previews with layout checks, builds, installs and screenshots the real widget.
+
+## Start here
+
+- [Skill](../skills/agent-widgets/SKILL.md): the loop, the view contract, widget.json and the design rules
+- [Components](../skills/agent-widgets/references/components.md): every kit component with its signature
+- [Cookbook](../skills/agent-widgets/references/cookbook.md): weather, lists, rings, countdowns, charts, buttons, images
+- [Contracts](../skills/agent-widgets/references/contracts.md): widget.json, samples, feeds, state, JSON output, exit codes, MCP tools
+- [Gotchas](../skills/agent-widgets/references/gotchas.md): what breaks in WidgetKit
+- [Design rules](../skills/agent-widgets/references/design-rules.md): hierarchy and layout per family
+
+## Engine
+
+- [AGENTS.md](../AGENTS.md): repository layout, build, tests and rules for changing the engine
