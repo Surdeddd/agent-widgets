@@ -21,6 +21,15 @@ public enum AWMetrics {
     }
 }
 
+public struct AWContentSizeKey: PreferenceKey {
+    public static let defaultValue: CGSize = .zero
+
+    public static func reduce(value: inout CGSize, nextValue: () -> CGSize) {
+        let next = nextValue()
+        value = CGSize(width: max(value.width, next.width), height: max(value.height, next.height))
+    }
+}
+
 public struct AWFrame<Content: View>: View {
     private let context: AWContext
     private let content: Content
@@ -32,6 +41,7 @@ public struct AWFrame<Content: View>: View {
 
     public var body: some View {
         content
+            .background(GeometryReader { proxy in Color.clear.preference(key: AWContentSizeKey.self, value: proxy.size) })
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             .padding(AWMetrics.padding(for: context.family))
             .environment(\.aw, context)

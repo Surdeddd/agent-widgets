@@ -6,17 +6,30 @@ import SwiftUI
 @MainActor
 final class TextFitCollector {
     var fits: [AWTextFit] = []
+    var content: CGSize = .zero
+}
+
+struct LayoutSample {
+    let fits: [AWTextFit]
+    let content: CGSize
 }
 
 @MainActor
 enum TextFitChecker {
-    static func collect(_ view: some View, size: CGSize) -> [AWTextFit] {
+    static func collect(_ view: some View, size: CGSize) -> LayoutSample {
         let collector = TextFitCollector()
         let probe = view
             .frame(width: size.width, height: size.height)
             .onPreferenceChange(AWTextFitKey.self) { collector.fits = $0 }
+            .onPreferenceChange(AWContentSizeKey.self) { collector.content = $0 }
         _ = PNG.render(probe, scale: 1)
-        return collector.fits
+        return LayoutSample(fits: collector.fits, content: collector.content)
+    }
+
+    static func contentOverflow(_ content: CGSize, family: Family) -> CGFloat? {
+        let inset = AWMetrics.padding(for: family) * 2
+        let extra = max(content.height - (family.size.height - inset), content.width - (family.size.width - inset))
+        return extra > 1 ? extra : nil
     }
 
     static func issues(for fits: [AWTextFit], scenario: String) -> [Issue] {

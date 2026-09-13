@@ -39,21 +39,19 @@ public enum MatrixRenderer {
         try PNG.write(image, to: output.appendingPathComponent(job.fileName))
         let size = job.family.size
         var issues: [Issue] = []
-        if let extent = FitProbe.overflow(content, size: size) {
-            issues.append(Issue(
-                code: IssueCode.overflow,
-                severity: .error,
-                message: L10n.pick(
-                    en: "Content spills \(Int(extent.rounded())) pt outside the \(job.family.rawValue) widget (\(job.scenario.name))",
-                    ru: "Содержимое вылезает на \(Int(extent.rounded())) pt за границы \(job.family.rawValue) (\(job.scenario.name))"
-                ),
-                hint: L10n.pick(
-                    en: "Show fewer items in this family, use AWList maxRows, or switch layout with @Environment(\\.aw).family",
-                    ru: "Показывай меньше элементов в этом размере, ограничь AWList maxRows или меняй раскладку по @Environment(\\.aw).family"
-                )
+        let layout = TextFitChecker.collect(content, size: size)
+        if let extra = TextFitChecker.contentOverflow(layout.content, family: job.family) {
+            issues.append(overflowIssue(
+                en: "Content needs \(Int(extra.rounded())) pt more than the \(job.family.rawValue) widget has inside its margins (\(job.scenario.name))",
+                ru: "Содержимому не хватает \(Int(extra.rounded())) pt внутри полей \(job.family.rawValue) (\(job.scenario.name))"
+            ))
+        } else if let extent = FitProbe.overflow(content, size: size) {
+            issues.append(overflowIssue(
+                en: "Content spills \(Int(extent.rounded())) pt outside the \(job.family.rawValue) widget (\(job.scenario.name))",
+                ru: "Содержимое вылезает на \(Int(extent.rounded())) pt за границы \(job.family.rawValue) (\(job.scenario.name))"
             ))
         }
-        issues += TextFitChecker.issues(for: TextFitChecker.collect(content, size: size), scenario: job.scenario.name)
+        issues += TextFitChecker.issues(for: layout.fits, scenario: job.scenario.name)
         let cell = PreviewCell(
             family: job.family,
             appearance: job.appearance,
@@ -64,5 +62,17 @@ public enum MatrixRenderer {
             issues: issues
         )
         return RenderedCell(job: job, cell: cell, image: image)
+    }
+
+    private static func overflowIssue(en: String, ru: String) -> Issue {
+        Issue(
+            code: IssueCode.overflow,
+            severity: .error,
+            message: L10n.pick(en: en, ru: ru),
+            hint: L10n.pick(
+                en: "Show fewer items in this family, use AWList maxRows, or switch layout with @Environment(\\.aw).family",
+                ru: "Показывай меньше элементов в этом размере, ограничь AWList maxRows или меняй раскладку по @Environment(\\.aw).family"
+            )
+        )
     }
 }

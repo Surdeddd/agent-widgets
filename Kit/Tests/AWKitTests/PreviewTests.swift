@@ -27,6 +27,22 @@ struct TallView: AWView {
     }
 }
 
+struct StackView: AWView {
+    let entry: AWEntry<Numbers>
+
+    init(entry: AWEntry<Numbers>) {
+        self.entry = entry
+    }
+
+    var body: some View {
+        VStack(spacing: 4) {
+            ForEach(0..<(entry.data?.rows ?? 0), id: \.self) { _ in
+                Rectangle().fill(Color.gray).frame(height: 18)
+            }
+        }
+    }
+}
+
 struct WordsView: AWView {
     let entry: AWEntry<Numbers>
 
@@ -59,9 +75,9 @@ struct GalleryView: AWView {
                             .frame(width: 58, height: 58)
                     }
                 }
-                if !context.isSmall {
+                if context.family == .large || context.family == .extraLarge {
                     AWSparkline([3, 5, 4, 6, 8, 7, 9, 12, 10, 11], tint: .green)
-                        .frame(height: context.family == .medium ? 22 : 40)
+                        .frame(height: 40)
                 }
                 if context.family == .large || context.family == .extraLarge {
                     AWList(Array(0..<data.rows).map(RowItem.init), maxRows: 4) { item in
@@ -99,6 +115,20 @@ private func scenario(_ json: String, name: String = "default") -> PreviewScenar
     #expect(!cells[0].cell.issues.contains { $0.code == IssueCode.overflow })
     #expect(cells[1].cell.issues.contains { $0.code == IssueCode.overflow })
     #expect(FileManager.default.fileExists(atPath: output.appendingPathComponent(fits.fileName).path))
+}
+
+@MainActor
+@Test func overflowIntoTheMarginsIsDetected() throws {
+    let output = temporaryOutput()
+    defer { try? FileManager.default.removeItem(at: output) }
+    let squeezed = PreviewJob(family: .small, appearance: .dark, mode: .color, scenario: scenario(#"{"value":1,"rows":7}"#))
+    let roomy = PreviewJob(family: .small, appearance: .dark, mode: .color, scenario: scenario(#"{"value":1,"rows":5}"#, name: "roomy"))
+    let plain = try MatrixRenderer.render(StackView.self, jobs: [squeezed, roomy], output: output, language: .en, store: AWStore(root: nil))
+    let framed = try MatrixRenderer.render(TallView.self, jobs: [squeezed, roomy], output: output, language: .en, store: AWStore(root: nil))
+    #expect(plain[0].cell.issues.contains { $0.code == IssueCode.overflow })
+    #expect(framed[0].cell.issues.contains { $0.code == IssueCode.overflow })
+    #expect(!plain[1].cell.issues.contains { $0.code == IssueCode.overflow })
+    #expect(!framed[1].cell.issues.contains { $0.code == IssueCode.overflow })
 }
 
 @MainActor
