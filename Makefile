@@ -17,7 +17,7 @@ install: build
 	mkdir -p "$(LIBDIR)/bin" "$(PREFIX)/bin"
 	ditto .build/release/aw "$(LIBDIR)/bin/aw"
 	ditto Templates "$(LIBDIR)/Templates"
-	ditto skills "$(LIBDIR)/skills"
+	if [ -d skills ]; then ditto skills "$(LIBDIR)/skills"; fi
 	rsync -a --delete --exclude .build --exclude .swiftpm Kit/ "$(LIBDIR)/Kit/"
 	ln -sf "$(LIBDIR)/bin/aw" "$(PREFIX)/bin/aw"
 
