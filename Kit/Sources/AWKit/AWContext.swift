@@ -24,6 +24,8 @@ public struct AWContext: Equatable, Sendable {
     public var renderingMode: AWRenderingMode
     public var isPreview: Bool
     public var language: Language
+    public var widget: String?
+    public var kind: String?
 
     public init(
         family: Family,

@@ -51,16 +51,27 @@ public struct AWFrame<Content: View>: View {
 public struct AWWidgetContainer<Content: View>: View {
     @Environment(\.widgetFamily) private var family
     @Environment(\.widgetRenderingMode) private var renderingMode
+    private let widget: String?
+    private let kind: String?
     private let language: Language
     private let content: Content
 
-    public init(language: Language = L10n.language, @ViewBuilder content: () -> Content) {
+    public init(widget: String? = nil, kind: String? = nil, language: Language = L10n.language, @ViewBuilder content: () -> Content) {
+        self.widget = widget
+        self.kind = kind
         self.language = language
         self.content = content()
     }
 
+    private var context: AWContext {
+        var context = AWContext(family: Family(family), renderingMode: AWRenderingMode(renderingMode), language: language)
+        context.widget = widget
+        context.kind = kind
+        return context
+    }
+
     public var body: some View {
-        AWFrame(context: AWContext(family: Family(family), renderingMode: AWRenderingMode(renderingMode), language: language)) {
+        AWFrame(context: context) {
             content
         }
         .containerBackground(for: .widget) { Color.clear }

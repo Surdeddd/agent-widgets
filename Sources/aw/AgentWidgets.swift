@@ -21,6 +21,11 @@ struct AgentWidgets: AsyncParsableCommand {
             DevCommand.self,
             ShotCommand.self,
             RollbackCommand.self,
+            FeedCommand.self,
+            DataCommand.self,
+            TickCommand.self,
+            DaemonCommand.self,
+            LogsCommand.self,
             ListCommand.self,
             TemplatesCommand.self,
             DoctorCommand.self

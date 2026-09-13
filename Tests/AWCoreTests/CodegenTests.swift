@@ -37,6 +37,9 @@ private let config = WorkspaceConfig(
     #expect(code.contains("kind: \"aw.dev\""))
     #expect(code.contains("AWDevWidget()"))
     #expect(code.contains("L10n.pick(en: \"Name weather\", ru: \"Имя weather\")"))
+    #expect(code.contains("AWWidgetContainer(widget: \"weather\", kind: \"aw.weather\") { WeatherView(entry: entry) }"))
+    #expect(code.contains("AWWidgetContainer(widget: entry.widget, kind: \"aw.dev\") { AWDevView(entry: entry) }"))
+    #expect(code.contains("static var includedPackages: [any AppIntentsPackage.Type] { [AWKitIntents.self] }"))
 }
 
 @Test func registryChunksLargeBundles() {

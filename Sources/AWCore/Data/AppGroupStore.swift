@@ -42,6 +42,21 @@ public struct AppGroupStore: Sendable {
         return true
     }
 
+    /// Publishes a model as canonical JSON; returns false when nothing changed, so the widget needs no reload.
+    @discardableResult
+    public func publish(_ data: Data, widget id: String) throws -> Bool {
+        let value = try JSONDecoder().decode(JSONValue.self, from: data)
+        return try write(value.canonicalData(), to: AppGroupLayout.data(id))
+    }
+
+    public func status(widget id: String) -> FeedStatus? {
+        read(AppGroupLayout.status(id)).flatMap { try? AWJSON.decoder().decode(FeedStatus.self, from: $0) }
+    }
+
+    public func writeStatus(_ status: FeedStatus, widget id: String) throws {
+        try write(AWJSON.encoder().encode(status), to: AppGroupLayout.status(id))
+    }
+
     public func devTarget() -> DevTarget? {
         read(AppGroupLayout.devTarget).flatMap { try? AWJSON.decoder().decode(DevTarget.self, from: $0) }
     }

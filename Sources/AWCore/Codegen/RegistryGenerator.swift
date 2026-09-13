@@ -7,7 +7,7 @@ public enum RegistryGenerator {
 
     public static func generate(_ widgets: [WidgetSource], devName: String = "Agent Widgets · Dev") -> String {
         let sorted = widgets.sorted { $0.id < $1.id }
-        var lines = ["import AWKit", "import SwiftUI", "import WidgetKit", ""]
+        var lines = ["import AppIntents", "import AWKit", "import SwiftUI", "import WidgetKit", ""]
         lines += samples(sorted)
         for widget in sorted {
             lines += widgetStruct(widget.manifest)
@@ -70,7 +70,7 @@ public enum RegistryGenerator {
             "struct \(typeName(manifest)): Widget {",
             "    var body: some WidgetConfiguration {",
             "        StaticConfiguration(kind: \(literal(manifest.resolvedKind)), provider: \(provider)) { entry in",
-            "            AWWidgetContainer { \(manifest.view)(entry: entry) }",
+            "            AWWidgetContainer(widget: \(literal(manifest.id)), kind: \(literal(manifest.resolvedKind))) { \(manifest.view)(entry: entry) }",
             "        }",
             "        .configurationDisplayName(L10n.pick(en: \(literal(name.en)), ru: \(literal(name.ru ?? name.en))))",
             "        .description(L10n.pick(en: \(literal(summary.en)), ru: \(literal(summary.ru ?? summary.en))))",
@@ -102,7 +102,7 @@ public enum RegistryGenerator {
             "struct AWDevWidget: Widget {",
             "    var body: some WidgetConfiguration {",
             "        StaticConfiguration(kind: \(literal(devKind)), provider: AWDevProvider()) { entry in",
-            "            AWWidgetContainer { AWDevView(entry: entry) }",
+            "            AWWidgetContainer(widget: entry.widget, kind: \(literal(devKind))) { AWDevView(entry: entry) }",
             "        }",
             "        .configurationDisplayName(\(literal(devName)))",
             "        .description(L10n.pick(en: \"Shows the widget an agent is working on.\", ru: \"Показывает виджет, над которым работает агент.\"))",
@@ -124,6 +124,12 @@ public enum RegistryGenerator {
             lines += chunk.map { "        \(typeName($0))()" }
             lines += ["    }", "}", ""]
         }
+        lines += [
+            "struct AWIntents: AppIntentsPackage {",
+            "    static var includedPackages: [any AppIntentsPackage.Type] { [AWKitIntents.self] }",
+            "}",
+            ""
+        ]
         lines += ["@main", "struct AWMainBundle: WidgetBundle {", "    var body: some Widget {"]
         lines += chunks.indices.map { "        AWBundle\($0)().body" }
         lines += ["        AWDevWidget()", "    }", "}"]

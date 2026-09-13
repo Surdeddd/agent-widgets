@@ -32,6 +32,27 @@ public struct PreviewOutcome: Codable, Sendable {
     }
 }
 
+public struct DataValidator: Sendable {
+    public let pipeline: PreviewPipeline
+    public let widget: WidgetSource
+
+    public init(pipeline: PreviewPipeline, widget: WidgetSource) {
+        self.pipeline = pipeline
+        self.widget = widget
+    }
+
+    public func check(_ data: Data) async -> Issue? {
+        let file = pipeline.workspace.cacheDir.appendingPathComponent("data/\(widget.id).json")
+        do {
+            try FileManager.default.createDirectory(at: file.deletingLastPathComponent(), withIntermediateDirectories: true)
+            try data.write(to: file, options: .atomic)
+            return try await pipeline.validate(widget, data: file).first
+        } catch {
+            return Issue(code: IssueCode.previewCrashed, severity: .error, message: String(describing: error))
+        }
+    }
+}
+
 public struct PreviewPipeline: Sendable {
     public let workspace: Workspace
     public let cache: KitCache
@@ -82,6 +103,28 @@ public struct PreviewPipeline: Sendable {
         }
         outcome.report = report
         return outcome
+    }
+
+    /// Decodes JSON into the widget's model with its preview binary; empty when it fits.
+    public func validate(_ widget: WidgetSource, data: URL) async throws -> [Issue] {
+        var outcome = PreviewOutcome(widget: widget.id, report: nil, issues: [], compiled: false, compileSeconds: 0, renderSeconds: 0)
+        guard let binary = try await compile(widget, into: &outcome) else {
+            return outcome.issues
+        }
+        let result = try await runner.run(binary.path, ["validate", "--data", data.path], cwd: workspace.root, environment: nil, timeout: 120)
+        guard !result.succeeded else {
+            return []
+        }
+        let reply = try? JSONSerialization.jsonObject(with: Data(result.stdout.utf8)) as? [String: Any]
+        return [Issue(
+            code: IssueCode.decode,
+            severity: .error,
+            message: reply?["error"] as? String ?? String(result.combinedOutput.suffix(600)),
+            hint: L10n.pick(
+                en: "Make the data use the same keys and types as the Codable model",
+                ru: "Приведи ключи и типы данных к Codable-модели"
+            )
+        )]
     }
 
     private func compile(_ widget: WidgetSource, into outcome: inout PreviewOutcome) async throws -> URL? {

@@ -1,0 +1,196 @@
+import AWSchema
+import Foundation
+
+public struct FeedRun: Codable, Sendable {
+    public var widget: String
+    public var ok: Bool
+    public var changed: Bool
+    public var seconds: Double
+    public var issues: [Issue]
+}
+
+public struct FeedRunner: Sendable {
+    public static let logLimit = 1_000_000
+
+    public let workspace: Workspace
+    public let store: AppGroupStore
+    public let runner: any ProcessRunning
+    public let language: Language
+
+    public init(workspace: Workspace, store: AppGroupStore, runner: any ProcessRunning, language: Language = L10n.language) {
+        self.workspace = workspace
+        self.store = store
+        self.runner = runner
+        self.language = language
+    }
+
+    public func logFile(for id: String) -> URL {
+        workspace.logsDir.appendingPathComponent("\(id).log")
+    }
+
+    public func environment(for widget: WidgetSource) -> [String: String] {
+        let id = widget.id
+        let settings = (try? widget.manifest.settings?.canonicalData()).flatMap { String(bytes: $0, encoding: .utf8) } ?? "{}"
+        let home = FileManager.default.homeDirectoryForCurrentUser.path
+        let inherited = ProcessInfo.processInfo.environment["PATH"] ?? "/usr/bin:/bin:/usr/sbin:/sbin"
+        return [
+            "AW_WIDGET_ID": id,
+            "AW_LANG": language.rawValue,
+            "AW_SETTINGS": settings,
+            "AW_STATE_PATH": store.url(AppGroupLayout.state(id)).path,
+            "AW_PREVIOUS_PATH": store.url(AppGroupLayout.data(id)).path,
+            "AW_IMAGES_DIR": store.url(AppGroupLayout.widgetDirectory(id) + "/images").path,
+            "PATH": "/opt/homebrew/bin:/usr/local/bin:\(home)/.local/bin:\(inherited)"
+        ]
+    }
+
+    /// Runs the feed once; failures keep the last good data and mark the status stale.
+    public func run(_ widget: WidgetSource, now: Date = Date(), validate: (@Sendable (Data) async -> Issue?)? = nil) async -> FeedRun {
+        let started = Date()
+        guard let feed = widget.manifest.feed else {
+            return FeedRun(widget: widget.id, ok: false, changed: false, seconds: 0, issues: [Self.noFeed(widget.id)])
+        }
+        let images = store.url(AppGroupLayout.widgetDirectory(widget.id) + "/images")
+        try? FileManager.default.createDirectory(at: images, withIntermediateDirectories: true)
+        let result: ProcessResult
+        do {
+            result = try await runner.run(
+                "/bin/zsh",
+                ["-c", feed.command],
+                cwd: widget.directory,
+                environment: environment(for: widget),
+                timeout: TimeInterval(feed.resolvedTimeout.seconds)
+            )
+        } catch {
+            return fail(widget, started: started, now: now, issue: Self.issue(
+                IssueCode.feedFailed,
+                en: "The feed of \(widget.id) could not start: \(error.localizedDescription)",
+                ru: "Feed виджета \(widget.id) не запустился: \(error.localizedDescription)",
+                hint: Self.runHint(widget.id)
+            ))
+        }
+        appendLog(widget.id, result: result, now: now)
+        if let failure = Self.failure(of: result, widget: widget.id, timeout: feed.resolvedTimeout.seconds) {
+            return fail(widget, started: started, now: now, issue: failure)
+        }
+        let output = Data(result.stdout.trimmingCharacters(in: .whitespacesAndNewlines).utf8)
+        guard case .object? = try? JSONDecoder().decode(JSONValue.self, from: output) else {
+            return fail(widget, started: started, now: now, issue: Self.invalidOutput(widget.id, result.stdout))
+        }
+        if let validate, let issue = await validate(output) {
+            return fail(widget, started: started, now: now, issue: issue)
+        }
+        do {
+            let changed = try store.publish(output, widget: widget.id)
+            try store.writeStatus(FeedStatus(ok: true, checkedAt: now, fetchedAt: now), widget: widget.id)
+            return FeedRun(widget: widget.id, ok: true, changed: changed, seconds: Date().timeIntervalSince(started), issues: [])
+        } catch {
+            return fail(widget, started: started, now: now, issue: Self.issue(
+                IssueCode.feedFailed,
+                en: "Could not write the data of \(widget.id): \(error.localizedDescription)",
+                ru: "Не удалось записать данные \(widget.id): \(error.localizedDescription)",
+                hint: L10n.pick(en: "Run `aw doctor` to check the App Group", ru: "Проверь App Group: `aw doctor`")
+            ))
+        }
+    }
+
+    private func fail(_ widget: WidgetSource, started: Date, now: Date, issue: Issue) -> FeedRun {
+        let previous = store.status(widget: widget.id)
+        try? store.writeStatus(FeedStatus(ok: false, checkedAt: now, fetchedAt: previous?.fetchedAt, error: issue.message), widget: widget.id)
+        return FeedRun(widget: widget.id, ok: false, changed: false, seconds: Date().timeIntervalSince(started), issues: [issue])
+    }
+
+    private func appendLog(_ id: String, result: ProcessResult, now: Date) {
+        let flags = result.timedOut ? " timeout" : ""
+        var text = "=== \(ISO8601DateFormatter().string(from: now)) exit \(result.status)\(flags) \(String(format: "%.1f", result.duration)) s\n"
+        if !result.stderr.isEmpty {
+            text += result.stderr.hasSuffix("\n") ? result.stderr : result.stderr + "\n"
+        }
+        LogFile.append(text, to: logFile(for: id), limit: Self.logLimit)
+    }
+
+    static func failure(of result: ProcessResult, widget id: String, timeout: Int) -> Issue? {
+        if result.timedOut {
+            return issue(
+                IssueCode.feedTimeout,
+                en: "The feed of \(id) ran longer than \(timeout) s and was stopped",
+                ru: "Feed виджета \(id) работал дольше \(timeout) с и был остановлен",
+                hint: L10n.pick(
+                    en: "Make it faster or raise \"timeout\" in the feed section of widget.json, for example \"2m\"",
+                    ru: "Ускорь его или подними \"timeout\" в секции feed в widget.json, например \"2m\""
+                )
+            )
+        }
+        guard result.status == 0 else {
+            let tail = result.stderr.split(whereSeparator: \.isNewline).suffix(3).joined(separator: " · ")
+            let detail = tail.isEmpty ? "" : ": \(tail)"
+            return issue(
+                IssueCode.feedFailed,
+                en: "The feed of \(id) exited with \(result.status)\(detail)",
+                ru: "Feed виджета \(id) завершился с кодом \(result.status)\(detail)",
+                hint: runHint(id)
+            )
+        }
+        return nil
+    }
+
+    static func invalidOutput(_ id: String, _ stdout: String) -> Issue {
+        let sample = stdout.trimmingCharacters(in: .whitespacesAndNewlines).prefix(120)
+        return issue(
+            IssueCode.feedInvalidOutput,
+            en: "The feed of \(id) printed something that is not a JSON object: \(sample)",
+            ru: "Feed виджета \(id) напечатал не JSON-объект: \(sample)",
+            hint: L10n.pick(
+                en: "Print exactly one JSON object shaped like the model, or {\"timeline\": [{\"date\": …, \"data\": {…}}]}; send logs to stderr",
+                ru: "Печатай ровно один JSON-объект в форме модели или {\"timeline\": [{\"date\": …, \"data\": {…}}]}; логи — в stderr"
+            )
+        )
+    }
+
+    static func noFeed(_ id: String) -> Issue {
+        issue(
+            IssueCode.feedFailed,
+            en: "Widget \(id) has no feed in widget.json",
+            ru: "У виджета \(id) нет feed в widget.json",
+            hint: L10n.pick(
+                en: "Add \"feed\": {\"command\": \"./feed.py\", \"every\": \"15m\"} or push data with `aw data set \(id) '{…}'`",
+                ru: "Добавь \"feed\": {\"command\": \"./feed.py\", \"every\": \"15m\"} или пушни данные: `aw data set \(id) '{…}'`"
+            )
+        )
+    }
+
+    private static func runHint(_ id: String) -> String {
+        L10n.pick(
+            en: "Try it by hand with `aw feed run \(id)`; stderr is in `aw logs \(id)`",
+            ru: "Запусти руками `aw feed run \(id)`; stderr — в `aw logs \(id)`"
+        )
+    }
+
+    private static func issue(_ code: String, en: String, ru: String, hint: String) -> Issue {
+        Issue(code: code, severity: .error, message: L10n.pick(en: en, ru: ru), hint: hint)
+    }
+}
+
+public enum LogFile {
+    public static func append(_ text: String, to url: URL, limit: Int) {
+        let fileManager = FileManager.default
+        try? fileManager.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+        if let size = (try? fileManager.attributesOfItem(atPath: url.path))?[.size] as? Int, size > limit {
+            let archive = url.appendingPathExtension("1")
+            try? fileManager.removeItem(at: archive)
+            try? fileManager.moveItem(at: url, to: archive)
+        }
+        guard let handle = try? FileHandle(forWritingTo: url) else {
+            try? Data(text.utf8).write(to: url)
+            return
+        }
+        defer { try? handle.close() }
+        _ = try? handle.seekToEnd()
+        try? handle.write(contentsOf: Data(text.utf8))
+    }
+
+    public static func tail(_ url: URL, lines: Int) -> [String]? {
+        guard let text = try? String(contentsOf: url, encoding: .utf8) else { return nil }
+        return Array(text.split(separator: "\n", omittingEmptySubsequences: false).map(String.init).dropLast(text.hasSuffix("\n") ? 1 : 0).suffix(lines))
+    }
+}
