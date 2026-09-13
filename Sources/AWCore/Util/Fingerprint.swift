@@ -31,7 +31,7 @@ final class FileLock {
     private let descriptor: Int32
 
     init(_ url: URL) throws {
-        descriptor = open(url.path, O_CREAT | O_RDWR, 0o644)
+        descriptor = open(url.path, O_CREAT | O_RDWR | O_CLOEXEC, 0o644)
         guard descriptor >= 0 else {
             throw CocoaError(.fileWriteNoPermission)
         }
