@@ -36,7 +36,7 @@ public protocol ProcessRunning: Sendable {
 
 extension ProcessRunning {
     public func run(_ executable: String, _ arguments: [String]) async throws -> ProcessResult {
-        try await run(executable, arguments, cwd: nil, environment: nil, timeout: nil)
+        try await run(executable, arguments, cwd: nil, environment: nil, timeout: 600)
     }
 }
 
@@ -50,6 +50,34 @@ public struct SystemProcessRunner: ProcessRunning {
         environment: [String: String]?,
         timeout: TimeInterval?
     ) async throws -> ProcessResult {
+        let process = Self.makeProcess(executable, arguments, cwd: cwd, environment: environment)
+        let output = Pipe()
+        let errors = Pipe()
+        process.standardOutput = output
+        process.standardError = errors
+        process.standardInput = FileHandle.nullDevice
+        let stdout = PipeDrain(output.fileHandleForReading)
+        let stderr = PipeDrain(errors.fileHandleForReading)
+        let exit = ExitSignal()
+        process.terminationHandler = { finished in
+            exit.finish(finished.terminationStatus)
+        }
+        let started = Date()
+        try process.run()
+        if let timeout {
+            Self.watch(process, exit: exit, timeout: timeout)
+        }
+        let (status, timedOut) = await exit.wait()
+        return ProcessResult(
+            status: status,
+            stdout: stdout.text(),
+            stderr: stderr.text(),
+            duration: Date().timeIntervalSince(started),
+            timedOut: timedOut
+        )
+    }
+
+    private static func makeProcess(_ executable: String, _ arguments: [String], cwd: URL?, environment: [String: String]?) -> Process {
         let process = Process()
         if executable.hasPrefix("/") {
             process.executableURL = URL(fileURLWithPath: executable)
@@ -64,37 +92,63 @@ public struct SystemProcessRunner: ProcessRunning {
         if let environment {
             process.environment = ProcessInfo.processInfo.environment.merging(environment) { _, override in override }
         }
-        let output = Pipe()
-        let errors = Pipe()
-        process.standardOutput = output
-        process.standardError = errors
-        process.standardInput = FileHandle.nullDevice
-        let stdout = PipeDrain(output.fileHandleForReading)
-        let stderr = PipeDrain(errors.fileHandleForReading)
-        let started = Date()
-        try process.run()
-        let flag = TimeoutFlag()
-        let watchdog = timeout.map { seconds in
-            Task.detached {
-                try? await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
-                guard !Task.isCancelled, process.isRunning else { return }
-                flag.fire()
-                process.terminate()
-                try? await Task.sleep(nanoseconds: 1_500_000_000)
+        return process
+    }
+
+    private static func watch(_ process: Process, exit: ExitSignal, timeout: TimeInterval) {
+        let queue = DispatchQueue.global(qos: .utility)
+        queue.asyncAfter(deadline: .now() + timeout) {
+            guard process.isRunning else { return }
+            exit.markTimedOut()
+            process.terminate()
+            queue.asyncAfter(deadline: .now() + 1.5) {
                 if process.isRunning {
                     kill(process.processIdentifier, SIGKILL)
                 }
             }
         }
-        await Task.detached { process.waitUntilExit() }.value
-        watchdog?.cancel()
-        return ProcessResult(
-            status: process.terminationStatus,
-            stdout: stdout.text(),
-            stderr: stderr.text(),
-            duration: Date().timeIntervalSince(started),
-            timedOut: flag.fired
-        )
+        queue.asyncAfter(deadline: .now() + timeout + 10) {
+            exit.markTimedOut()
+            exit.finish(process.isRunning ? -1 : process.terminationStatus)
+        }
+    }
+}
+
+private final class ExitSignal: @unchecked Sendable {
+    private let lock = NSLock()
+    private var outcome: (Int32, Bool)?
+    private var waiter: CheckedContinuation<(Int32, Bool), Never>?
+    private var timedOut = false
+
+    func markTimedOut() {
+        lock.withLock { timedOut = true }
+    }
+
+    func finish(_ status: Int32) {
+        lock.lock()
+        guard outcome == nil else {
+            lock.unlock()
+            return
+        }
+        let value = (status, timedOut)
+        outcome = value
+        let pending = waiter
+        waiter = nil
+        lock.unlock()
+        pending?.resume(returning: value)
+    }
+
+    func wait() async -> (Int32, Bool) {
+        await withCheckedContinuation { continuation in
+            lock.lock()
+            if let outcome {
+                lock.unlock()
+                continuation.resume(returning: outcome)
+                return
+            }
+            waiter = continuation
+            lock.unlock()
+        }
     }
 }
 
@@ -123,18 +177,5 @@ private final class PipeDrain: @unchecked Sendable {
             handle.readabilityHandler = nil
         }
         return lock.withLock { String(bytes: buffer, encoding: .utf8) ?? "" }
-    }
-}
-
-private final class TimeoutFlag: @unchecked Sendable {
-    private let lock = NSLock()
-    private var value = false
-
-    func fire() {
-        lock.withLock { value = true }
-    }
-
-    var fired: Bool {
-        lock.withLock { value }
     }
 }
