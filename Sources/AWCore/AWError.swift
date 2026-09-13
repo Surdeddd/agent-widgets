@@ -15,44 +15,62 @@ public enum AWError: Error, Equatable, Sendable {
             Issue(
                 code: IssueCode.workspaceNotFound,
                 severity: .error,
-                message: "No aw.json found in \(path) or its parents",
-                hint: "Run `aw init` in the folder that should hold your widgets, or pass --workspace"
+                message: L10n.pick(en: "No aw.json found in \(path) or its parents", ru: "В \(path) и выше нет aw.json"),
+                hint: L10n.pick(
+                    en: "Run `aw init` in the folder that should hold your widgets, or pass --workspace",
+                    ru: "Запусти `aw init` в папке для виджетов или передай --workspace"
+                )
             )
         case .workspaceExists(let path):
             Issue(
                 code: IssueCode.workspaceExists,
                 severity: .error,
-                message: "\(path) is already an agent-widgets workspace",
-                hint: "Use `aw new <id>` to add widgets to it"
+                message: L10n.pick(en: "\(path) is already an agent-widgets workspace", ru: "\(path) уже workspace agent-widgets"),
+                hint: L10n.pick(en: "Add widgets with `aw new <id>`", ru: "Добавляй виджеты через `aw new <id>`")
             )
         case .engineNotFound:
             Issue(
                 code: IssueCode.engineNotFound,
                 severity: .error,
-                message: "Engine resources (Templates, Kit) were not found next to the aw binary",
-                hint: "Reinstall with `make install` or set AW_HOME to the agent-widgets checkout"
+                message: L10n.pick(
+                    en: "Engine resources (Templates, Kit) were not found next to the aw binary",
+                    ru: "Рядом с бинарём aw не найдены ресурсы движка (Templates, Kit)"
+                ),
+                hint: L10n.pick(
+                    en: "Reinstall with `make install` or set AW_HOME to the agent-widgets checkout",
+                    ru: "Переустанови через `make install` или укажи AW_HOME на папку agent-widgets"
+                )
             )
         case .invalidJSON(let file, let reason):
             Issue(
                 code: IssueCode.invalidJSON,
                 severity: .error,
                 message: "\(file): \(reason)",
-                hint: "Fix the JSON; `aw explain INVALID_JSON` shows the expected shape",
+                hint: L10n.pick(
+                    en: "Fix the JSON; `aw explain INVALID_JSON` shows the expected shape",
+                    ru: "Исправь JSON; `aw explain INVALID_JSON` покажет нужную форму"
+                ),
                 file: file
             )
         case .widgetNotFound(let id):
             Issue(
                 code: IssueCode.widgetNotFound,
                 severity: .error,
-                message: "Widget \"\(id)\" is not in this workspace",
-                hint: "Run `aw list` to see widget ids or `aw new \(id)` to create it"
+                message: L10n.pick(en: "Widget \"\(id)\" is not in this workspace", ru: "Виджета \"\(id)\" нет в этом workspace"),
+                hint: L10n.pick(
+                    en: "Run `aw list` to see widget ids or `aw new \(id)` to create it",
+                    ru: "`aw list` покажет id виджетов, `aw new \(id)` создаст новый"
+                )
             )
         case .toolFailed(let tool, let status, let output):
             Issue(
                 code: IssueCode.toolMissing,
                 severity: .error,
-                message: "\(tool) exited with \(status): \(output.prefix(400))",
-                hint: "Run `aw doctor` to check the toolchain"
+                message: L10n.pick(
+                    en: "\(tool) exited with \(status): \(output.prefix(400))",
+                    ru: "\(tool) завершился с кодом \(status): \(output.prefix(400))"
+                ),
+                hint: L10n.pick(en: "Run `aw doctor` to check the toolchain", ru: "Проверь тулчейн: `aw doctor`")
             )
         }
     }
@@ -65,13 +83,22 @@ public enum DecodingErrorFormatter {
         }
         switch decoding {
         case .keyNotFound(let key, let context):
-            return "missing key \"\(path(context.codingPath + [key]))\""
+            return L10n.pick(
+                en: "missing key \"\(path(context.codingPath + [key]))\"",
+                ru: "нет ключа \"\(path(context.codingPath + [key]))\""
+            )
         case .typeMismatch(let type, let context):
-            return "wrong type at \"\(path(context.codingPath))\", expected \(type)"
+            return L10n.pick(
+                en: "wrong type at \"\(path(context.codingPath))\", expected \(type)",
+                ru: "неверный тип в \"\(path(context.codingPath))\", ожидался \(type)"
+            )
         case .valueNotFound(let type, let context):
-            return "null at \"\(path(context.codingPath))\", expected \(type)"
+            return L10n.pick(
+                en: "null at \"\(path(context.codingPath))\", expected \(type)",
+                ru: "null в \"\(path(context.codingPath))\", ожидался \(type)"
+            )
         case .dataCorrupted(let context):
-            let location = context.codingPath.isEmpty ? "" : " at \"\(path(context.codingPath))\""
+            let location = context.codingPath.isEmpty ? "" : " (\(path(context.codingPath)))"
             return "\(context.debugDescription)\(location)"
         @unknown default:
             return String(describing: decoding)

@@ -86,43 +86,73 @@ public struct WorkspaceConfig: Codable, Equatable, Sendable {
     }
 
     public func validate() -> [Issue] {
+        identifierIssues() + signingIssues()
+    }
+
+    private func identifierIssues() -> [Issue] {
         var issues: [Issue] = []
         if slug.range(of: "^[a-z][a-z0-9-]{1,39}$", options: .regularExpression) == nil {
-            issues.append(Issue(
-                code: IssueCode.manifestInvalid,
-                severity: .error,
-                message: "Workspace slug \"\(slug)\" is invalid",
-                hint: "Use lowercase letters, digits and dashes, for example \"my-widgets\"",
+            issues.append(configIssue(
+                IssueCode.manifestInvalid,
+                LocalizedText(en: "Workspace slug \"\(slug)\" is invalid", ru: "Некорректный slug workspace \"\(slug)\""),
+                hint: LocalizedText(
+                    en: "Use lowercase letters, digits and dashes, for example \"my-widgets\"",
+                    ru: "Строчные латинские буквы, цифры и дефис, например \"my-widgets\""
+                ),
                 file: "aw.json"
             ))
         }
         if bundlePrefix.range(of: "^[A-Za-z][A-Za-z0-9-]*(\\.[A-Za-z0-9-]+)+$", options: .regularExpression) == nil {
-            issues.append(Issue(
-                code: IssueCode.manifestInvalid,
-                severity: .error,
-                message: "Bundle prefix \"\(bundlePrefix)\" is invalid",
-                hint: "Use reverse-DNS, for example \"com.yourname\"",
-                file: "aw.json"
-            ))
-        }
-        if teamID.range(of: "^[A-Z0-9]{10}$", options: .regularExpression) == nil || signingIdentity.isEmpty {
-            issues.append(Issue(
-                code: IssueCode.signingMissing,
-                severity: .error,
-                message: "No usable signing identity or Team ID in aw.json / aw.local.json",
-                hint: "Xcode → Settings → Accounts → Manage Certificates → + Apple Development, then run `aw init --refresh-signing`",
-                file: "aw.local.json"
-            ))
-        } else if !resolvedAppGroup.hasPrefix("\(teamID).") {
-            issues.append(Issue(
-                code: IssueCode.manifestInvalid,
-                severity: .error,
-                message: "App Group \"\(resolvedAppGroup)\" does not start with the Team ID \(teamID)",
-                hint: "On macOS the App Group must be \"<TeamID>.<anything>\", otherwise the widget reads nothing",
+            issues.append(configIssue(
+                IssueCode.manifestInvalid,
+                LocalizedText(
+                    en: "Bundle prefix \"\(bundlePrefix)\" is invalid",
+                    ru: "Некорректный bundle prefix \"\(bundlePrefix)\""
+                ),
+                hint: LocalizedText(
+                    en: "Use reverse-DNS, for example \"com.yourname\"",
+                    ru: "Формат reverse-DNS, например \"com.yourname\""
+                ),
                 file: "aw.json"
             ))
         }
         return issues
+    }
+
+    private func signingIssues() -> [Issue] {
+        if teamID.range(of: "^[A-Z0-9]{10}$", options: .regularExpression) == nil || signingIdentity.isEmpty {
+            return [configIssue(
+                IssueCode.signingMissing,
+                LocalizedText(
+                    en: "No usable signing identity or Team ID in aw.json / aw.local.json",
+                    ru: "В aw.json / aw.local.json нет рабочей подписи или Team ID"
+                ),
+                hint: LocalizedText(
+                    en: "Xcode → Settings → Accounts → Manage Certificates → + Apple Development, then `aw init --refresh-signing`",
+                    ru: "Xcode → Settings → Accounts → Manage Certificates → + Apple Development, затем `aw init --refresh-signing`"
+                ),
+                file: "aw.local.json"
+            )]
+        }
+        guard resolvedAppGroup.hasPrefix("\(teamID).") else {
+            return [configIssue(
+                IssueCode.manifestInvalid,
+                LocalizedText(
+                    en: "App Group \"\(resolvedAppGroup)\" does not start with the Team ID \(teamID)",
+                    ru: "App Group \"\(resolvedAppGroup)\" не начинается с Team ID \(teamID)"
+                ),
+                hint: LocalizedText(
+                    en: "On macOS the App Group must be \"<TeamID>.<anything>\", otherwise the widget reads nothing",
+                    ru: "На macOS App Group обязан быть \"<TeamID>.<что угодно>\", иначе виджет ничего не прочитает"
+                ),
+                file: "aw.json"
+            )]
+        }
+        return []
+    }
+
+    private func configIssue(_ code: String, _ message: LocalizedText, hint: LocalizedText, file: String) -> Issue {
+        Issue(code: code, severity: .error, message: message.localized, hint: hint.localized, file: file)
     }
 
     private static func readJSON(_ url: URL) throws -> JSONValue {

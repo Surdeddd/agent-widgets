@@ -127,12 +127,16 @@ public struct Workspace: Sendable {
     private func folderIssues(for source: WidgetSource) -> [Issue] {
         let folder = source.directory.lastPathComponent
         var issues: [Issue] = []
-        if source.manifest.id != folder {
+        let id = source.manifest.id
+        if id != folder {
             issues.append(Issue(
                 code: IssueCode.manifestInvalid,
                 severity: .error,
-                message: "Folder widgets/\(folder) holds widget id \"\(source.manifest.id)\"",
-                hint: "Rename the folder or the id so they match",
+                message: L10n.pick(
+                    en: "Folder widgets/\(folder) holds widget id \"\(id)\"",
+                    ru: "В папке widgets/\(folder) лежит виджет с id \"\(id)\""
+                ),
+                hint: L10n.pick(en: "Rename the folder or the id so they match", ru: "Переименуй папку или id, чтобы совпадали"),
                 file: "widgets/\(folder)/\(Self.manifestFile)"
             ))
         }
@@ -140,8 +144,11 @@ public struct Workspace: Sendable {
             issues.append(Issue(
                 code: IssueCode.missingDefaultSample,
                 severity: .warning,
-                message: "Widget \(source.manifest.id) has no samples/default.json",
-                hint: "Add sample data shaped like the model so `aw preview` can render the widget",
+                message: L10n.pick(en: "Widget \(id) has no samples/default.json", ru: "У виджета \(id) нет samples/default.json"),
+                hint: L10n.pick(
+                    en: "Add sample data shaped like the model so `aw preview` can render the widget",
+                    ru: "Добавь пример данных в форме модели, чтобы `aw preview` смог отрисовать виджет"
+                ),
                 file: "widgets/\(folder)/samples/default.json"
             ))
         }
