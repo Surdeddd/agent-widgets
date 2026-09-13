@@ -1,0 +1,82 @@
+import AppKit
+import SwiftUI
+import WidgetKit
+
+final class AWHostDelegate: NSObject, NSApplicationDelegate {
+    private var window: NSWindow?
+
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        _ = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "__APP_GROUP__")
+        WidgetCenter.shared.reloadAllTimelines()
+    }
+
+    func application(_ application: NSApplication, open urls: [URL]) {
+        for url in urls {
+            let kind = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems?.first { $0.name == "kind" }?.value
+            if url.host == "reload", let kind {
+                WidgetCenter.shared.reloadTimelines(ofKind: kind)
+            } else {
+                WidgetCenter.shared.reloadAllTimelines()
+            }
+        }
+    }
+
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        WidgetCenter.shared.reloadAllTimelines()
+        showHelp()
+        return false
+    }
+
+    private func showHelp() {
+        if window == nil {
+            let window = NSWindow(
+                contentRect: NSRect(x: 0, y: 0, width: 460, height: 260),
+                styleMask: [.titled, .closable],
+                backing: .buffered,
+                defer: false
+            )
+            window.title = "__APP_NAME__"
+            window.contentView = NSHostingView(rootView: AWHostHelp())
+            window.isReleasedWhenClosed = false
+            window.center()
+            self.window = window
+        }
+        NSApp.activate(ignoringOtherApps: true)
+        window?.makeKeyAndOrderFront(nil)
+    }
+}
+
+struct AWHostHelp: View {
+    private var russian: Bool {
+        Locale.preferredLanguages.first?.hasPrefix("ru") == true
+    }
+
+    var body: some View {
+        VStack(spacing: 14) {
+            Image(systemName: "square.grid.2x2.fill")
+                .font(.system(size: 40, weight: .light))
+                .foregroundStyle(.secondary)
+            Text("__APP_NAME__")
+                .font(.title2.weight(.semibold))
+            Text(russian
+                ? "Виджеты установлены.\nПравый клик по столу → «Изменить виджеты» → найди «__APP_NAME__»."
+                : "Widgets are installed.\nRight-click the desktop → Edit Widgets → search for “__APP_NAME__”.")
+                .multilineTextAlignment(.center)
+                .foregroundStyle(.secondary)
+            Text(russian ? "Для агентов: aw doctor" : "For agents: aw doctor")
+                .font(.caption.monospaced())
+                .foregroundStyle(.tertiary)
+        }
+        .padding(32)
+        .frame(width: 460, height: 260)
+    }
+}
+
+@main
+struct AWHostApp: App {
+    @NSApplicationDelegateAdaptor(AWHostDelegate.self) private var delegate
+
+    var body: some Scene {
+        Settings { EmptyView() }
+    }
+}
