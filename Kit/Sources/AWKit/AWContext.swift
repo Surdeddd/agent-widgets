@@ -44,6 +44,11 @@ public struct AWContext: Equatable, Sendable {
         renderingMode == .vibrant
     }
 
+    /// True on the idle desktop and in accented mode: the system strips color, so tints must not carry meaning.
+    public var isMonochrome: Bool {
+        renderingMode != .fullColor
+    }
+
     public var isSmall: Bool {
         family == .small
     }

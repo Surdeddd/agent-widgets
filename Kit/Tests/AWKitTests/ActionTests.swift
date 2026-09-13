@@ -62,6 +62,14 @@ import Testing
     #expect(state.applying(.reset, key: "").values.isEmpty)
 }
 
+@Test func dayKeysAreAbsoluteDates() {
+    var calendar = Calendar(identifier: .gregorian)
+    calendar.timeZone = TimeZone(identifier: "Asia/Bangkok") ?? .current
+    let lateEvening = Date(timeIntervalSince1970: 1_789_390_000)
+    #expect(AWState.dayKey(lateEvening, calendar: calendar) == "2026-09-14")
+    #expect(AWState.dayKey(lateEvening.addingTimeInterval(86_400), calendar: calendar) == "2026-09-15")
+}
+
 @Test func buttonIntentCarriesTheWidgetFromContext() {
     let intent = AWActionIntent(widget: "cards", kind: "aw.cards", action: .next, key: "cursor", value: "")
     #expect(intent.widget == "cards")

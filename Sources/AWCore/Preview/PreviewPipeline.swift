@@ -177,11 +177,11 @@ public struct PreviewPipeline: Sendable {
         return arguments
     }
 
-    private func scenarios(of widget: WidgetSource, request: PreviewRequest) -> [(String, URL)] {
+    func scenarios(of widget: WidgetSource, request: PreviewRequest) -> [(String, URL)] {
         widget.samples
             .filter { !$0.key.contains(".") }
             .filter { request.scenarios?.contains($0.key) ?? true }
             .sorted { $0.key < $1.key }
-            .map { ($0.key, $0.value) }
+            .map { ($0.key, widget.samples["\($0.key).\(request.language.rawValue)"] ?? $0.value) }
     }
 }

@@ -70,7 +70,7 @@ AWButton(.increment, key: "cups") { Label("Cup", systemImage: "plus") }
 
 - `AWButton(_ action: AWAction, key: String = "cursor", value: String = "", label:)` and `AWButton(_ action:, symbol:, key:, value:)` for a round icon button.
 - `AWAction`: `.next`, `.prev` (cursor ± 1), `.toggle`, `.increment` (by `value`, default 1), `.set` (JSON or text `value`), `.shuffle` (new deck order, cursor back to 0), `.reset` (clears `key`, or all state with `key: ""`).
-- Read state in the view: `entry.state.int("cups")`, `.bool("done")`, `.double(_)`, `.string(_)`, `.cursor`.
+- Read state in the view: `entry.state.int("cups") -> Int`, `.bool("done") -> Bool`, `.double(_) -> Double` (all take `default:`, 0 / false otherwise), `.string(_) -> String?`, `.cursor -> Int`. Store dates as numbers (`AWButton(.set, key: "until", value: "\(date.timeIntervalSince1970)")`) and read them back with `.double`.
 - Decks: `entry.state.deckIndex(count: cards.count, slot: slot)` gives the card to show; with a shuffle seed it walks a scrambled order that still visits every card once per cycle. `entry.state.isShuffled` tells the button which icon to show.
 - Buttons do not spend the reload budget.
 
@@ -83,6 +83,7 @@ AWButton(.increment, key: "cups") { Label("Cup", systemImage: "plus") }
 - `AWSpace`: `xxs` 2, `xs` 4, `s` 8, `m` 12, `l` 16, `xl` 24.
 - `AWMetrics.spacing(for: family)` (6 in small, 8 otherwise), `AWMetrics.padding(for:)`.
 - `AWStatus`: `.ok`, `.warning`, `.critical`, `.info`, `.neutral` with `.symbol`, `.color` and `.tint(context)` (monochrome when idle).
+- `context.isMonochrome` is true on the idle desktop (and in accented mode) — color is gone, so switch to weight, symbols or position; `context.isVibrant` is the same check for the idle desktop only.
 - `AWFormat.compact(_ value: Double) -> String` — `1234` → `"1.2K"`, `2_000_000` → `"2M"`; pass `Double(intValue)` for integers.
 - `AWFormat.freshness(_ date: Date, now: Date = Date(), language:) -> String` → “5m ago” / “5 мин назад”; `AWFormat.updated(_:)` → “updated 5m ago”.
 - `AWTick`: `.none`, `.everyMinute(count:)`, `.every(seconds:count:)` — extra timeline entries so time-based views update without reloads.

@@ -25,7 +25,7 @@ A desktop widget is read from the corner of the eye in under a second. Everythin
 
 ## Color and modes
 
-- Widgets appear light, dark and, when the desktop is idle, monochrome (`context.isVibrant`). Check all three rows of the sheet.
+- Widgets appear light, dark and, when the desktop is idle, monochrome — `context.isMonochrome` is true then. Check all three rows of the sheet.
 - Color never carries meaning alone: pair it with a symbol (`AWStatus.symbol`), a word or position.
 - Use one accent color per widget; kit components already fade tints in idle mode.
 - No solid backgrounds — the system draws the glass; painted fills look wrong in idle mode.

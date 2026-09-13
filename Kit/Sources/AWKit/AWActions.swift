@@ -53,6 +53,12 @@ extension AWState {
         seed != 0
     }
 
+    /// "2026-09-14" for the day `date` falls on: stable keys for per-day state such as habit check-ins.
+    public static func dayKey(_ date: Date, calendar: Calendar = .current) -> String {
+        let parts = calendar.dateComponents([.year, .month, .day], from: date)
+        return String(format: "%04d-%02d-%02d", parts.year ?? 0, parts.month ?? 0, parts.day ?? 0)
+    }
+
     public func deckIndex(count: Int, slot: Int = 0, key: String = AWState.cursorKey) -> Int {
         AWDeck.index(slot + int(key), count: count, seed: seed)
     }

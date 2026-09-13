@@ -161,6 +161,23 @@ private func scenario(_ json: String, name: String = "default") -> PreviewScenar
     #expect(overflow.message.contains("AWList, 5 rows"))
 }
 
+@Test func timelineSamplesPreviewTheirNextEntries() throws {
+    let now = Date(timeIntervalSince1970: 1_800_000_000)
+    let stamp = { (offset: TimeInterval) in ISO8601DateFormatter().string(from: now.addingTimeInterval(offset)) }
+    let json = """
+    {"timeline": [
+      {"date": "\(stamp(-600))", "data": {"value": 1, "rows": 1}},
+      {"date": "\(stamp(3000))", "data": {"value": 2, "rows": 1}},
+      {"date": "\(stamp(6600))", "data": {"value": 3, "rows": 1}},
+      {"date": "\(stamp(10200))", "data": {"value": 4, "rows": 1}}
+    ]}
+    """
+    let expanded = PreviewScenario.expandingTimelines([scenario(json), scenario(#"{"value":1,"rows":1}"#, name: "flat")], now: now)
+    #expect(expanded.map(\.name) == ["default", "default+50m", "default+2h", "flat"])
+    let next = try JSONDecoder().decode(Numbers.self, from: try #require(expanded[1].data))
+    #expect(next.value == 2)
+}
+
 @MainActor
 @Test func onlyOutermostComponentsReportTheirSize() {
     let context = AWContext(family: .medium, isPreview: true, language: .en)

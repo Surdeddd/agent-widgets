@@ -34,7 +34,8 @@ url = (
     "&current=temperature_2m,weather_code&hourly=temperature_2m"
     "&forecast_days=2&timezone=auto"
 )
-with urllib.request.urlopen(url, timeout=20) as response:
+request = urllib.request.Request(url, headers={"User-Agent": "agent-widgets/0.1"})
+with urllib.request.urlopen(request, timeout=20) as response:
     raw = json.load(response)
 
 def describe(code):
@@ -126,6 +127,26 @@ HStack(spacing: AWSpace.s) {
 ```
 
 Preview a pressed state with a sidecar sample: `samples/default.state.json` containing `{"cups": 3}`.
+
+## Habit week
+
+Keys for per-day state are absolute dates, never column numbers — the seven-day window moves every midnight.
+
+```swift
+let days = (0..<7).reversed().map { Calendar.current.date(byAdding: .day, value: -$0, to: entry.date) ?? entry.date }
+HStack(spacing: AWSpace.xs) {
+    ForEach(days, id: \.self) { day in
+        let key = "\(habit.id)@\(AWState.dayKey(day))"
+        AWButton(.toggle, key: key) {
+            Circle()
+                .fill(entry.state.bool(key) ? Color.green : Color.secondary.opacity(0.2))
+                .frame(width: 18, height: 18)
+        }
+    }
+}
+```
+
+A sidecar like `{"read@2026-09-13": true, "read@2026-09-14": true}` previews a partly done week; the label of an `AWButton` can be any view.
 
 ## Flash-card deck
 

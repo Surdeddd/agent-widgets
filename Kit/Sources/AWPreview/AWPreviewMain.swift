@@ -36,7 +36,8 @@ public enum AWPreviewRunner {
         try L10n.$language.withValue(options.language) {
             try FileManager.default.createDirectory(at: options.output, withIntermediateDirectories: true)
             let store = try prepareStore(options)
-            var issues = decodeIssues(type, options.scenarios)
+            let scenarios = PreviewScenario.expandingTimelines(options.scenarios, now: Date())
+            var issues = decodeIssues(type, scenarios)
             if options.scenarios.isEmpty {
                 issues.append(Issue(
                     code: IssueCode.missingDefaultSample,
@@ -45,7 +46,7 @@ public enum AWPreviewRunner {
                     hint: L10n.pick(en: "Add samples/default.json shaped like the model", ru: "Добавь samples/default.json в форме модели")
                 ))
             }
-            let jobs = PreviewPlan.jobs(families: options.families, scenarios: options.scenarios, full: options.full)
+            let jobs = PreviewPlan.jobs(families: options.families, scenarios: scenarios, full: options.full)
             let cells = try MatrixRenderer.render(type, jobs: jobs, output: options.output, language: options.language, store: store)
             let sheet = options.output.appendingPathComponent("sheet.png")
             if let image = SheetComposer.compose(title: "\(options.widget) — aw preview", cells: cells) {

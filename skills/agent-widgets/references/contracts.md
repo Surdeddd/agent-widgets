@@ -38,6 +38,7 @@ Intervals: `"30s"`, `"15m"`, `"1h"`, `"1d"` or a number of seconds.
 - `<sample>.state.json` — button state for that sample, for example `{"cursor": 2, "cups": 3}`.
 - `<sample>.status.json` — feed status for that sample, for example `{"ok": false, "checkedAt": "2026-09-14T09:00:00Z", "fetchedAt": "2026-09-14T06:00:00Z"}` to preview staleness.
 - `images/` — files `AWImage` finds in previews.
+- `<sample>.ru.json` / `<sample>.en.json` — the same sample with feed text in that language; `aw preview <id> --lang ru` uses it instead of `<sample>.json`, so feed-localized strings can be checked too.
 
 ## Feed
 
@@ -63,7 +64,7 @@ Intervals: `"30s"`, `"15m"`, `"1h"`, `"1d"` or a number of seconds.
 
 ## CLI output
 
-Every command accepts `--json` and prints:
+Every command accepts `--json`, `--workspace <dir>` and `--lang en|ru` (the language of messages and of `context.pick` in previews; `AW_LANG` sets the default). With `--json` it prints:
 
 ```json
 {"ok": true, "issues": [{"code": "OVERFLOW", "severity": "error", "message": "…", "hint": "…", "file": "…", "line": 12}], "artifacts": ["…/sheet.png"], "data": {}}
@@ -77,7 +78,7 @@ Exit codes: `0` ok, `1` checks failed, `2` usage, `3` environment, `4` build fai
 |---|---|
 | `aw init [dir]` | new workspace with signing detected |
 | `aw templates` / `aw new <id> --template t` | scaffold a widget |
-| `aw preview <id> [--family f] [--scenario s] [--full]` | render the matrix, check the layout, write `sheet.png` + `report.json` |
+| `aw preview <id> [--family f] [--scenario s] [--full] [--open] [--lang ru]` | render the matrix, check the layout, write `sheet.png` + `report.json`; `--open` opens the sheet |
 | `aw ship <id> [--scenario s] [--live] [--force] [--no-shot]` | preview → build → install → dev slot → real screenshot |
 | `aw build [--no-sign]` / `aw install [--hard]` / `aw rollback` | build and install the app with backups |
 | `aw dev <id> [--scenario s] [--live]` | point the dev slot at a widget |

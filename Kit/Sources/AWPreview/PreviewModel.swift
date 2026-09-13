@@ -31,6 +31,46 @@ public struct PreviewScenario: Sendable {
     private static func sidecar(_ url: URL) -> Data? {
         try? Data(contentsOf: url)
     }
+
+    /// Adds the next two entries of every timeline sample as their own scenarios, named by their distance from now.
+    public static func expandingTimelines(_ scenarios: [PreviewScenario], now: Date) -> [PreviewScenario] {
+        scenarios.flatMap { [$0] + $0.upcoming(now: now) }
+    }
+
+    func upcoming(now: Date) -> [PreviewScenario] {
+        guard let data,
+              let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              Set(object.keys).isSubset(of: ["timeline", "refreshAfter"]),
+              let items = object["timeline"] as? [[String: Any]]
+        else {
+            return []
+        }
+        let dated = items
+            .compactMap { item -> (date: Date, payload: Any)? in
+                guard let date = item["date"].flatMap(Self.date), let payload = item["data"] else { return nil }
+                return (date, payload)
+            }
+            .sorted { $0.date < $1.date }
+        let future = dated.filter { $0.date > now }
+        let next = dated.contains { $0.date <= now } ? future : Array(future.dropFirst())
+        return next.prefix(2).compactMap { item in
+            guard let json = try? JSONSerialization.data(withJSONObject: item.payload, options: [.fragmentsAllowed]) else { return nil }
+            let name = "\(self.name)+\(Self.offset(item.date.timeIntervalSince(now)))"
+            return PreviewScenario(name: name, data: json, state: state, status: status, source: source)
+        }
+    }
+
+    static func date(_ raw: Any) -> Date? {
+        if let text = raw as? String {
+            return AWJSON.parseDate(text)
+        }
+        return (raw as? NSNumber).map { Date(timeIntervalSince1970: $0.doubleValue) }
+    }
+
+    static func offset(_ seconds: TimeInterval) -> String {
+        let minutes = Int((seconds / 60).rounded())
+        return minutes < 60 ? "\(minutes)m" : "\(Int((Double(minutes) / 60).rounded()))h"
+    }
 }
 
 public struct PreviewJob: Sendable {
