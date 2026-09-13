@@ -1,0 +1,8 @@
+{
+  "id": "ring",
+  "summary": {
+    "en": "Progress rings toward goals",
+    "ru": "Кольца прогресса к целям"
+  },
+  "families": ["small", "medium", "large"]
+}

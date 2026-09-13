@@ -1,0 +1,27 @@
+#!/usr/bin/env python3
+import json
+import os
+import time
+import urllib.request
+
+russian = os.environ.get("AW_LANG") == "ru"
+settings = json.loads(os.environ.get("AW_SETTINGS") or "{}")
+targets = settings.get("targets", [])
+
+
+def check(target):
+    started = time.monotonic()
+    request = urllib.request.Request(target["url"], method="HEAD", headers={"User-Agent": "agent-widgets"})
+    try:
+        with urllib.request.urlopen(request, timeout=8) as response:
+            elapsed = int((time.monotonic() - started) * 1000)
+            status = "ok" if response.status < 400 and elapsed < 800 else "warning"
+            return {"name": target["name"], "value": f"{elapsed} ms", "detail": f"HTTP {response.status}", "status": status}
+    except Exception as error:
+        return {"name": target["name"], "value": "—", "detail": type(error).__name__, "status": "critical"}
+
+
+print(json.dumps({
+    "title": "Сервисы" if russian else "Services",
+    "items": [check(target) for target in targets],
+}, ensure_ascii=False))

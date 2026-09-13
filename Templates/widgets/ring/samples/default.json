@@ -1,0 +1,9 @@
+{
+  "title": "Time flies",
+  "rings": [
+    { "label": "Day", "progress": 0.62, "value": "62%" },
+    { "label": "Week", "progress": 0.23, "value": "23%" },
+    { "label": "Month", "progress": 0.45, "value": "45%" },
+    { "label": "Year", "progress": 0.7, "value": "70%" }
+  ]
+}

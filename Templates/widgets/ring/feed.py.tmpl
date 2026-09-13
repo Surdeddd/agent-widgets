@@ -1,0 +1,29 @@
+#!/usr/bin/env python3
+import calendar
+import json
+import os
+from datetime import datetime, timedelta
+
+russian = os.environ.get("AW_LANG") == "ru"
+now = datetime.now()
+day_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+week_start = day_start - timedelta(days=now.weekday())
+month_days = calendar.monthrange(now.year, now.month)[1]
+year_days = 366 if calendar.isleap(now.year) else 365
+
+
+def fraction(elapsed, total):
+    return max(0.0, min(1.0, elapsed / total))
+
+
+spans = [
+    ("День" if russian else "Day", fraction((now - day_start).total_seconds(), 86400)),
+    ("Неделя" if russian else "Week", fraction((now - week_start).total_seconds(), 7 * 86400)),
+    ("Месяц" if russian else "Month", fraction((now - now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)).total_seconds(), month_days * 86400)),
+    ("Год" if russian else "Year", fraction(now.timetuple().tm_yday - 1 + (now - day_start).total_seconds() / 86400, year_days)),
+]
+
+print(json.dumps({
+    "title": "Время идёт" if russian else "Time flies",
+    "rings": [{"label": label, "progress": round(value, 4), "value": f"{value * 100:.0f}%"} for label, value in spans],
+}, ensure_ascii=False))

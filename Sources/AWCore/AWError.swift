@@ -7,10 +7,26 @@ public enum AWError: Error, Equatable, Sendable {
     case engineNotFound
     case invalidJSON(file: String, reason: String)
     case widgetNotFound(String)
+    case widgetExists(String)
+    case templateUnknown(String, [String])
     case toolFailed(tool: String, status: Int32, output: String)
 
     public var issue: Issue {
         switch self {
+        case .widgetExists(let id):
+            Issue(
+                code: IssueCode.widgetExists,
+                severity: .error,
+                message: L10n.pick(en: "Widget \"\(id)\" already exists", ru: "Виджет \"\(id)\" уже есть"),
+                hint: L10n.pick(en: "Pick another id or edit widgets/\(id)", ru: "Выбери другой id или правь widgets/\(id)")
+            )
+        case .templateUnknown(let name, let available):
+            Issue(
+                code: IssueCode.templateUnknown,
+                severity: .error,
+                message: L10n.pick(en: "Unknown template \"\(name)\"", ru: "Нет шаблона \"\(name)\""),
+                hint: L10n.pick(en: "Available: \(available.joined(separator: ", "))", ru: "Есть: \(available.joined(separator: ", "))")
+            )
         case .workspaceNotFound(let path):
             Issue(
                 code: IssueCode.workspaceNotFound,

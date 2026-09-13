@@ -1,0 +1,8 @@
+{
+  "title": "Free space on the external backup drive",
+  "value": 12345.6,
+  "unit": "GB",
+  "caption": "of 16000 GB on /Volumes/Backup Archive 2026 (encrypted, weekly rotation)",
+  "change": 0.183,
+  "history": [9800, 9950, 10100, 10020, 10400, 10800, 11100, 11050, 11600, 11900, 12100, 12345.6]
+}

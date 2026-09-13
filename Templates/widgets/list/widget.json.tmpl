@@ -1,0 +1,19 @@
+{
+  "id": "__ID__",
+  "name": { "en": "__NAME__", "ru": "__NAME_RU__" },
+  "description": {
+    "en": "Checks a few endpoints and shows which ones are healthy.",
+    "ru": "Проверяет несколько адресов и показывает, какие живы."
+  },
+  "families": ["small", "medium", "large"],
+  "view": "__TYPE__View",
+  "refresh": "15m",
+  "feed": { "command": "python3 feed.py", "every": "15m", "timeout": "30s" },
+  "settings": {
+    "targets": [
+      { "name": "GitHub", "url": "https://github.com" },
+      { "name": "Apple", "url": "https://www.apple.com" },
+      { "name": "Anthropic", "url": "https://www.anthropic.com" }
+    ]
+  }
+}

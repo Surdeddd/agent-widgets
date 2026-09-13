@@ -1,0 +1,9 @@
+{
+  "title": "Quarterly objectives for the platform team",
+  "rings": [
+    { "label": "Migration", "progress": 1.0, "value": "100%" },
+    { "label": "Latency budget", "progress": 0.87, "value": "87%" },
+    { "label": "On-call load", "progress": 0.12, "value": "12%" },
+    { "label": "Documentation coverage", "progress": 0.55, "value": "55%" }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "title": "Production services in the Singapore region",
+  "items": [
+    { "name": "Authentication and single sign-on", "value": "118 ms", "detail": "HTTP 200 · edge cache warm", "status": "ok" },
+    { "name": "Payments", "value": "92 ms", "detail": "HTTP 200", "status": "ok" },
+    { "name": "Search cluster", "value": "1.2 s", "detail": "p95 above the 800 ms budget", "status": "warning" },
+    { "name": "Status page", "value": "—", "detail": "connection timed out after 8 seconds", "status": "critical" },
+    { "name": "Object storage", "value": "64 ms", "detail": "HTTP 200", "status": "ok" },
+    { "name": "Notifications", "value": "310 ms", "detail": "HTTP 200", "status": "ok" },
+    { "name": "Analytics ingest", "value": "480 ms", "detail": "HTTP 202", "status": "ok" },
+    { "name": "Billing webhooks", "value": "2.4 s", "detail": "retrying", "status": "warning" },
+    { "name": "Legacy reports", "value": "—", "detail": "DNS failure", "status": "critical" }
+  ]
+}

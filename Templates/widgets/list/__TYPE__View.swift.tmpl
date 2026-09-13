@@ -1,0 +1,50 @@
+import AWKit
+import SwiftUI
+
+struct __TYPE__Item: Codable, Sendable, Identifiable {
+    var id: String { name }
+    let name: String
+    let value: String?
+    let detail: String?
+    let status: AWStatus
+}
+
+struct __TYPE__Data: Codable, Sendable {
+    let title: String
+    let items: [__TYPE__Item]
+}
+
+struct __TYPE__View: AWView {
+    let entry: AWEntry<__TYPE__Data>
+    @Environment(\.aw) private var context
+
+    init(entry: AWEntry<__TYPE__Data>) {
+        self.entry = entry
+    }
+
+    var body: some View {
+        AWPhaseView(entry) { data in
+            VStack(alignment: .leading, spacing: AWMetrics.spacing(for: context.family)) {
+                AWHeader(data.title, symbol: "waveform.path.ecg", entry: entry)
+                if context.isSmall {
+                    summary(data)
+                } else {
+                    AWList(data.items) { item in
+                        AWRow(item.name, value: item.value, detail: context.family == .medium ? nil : item.detail, status: item.status)
+                    }
+                }
+                Spacer(minLength: 0)
+            }
+        }
+    }
+
+    private func summary(_ data: __TYPE__Data) -> some View {
+        let failing = data.items.filter { $0.status == .critical || $0.status == .warning }
+        return VStack(alignment: .leading, spacing: AWSpace.xs) {
+            AWMetric("\(data.items.count - failing.count)/\(data.items.count)", label: context.pick(en: "healthy", ru: "в норме"))
+            if let first = failing.first {
+                AWBadge(first.name, status: first.status)
+            }
+        }
+    }
+}

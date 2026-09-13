@@ -1,0 +1,50 @@
+import AWKit
+import SwiftUI
+
+struct __TYPE__Data: Codable, Sendable {
+    let title: String
+    let value: Double
+    let unit: String
+    let caption: String?
+    let change: Double?
+    let history: [Double]
+}
+
+struct __TYPE__View: AWView {
+    let entry: AWEntry<__TYPE__Data>
+    @Environment(\.aw) private var context
+
+    init(entry: AWEntry<__TYPE__Data>) {
+        self.entry = entry
+    }
+
+    var body: some View {
+        AWPhaseView(entry) { data in
+            VStack(alignment: .leading, spacing: AWMetrics.spacing(for: context.family)) {
+                AWHeader(data.title, symbol: "internaldrive", entry: entry)
+                AWMetric(format(data.value), unit: data.unit, trend: data.change.map { AWTrend.percent($0) })
+                if let caption = data.caption, !context.isSmall {
+                    AWText(caption, .caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer(minLength: 0)
+                if data.history.count > 1 {
+                    AWSparkline(data.history)
+                        .frame(height: sparklineHeight)
+                }
+            }
+        }
+    }
+
+    private var sparklineHeight: CGFloat {
+        switch context.family {
+        case .small: 26
+        case .medium: 34
+        default: 110
+        }
+    }
+
+    private func format(_ value: Double) -> String {
+        value >= 100 ? String(format: "%.0f", value) : String(format: "%.1f", value)
+    }
+}

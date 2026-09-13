@@ -1,0 +1,92 @@
+import AWKit
+import SwiftUI
+
+struct __TYPE__Ring: Codable, Sendable, Identifiable {
+    var id: String { label }
+    let label: String
+    let progress: Double
+    let value: String
+}
+
+struct __TYPE__Data: Codable, Sendable {
+    let title: String
+    let rings: [__TYPE__Ring]
+}
+
+struct __TYPE__View: AWView {
+    let entry: AWEntry<__TYPE__Data>
+    @Environment(\.aw) private var context
+
+    private let tints: [Color] = [.orange, .green, .blue, .pink]
+
+    init(entry: AWEntry<__TYPE__Data>) {
+        self.entry = entry
+    }
+
+    var body: some View {
+        AWPhaseView(entry) { data in
+            VStack(alignment: .leading, spacing: AWMetrics.spacing(for: context.family)) {
+                AWHeader(data.title, symbol: "circle.dashed", entry: entry)
+                switch context.family {
+                case .small:
+                    primary(data)
+                case .medium:
+                    row(data)
+                default:
+                    primary(data)
+                    details(data)
+                }
+                Spacer(minLength: 0)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func primary(_ data: __TYPE__Data) -> some View {
+        if let ring = data.rings.first {
+            HStack {
+                Spacer(minLength: 0)
+                AWRing(progress: ring.progress, tint: tints[0]) {
+                    VStack(spacing: 0) {
+                        AWText(ring.value, .title)
+                        AWText(ring.label, .label)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .frame(width: context.isSmall ? 96 : 150, height: context.isSmall ? 96 : 150)
+                Spacer(minLength: 0)
+            }
+        }
+    }
+
+    private func row(_ data: __TYPE__Data) -> some View {
+        HStack(spacing: AWSpace.m) {
+            ForEach(Array(data.rings.prefix(4).enumerated()), id: \.offset) { index, ring in
+                VStack(spacing: AWSpace.xs) {
+                    AWRing(progress: ring.progress, tint: tints[index % tints.count]) {
+                        AWText(ring.value, .headline)
+                    }
+                    .frame(width: 58, height: 58)
+                    AWText(ring.label, .label)
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity)
+            }
+        }
+    }
+
+    private func details(_ data: __TYPE__Data) -> some View {
+        VStack(spacing: AWSpace.s) {
+            ForEach(Array(data.rings.dropFirst().prefix(3).enumerated()), id: \.offset) { index, ring in
+                VStack(alignment: .leading, spacing: 3) {
+                    HStack {
+                        AWText(ring.label, .body)
+                        Spacer(minLength: AWSpace.xs)
+                        AWText(ring.value, .headline)
+                    }
+                    AWBar(progress: ring.progress, tint: tints[(index + 1) % tints.count])
+                }
+            }
+        }
+    }
+}
