@@ -9,6 +9,7 @@ public enum AWAction: String, Codable, CaseIterable, Sendable {
     case set
     case shuffle
     case reset
+    case stamp
 }
 
 public enum AWDeck {
@@ -67,6 +68,7 @@ extension AWState {
         _ action: AWAction,
         key: String = AWState.cursorKey,
         value: String = "",
+        now: Date = Date(),
         random: () -> Int = { Int.random(in: 1...9_999_999) }
     ) -> AWState {
         var copy = self
@@ -92,6 +94,8 @@ extension AWState {
             } else {
                 copy.values[key] = nil
             }
+        case .stamp:
+            copy.set(key, .number(now.timeIntervalSince1970 + (Double(value) ?? 0)))
         }
         return copy
     }

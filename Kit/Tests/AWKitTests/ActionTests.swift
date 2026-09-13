@@ -62,6 +62,14 @@ import Testing
     #expect(state.applying(.reset, key: "").values.isEmpty)
 }
 
+@Test func stampRecordsTheTapMomentPlusAnOffset() {
+    let tap = Date(timeIntervalSince1970: 1_800_000_000)
+    let started = AWState().applying(.stamp, key: "endsAt", value: "1500", now: tap)
+    #expect(started.date("endsAt") == tap.addingTimeInterval(1500))
+    #expect(AWState().applying(.stamp, key: "at", now: tap).date("at") == tap)
+    #expect(AWState().date("missing") == nil)
+}
+
 @Test func dayKeysAreAbsoluteDates() {
     var calendar = Calendar(identifier: .gregorian)
     calendar.timeZone = TimeZone(identifier: "Asia/Bangkok") ?? .current

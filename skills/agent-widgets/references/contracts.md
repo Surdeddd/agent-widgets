@@ -35,10 +35,16 @@ Intervals: `"30s"`, `"15m"`, `"1h"`, `"1d"` or a number of seconds.
 - `default.json` — required; the preview, the gallery placeholder and the dev slot use it. A sample can be the model itself or the same `{"timeline": [...]}` envelope your feed prints; the preview renders the entry that is current now.
 - `long.json` — longest realistic strings; truncation there is a warning, in default an error.
 - `empty.json` — `null`, previews the waiting state.
-- `<sample>.state.json` — button state for that sample, for example `{"cursor": 2, "cups": 3}`.
+- `<sample>.state.json` — button state for that sample, for example `{"cursor": 2, "cups": 3}`; a shuffled deck is `{"cursor": 5, "seed": 42}` (any non-zero seed), a running timer `{"endsAt": 1789400000}`.
 - `<sample>.status.json` — feed status for that sample, for example `{"ok": false, "checkedAt": "2026-09-14T09:00:00Z", "fetchedAt": "2026-09-14T06:00:00Z"}` to preview staleness.
 - `images/` — files `AWImage` finds in previews.
 - `<sample>.ru.json` / `<sample>.en.json` — the same sample with feed text in that language; `aw preview <id> --lang ru` uses it instead of `<sample>.json`, so feed-localized strings can be checked too.
+
+## What `aw preview` renders
+
+- By default: `default` in light, dark and desktop-idle for every family, every other sample in dark, plus the next two entries of timeline samples.
+- `--full`: every sample in light, dark, light-idle and dark-idle.
+- Each cell is a PNG next to `sheet.png` (`<family>-<appearance>-<mode>-<sample>.png`); `report.json` lists the issues per cell.
 
 ## Feed
 
@@ -60,7 +66,7 @@ Intervals: `"30s"`, `"15m"`, `"1h"`, `"1d"` or a number of seconds.
 
 ## State and actions
 
-`AWButton` runs `AWActionIntent` inside the widget: it updates `state.json` for that widget and redraws it (and the dev slot). Actions: `next`, `prev`, `toggle`, `increment`, `set`, `shuffle`, `reset`. The view reads `entry.state`; feeds can read `AW_STATE_PATH`.
+`AWButton` runs `AWActionIntent` inside the widget: it updates `state.json` for that widget and redraws it (and the dev slot). Actions: `next`, `prev`, `toggle`, `increment`, `set`, `shuffle`, `reset`, `stamp`. The view reads `entry.state`; feeds can read `AW_STATE_PATH`.
 
 ## CLI output
 

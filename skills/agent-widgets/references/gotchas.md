@@ -9,6 +9,7 @@ Things that look fine in code and break on the desktop. The preview catches many
 - **Widgets are snapshots.** No `URLSession`, timers, `onAppear`, tasks or animations in views. Fetch in the feed; animate only through changes between timeline entries (the system cross-fades, ≤ 2 s).
 - **Time that ticks** must use `Text(date, style: .timer / .relative / .time)`, `AWCountdown` or `AWClock` with `AWTick` entries — reloading every second is impossible.
 - **Crashes are blank widgets.** A force unwrap or an out-of-range index kills the preview (`PREVIEW_CRASHED`) and shows nothing on the desktop. Guard arrays and optionals.
+- **Spell colors out in ternaries.** `cond ? .primary : .orange` fails to compile (`.primary` is also a `HierarchicalShapeStyle`); write `Color.primary` and `Color.orange`.
 - **SF Symbols must exist on macOS 14.** A misspelled name renders nothing; check the name in the SF Symbols app.
 
 ## Data

@@ -7,12 +7,14 @@ public struct AWMetric: View {
     private let unit: String?
     private let label: String?
     private let trend: AWTrend?
+    private let tint: Color?
 
-    public init(_ value: String, unit: String? = nil, label: String? = nil, trend: AWTrend? = nil) {
+    public init(_ value: String, unit: String? = nil, label: String? = nil, trend: AWTrend? = nil, tint: Color? = nil) {
         self.value = value
         self.unit = unit
         self.label = label
         self.trend = trend
+        self.tint = tint
     }
 
     public var body: some View {
@@ -22,7 +24,12 @@ public struct AWMetric: View {
                     .foregroundStyle(.secondary)
             }
             HStack(alignment: .firstTextBaseline, spacing: 3) {
-                AWText(value, .hero)
+                if let tint {
+                    AWText(value, .hero)
+                        .foregroundStyle(context.isMonochrome ? Color.primary : tint)
+                } else {
+                    AWText(value, .hero)
+                }
                 if let unit {
                     AWText(unit, .headline)
                         .foregroundStyle(.secondary)

@@ -37,6 +37,10 @@ public struct AWState: Codable, Equatable, Sendable {
         values[key]?.stringValue
     }
 
+    public func date(_ key: String) -> Date? {
+        values[key]?.doubleValue.map(Date.init(timeIntervalSince1970:))
+    }
+
     public mutating func set(_ key: String, _ value: JSONValue) {
         values[key] = value
     }

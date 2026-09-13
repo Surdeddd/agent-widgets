@@ -6,10 +6,12 @@ public struct AWCountdown: View {
     @Environment(\.aw) private var context
     private let target: Date
     private let label: String?
+    private let tint: Color?
 
-    public init(to target: Date, label: String? = nil) {
+    public init(to target: Date, label: String? = nil, tint: Color? = nil) {
         self.target = target
         self.label = label
+        self.tint = tint
     }
 
     public var body: some View {
@@ -23,6 +25,7 @@ public struct AWCountdown: View {
                 .monospacedDigit()
                 .lineLimit(1)
                 .minimumScaleFactor(0.5)
+                .foregroundStyle(tint.map { context.isMonochrome ? Color.primary : $0 } ?? Color.primary)
                 .widgetAccentable()
         }
         .awBlock("AWCountdown")

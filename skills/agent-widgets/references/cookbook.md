@@ -105,6 +105,43 @@ HStack(spacing: AWSpace.m) {
 AWCountdown(to: data.date, label: data.event)
 ```
 
+## Timer you start from the widget
+
+```swift
+static var tick: AWTick { .everyMinute(count: 60) }
+
+let endsAt = entry.state.date("endsAt")
+if let endsAt, endsAt > entry.date {
+    AWCountdown(to: endsAt, label: context.pick(en: "Focus", ru: "Фокус"), tint: .orange)
+    AWButton(.reset, symbol: "stop.fill", key: "endsAt")
+} else {
+    AWMetric("25", unit: "min", label: context.pick(en: "Ready", ru: "Готов"))
+    AWButton(.stamp, symbol: "play.fill", key: "endsAt", value: "1500")
+}
+```
+
+`.stamp` records the moment of the tap, not the moment the view was drawn. The minute ticks flip the widget back to “Ready” within a minute after the timer ends. Preview the running state with a sidecar such as `{"endsAt": 1789400000}`.
+
+## Grid of equal items
+
+```swift
+let columns = context.family == .medium ? 4 : 2
+LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: AWSpace.s), count: columns), spacing: AWSpace.m) {
+    ForEach(Array(data.cities.prefix(context.isSmall ? 2 : 4))) { city in
+        let zone = TimeZone(identifier: city.zone) ?? .current
+        VStack(spacing: AWSpace.xs) {
+            AWText(city.name, .label)
+                .foregroundStyle(.secondary)
+            AWText(entry.date.formatted(Date.FormatStyle(date: .omitted, time: .shortened, timeZone: zone)), .title)
+        }
+        .frame(maxWidth: .infinity)
+    }
+}
+.frame(maxHeight: .infinity)
+```
+
+The same peers in every family, fewer of them in small; times in other zones come from `Date.FormatStyle(timeZone:)` and tick with `static var tick: AWTick { .everyMinute(count: 60) }`.
+
 For days-away counters use a number (`AWMetric("\(days)", unit: "days")`) and `static var tick: AWTick { .every(seconds: 3600, count: 24) }` so the number updates hourly without reloads.
 
 ## Bar chart for the week

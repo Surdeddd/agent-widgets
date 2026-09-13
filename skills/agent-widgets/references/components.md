@@ -17,7 +17,7 @@ Everything here comes from `import AWKit`. Every component reads `@Environment(\
 | component | use it for |
 |---|---|
 | `AWText(_ string: String, _ role: AWTextRole = .body, lines: Int = 1)` | all text; never ellipsizes silently — previews report `TRUNCATION` |
-| `AWMetric(_ value: String, unit: String? = nil, label: String? = nil, trend: AWTrend? = nil)` | the hero number with unit, caption and trend |
+| `AWMetric(_ value: String, unit: String? = nil, label: String? = nil, trend: AWTrend? = nil, tint: Color? = nil)` | the hero number with unit, caption and trend; `tint` colors the number and fades in monochrome |
 | `AWTrendLabel(_ trend: AWTrend)` | “↗ +4.2%” with status color |
 | `AWBadge(_ text: String, status: AWStatus = .neutral, showsSymbol: Bool = true)` | a status pill |
 
@@ -52,7 +52,7 @@ AWList(items, maxRows: context.family == .large ? 8 : 3) { item in
 
 | component | use it for |
 |---|---|
-| `AWCountdown(to: Date, label: String? = nil)` | a live countdown (`Text(date, style: .timer)`), no reloads needed |
+| `AWCountdown(to: Date, label: String? = nil, tint: Color? = nil)` | a live countdown (`Text(date, style: .timer)`), no reloads needed |
 | `AWClock(date: Date, timeZone: TimeZone = .current, label: String? = nil)` | a clock face in text; pair with `static var tick: AWTick { .everyMinute(count: 60) }` |
 
 `Text(date, style: .relative | .time | .timer)` also works anywhere and keeps ticking without reloads.
@@ -69,8 +69,10 @@ AWButton(.increment, key: "cups") { Label("Cup", systemImage: "plus") }
 ```
 
 - `AWButton(_ action: AWAction, key: String = "cursor", value: String = "", label:)` and `AWButton(_ action:, symbol:, key:, value:)` for a round icon button.
-- `AWAction`: `.next`, `.prev` (cursor ± 1), `.toggle`, `.increment` (by `value`, default 1), `.set` (JSON or text `value`), `.shuffle` (new deck order, cursor back to 0), `.reset` (clears `key`, or all state with `key: ""`).
-- Read state in the view: `entry.state.int("cups") -> Int`, `.bool("done") -> Bool`, `.double(_) -> Double` (all take `default:`, 0 / false otherwise), `.string(_) -> String?`, `.cursor -> Int`. Store dates as numbers (`AWButton(.set, key: "until", value: "\(date.timeIntervalSince1970)")`) and read them back with `.double`.
+- `AWAction`: `.next`, `.prev` (cursor ± 1), `.toggle`, `.increment` (by `value`, default 1), `.set` (JSON or text `value`), `.shuffle` (new deck order, cursor back to 0), `.reset` (clears `key`, or all state with `key: ""`), `.stamp` (stores the moment of the tap plus `value` seconds — `AWButton(.stamp, key: "endsAt", value: "1500")` starts a 25-minute timer).
+- Read state in the view: `entry.state.int("cups") -> Int`, `.bool("done") -> Bool`, `.double(_) -> Double` (all take `default:`, 0 / false otherwise), `.string(_) -> String?`, `.date(_) -> Date?` (for stamps), `.cursor -> Int`.
+- Never bake `Date()` or `entry.date` into a button's `value`: the view was drawn minutes before the tap. Use `.stamp`.
+- Daily counters reset themselves when the day is part of the key: `AWButton(.increment, key: "sessions@\(AWState.dayKey(entry.date))")`.
 - Decks: `entry.state.deckIndex(count: cards.count, slot: slot)` gives the card to show; with a shuffle seed it walks a scrambled order that still visits every card once per cycle. `entry.state.isShuffled` tells the button which icon to show.
 - Buttons do not spend the reload budget.
 
