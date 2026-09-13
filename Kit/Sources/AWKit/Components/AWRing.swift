@@ -23,6 +23,7 @@ public struct AWRing<Center: View>: View {
                 .frame(width: proxy.size.width, height: proxy.size.height)
         }
         .aspectRatio(1, contentMode: .fit)
+        .awBlock("AWRing")
     }
 
     private func ring(width: CGFloat) -> some View {
@@ -92,5 +93,6 @@ public struct AWGauge: View {
         }
         .padding(width / 2)
         .aspectRatio(1, contentMode: .fit)
+        .awBlock("AWGauge")
     }
 }

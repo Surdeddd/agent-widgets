@@ -32,7 +32,7 @@ Intervals: `"30s"`, `"15m"`, `"1h"`, `"1d"` or a number of seconds.
 
 ## Samples
 
-- `default.json` — required; the preview, the gallery placeholder and the dev slot use it.
+- `default.json` — required; the preview, the gallery placeholder and the dev slot use it. A sample can be the model itself or the same `{"timeline": [...]}` envelope your feed prints; the preview renders the entry that is current now.
 - `long.json` — longest realistic strings; truncation there is a warning, in default an error.
 - `empty.json` — `null`, previews the waiting state.
 - `<sample>.state.json` — button state for that sample, for example `{"cursor": 2, "cups": 3}`.

@@ -41,6 +41,7 @@ public struct AWRow: View {
                     .monospacedDigit()
             }
         }
+        .awBlock("AWRow \(title)")
     }
 }
 
@@ -68,6 +69,7 @@ public struct AWList<Item: Identifiable, Row: View>: View {
                     .foregroundStyle(.tertiary)
             }
         }
+        .awBlock("AWList, \(shown.count) rows")
     }
 
     private var defaultLimit: Int {

@@ -7,11 +7,18 @@ import SwiftUI
 final class TextFitCollector {
     var fits: [AWTextFit] = []
     var content: CGSize = .zero
+    var blocks: [AWBlock] = []
 }
 
 struct LayoutSample {
     let fits: [AWTextFit]
     let content: CGSize
+    let blocks: [AWBlock]
+}
+
+struct ContentOverflow {
+    let extra: CGFloat
+    let vertical: Bool
 }
 
 @MainActor
@@ -22,14 +29,28 @@ enum TextFitChecker {
             .frame(width: size.width, height: size.height)
             .onPreferenceChange(AWTextFitKey.self) { collector.fits = $0 }
             .onPreferenceChange(AWContentSizeKey.self) { collector.content = $0 }
+            .onPreferenceChange(AWBlockKey.self) { collector.blocks = $0 }
         _ = PNG.render(probe, scale: 1)
-        return LayoutSample(fits: collector.fits, content: collector.content)
+        return LayoutSample(fits: collector.fits, content: collector.content, blocks: collector.blocks)
     }
 
-    static func contentOverflow(_ content: CGSize, family: Family) -> CGFloat? {
+    static func contentOverflow(_ content: CGSize, family: Family) -> ContentOverflow? {
         let inset = AWMetrics.padding(for: family) * 2
-        let extra = max(content.height - (family.size.height - inset), content.width - (family.size.width - inset))
-        return extra > 1 ? extra : nil
+        let height = content.height - (family.size.height - inset)
+        let width = content.width - (family.size.width - inset)
+        let extra = max(height, width)
+        return extra > 1 ? ContentOverflow(extra: extra, vertical: height >= width) : nil
+    }
+
+    /// The three biggest named parts along the overflowing axis, for example "AWSparkline 96 pt · AWList, 5 rows 140 pt".
+    static func largest(_ blocks: [AWBlock], vertical: Bool) -> String {
+        var seen = Set<String>()
+        return blocks
+            .sorted { (vertical ? $0.size.height : $0.size.width) > (vertical ? $1.size.height : $1.size.width) }
+            .filter { seen.insert($0.name).inserted }
+            .prefix(3)
+            .map { "\($0.name) \(Int((vertical ? $0.size.height : $0.size.width).rounded())) pt" }
+            .joined(separator: " · ")
     }
 
     static func issues(for fits: [AWTextFit], scenario: String) -> [Issue] {

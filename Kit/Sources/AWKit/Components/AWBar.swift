@@ -29,5 +29,6 @@ public struct AWBar: View {
             }
         }
         .frame(height: height ?? (context.isSmall ? 5 : 6))
+        .awBlock("AWBar")
     }
 }

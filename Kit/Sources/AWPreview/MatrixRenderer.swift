@@ -40,10 +40,14 @@ public enum MatrixRenderer {
         let size = job.family.size
         var issues: [Issue] = []
         let layout = TextFitChecker.collect(content, size: size)
-        if let extra = TextFitChecker.contentOverflow(layout.content, family: job.family) {
+        if let overflow = TextFitChecker.contentOverflow(layout.content, family: job.family) {
+            let amount = Int(overflow.extra.rounded())
+            let parts = TextFitChecker.largest(layout.blocks, vertical: overflow.vertical)
+            let partsEn = parts.isEmpty ? "" : ". \(overflow.vertical ? "Tallest" : "Widest") parts: \(parts)"
+            let partsRu = parts.isEmpty ? "" : ". \(overflow.vertical ? "Самые высокие" : "Самые широкие") части: \(parts)"
             issues.append(overflowIssue(
-                en: "Content needs \(Int(extra.rounded())) pt more than the \(job.family.rawValue) widget has inside its margins (\(job.scenario.name))",
-                ru: "Содержимому не хватает \(Int(extra.rounded())) pt внутри полей \(job.family.rawValue) (\(job.scenario.name))"
+                en: "Content needs \(amount) pt more than the \(job.family.rawValue) widget has inside its margins (\(job.scenario.name))" + partsEn,
+                ru: "Содержимому не хватает \(amount) pt внутри полей \(job.family.rawValue) (\(job.scenario.name))" + partsRu
             ))
         } else if let extent = FitProbe.overflow(content, size: size) {
             issues.append(overflowIssue(

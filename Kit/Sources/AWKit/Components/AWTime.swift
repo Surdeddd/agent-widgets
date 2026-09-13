@@ -25,6 +25,7 @@ public struct AWCountdown: View {
                 .minimumScaleFactor(0.5)
                 .widgetAccentable()
         }
+        .awBlock("AWCountdown")
     }
 }
 
@@ -48,6 +49,7 @@ public struct AWClock: View {
             }
             AWText(Self.format(date, timeZone: timeZone), .hero)
         }
+        .awBlock("AWClock")
     }
 
     public static func format(_ date: Date, timeZone: TimeZone, pattern: String = "HH:mm") -> String {

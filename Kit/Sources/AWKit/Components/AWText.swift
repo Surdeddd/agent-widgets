@@ -32,6 +32,7 @@ public struct AWText: View {
 
     public var body: some View {
         let shown = role == .label ? string.uppercased() : string
+        let snippet = shown.count > 24 ? String(shown.prefix(24)) + "…" : shown
         let text = Text(shown)
             .font(AWType.font(role, context.family))
             .tracking(AWType.tracking(role, context.family))
@@ -53,5 +54,6 @@ public struct AWText: View {
                 )
             }
         )
+        .awBlock("AWText “\(snippet)”")
     }
 }

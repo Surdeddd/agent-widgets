@@ -7,16 +7,25 @@ public struct AWHeader: View {
     private let symbol: String?
     private let fetchedAt: Date?
     private let isStale: Bool
+    private let now: Date?
+    private let lines: Int
 
-    public init(_ title: String, symbol: String? = nil, fetchedAt: Date? = nil, isStale: Bool = false) {
+    public init(_ title: String, symbol: String? = nil, fetchedAt: Date? = nil, isStale: Bool = false, lines: Int = 1) {
         self.title = title
         self.symbol = symbol
         self.fetchedAt = fetchedAt
         self.isStale = isStale
+        self.now = nil
+        self.lines = lines
     }
 
-    public init<Model>(_ title: String, symbol: String? = nil, entry: AWEntry<Model>) {
-        self.init(title, symbol: symbol, fetchedAt: entry.fetchedAt, isStale: entry.phase.isStale)
+    public init<Model>(_ title: String, symbol: String? = nil, entry: AWEntry<Model>, lines: Int = 1) {
+        self.title = title
+        self.symbol = symbol
+        self.fetchedAt = entry.fetchedAt
+        self.isStale = entry.phase.isStale
+        self.now = entry.date
+        self.lines = lines
     }
 
     public var body: some View {
@@ -26,16 +35,17 @@ public struct AWHeader: View {
                     .font(.system(size: AWType.size(.caption, context.family), weight: .semibold))
                     .foregroundStyle(.secondary)
             }
-            AWText(title, .label)
+            AWText(title, .label, lines: lines)
                 .foregroundStyle(.secondary)
             Spacer(minLength: 4)
             if isStale {
                 AWStaleBadge()
             } else if let fetchedAt, !context.isSmall {
-                AWText(AWFormat.freshness(fetchedAt, language: context.language), .caption)
+                AWText(AWFormat.freshness(fetchedAt, now: now ?? Date(), language: context.language), .caption)
                     .foregroundStyle(.tertiary)
             }
         }
+        .awBlock("AWHeader")
     }
 }
 

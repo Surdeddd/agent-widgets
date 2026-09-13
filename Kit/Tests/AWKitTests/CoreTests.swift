@@ -135,6 +135,15 @@ private func build(
     #expect(AWFormat.compact(-15_300) == "-15.3K")
 }
 
+@Test func plainDataGetsFreshnessEntriesThatTurnStaleOnTime() {
+    let status = FeedStatus(ok: true, checkedAt: now, fetchedAt: now.addingTimeInterval(-3000))
+    let output = build(weatherJSON, status: status, refresh: 1800)
+    #expect(output.entries.map(\.date) == [now, now.addingTimeInterval(900)])
+    #expect(output.entries[0].phase == .ok)
+    #expect(output.entries[1].phase.isStale)
+    #expect(output.reloadAfter == now.addingTimeInterval(1800))
+}
+
 @Test func contextMapsFamiliesBothWays() {
     for family in Family.allCases {
         #expect(Family(family.widgetFamily) == family)

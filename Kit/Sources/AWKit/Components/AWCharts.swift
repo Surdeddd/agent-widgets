@@ -49,6 +49,7 @@ public struct AWSparkline: View {
         .chartLegend(.hidden)
         .chartYScale(domain: (low - pad)...(high + pad))
         .widgetAccentable()
+        .awBlock("AWSparkline")
     }
 }
 
@@ -100,6 +101,7 @@ public struct AWBarChart: View {
             }
         }
         .widgetAccentable()
+        .awBlock("AWBarChart")
     }
 
     static func slots(for items: [AWBarItem]) -> [String] {

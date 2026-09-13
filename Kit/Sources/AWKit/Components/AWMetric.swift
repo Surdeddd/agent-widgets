@@ -32,6 +32,7 @@ public struct AWMetric: View {
                 AWTrendLabel(trend)
             }
         }
+        .awBlock("AWMetric \(value)")
     }
 }
 

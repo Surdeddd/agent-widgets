@@ -97,6 +97,25 @@ struct RowItem: Identifiable {
     let id: Int
 }
 
+struct CrowdedView: AWView {
+    let entry: AWEntry<Numbers>
+
+    init(entry: AWEntry<Numbers>) {
+        self.entry = entry
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            AWMetric("\(entry.data?.value ?? 0)", unit: "ms", label: "Latency")
+            AWSparkline([1, 3, 2, 5, 4, 6])
+                .frame(height: 120)
+            AWList(Array(0..<(entry.data?.rows ?? 0)).map(RowItem.init), maxRows: 6) { item in
+                AWRow("Node \(item.id)", value: "\(item.id) ms")
+            }
+        }
+    }
+}
+
 private func temporaryOutput() -> URL {
     FileManager.default.temporaryDirectory.appendingPathComponent("aw-preview-\(UUID().uuidString)", isDirectory: true)
 }
@@ -129,6 +148,33 @@ private func scenario(_ json: String, name: String = "default") -> PreviewScenar
     #expect(framed[0].cell.issues.contains { $0.code == IssueCode.overflow })
     #expect(!plain[1].cell.issues.contains { $0.code == IssueCode.overflow })
     #expect(!framed[1].cell.issues.contains { $0.code == IssueCode.overflow })
+}
+
+@MainActor
+@Test func overflowNamesTheTallestParts() throws {
+    let output = temporaryOutput()
+    defer { try? FileManager.default.removeItem(at: output) }
+    let job = PreviewJob(family: .small, appearance: .dark, mode: .color, scenario: scenario(#"{"value":42,"rows":5}"#))
+    let cells = try MatrixRenderer.render(CrowdedView.self, jobs: [job], output: output, language: .en, store: AWStore(root: nil))
+    let overflow = try #require(cells[0].cell.issues.first { $0.code == IssueCode.overflow })
+    #expect(overflow.message.contains("Tallest parts: AWSparkline 120 pt"), "\(overflow.message)")
+    #expect(overflow.message.contains("AWList, 5 rows"))
+}
+
+@MainActor
+@Test func onlyOutermostComponentsReportTheirSize() {
+    let context = AWContext(family: .medium, isPreview: true, language: .en)
+    let view = AWFrame(context: context) {
+        VStack {
+            AWMetric("412", unit: "GB", label: "Disk")
+            AWText("Loose text", .body)
+        }
+    }
+    let names = TextFitChecker.collect(view, size: Family.medium.size).blocks.map(\.name)
+    #expect(names.contains("AWMetric 412"))
+    #expect(names.contains("AWText “Loose text”"))
+    #expect(!names.contains("AWText “412”"))
+    #expect(!names.contains("AWText “DISK”"))
 }
 
 @MainActor

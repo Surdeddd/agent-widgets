@@ -26,6 +26,12 @@ public struct AWImage: View {
     }
 
     public var body: some View {
+        picture
+            .awBlock("AWImage \(name)")
+    }
+
+    @ViewBuilder
+    private var picture: some View {
         if let url = store.imageURL(widget: widget, name: name), let image = NSImage(contentsOf: url) {
             if contentMode == .fill {
                 Image(nsImage: image)

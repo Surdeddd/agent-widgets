@@ -7,8 +7,8 @@ Everything here comes from `import AWKit`. Every component reads `@Environment(\
 | component | use it for |
 |---|---|
 | `AWPhaseView(entry) { data in … }` | root of every view: shows content when data exists, otherwise waiting / error states |
-| `AWHeader(_ title: String, symbol: String? = nil, entry: AWEntry<M>)` | small caps title with an SF Symbol, freshness (“5m ago”) and a stale badge |
-| `AWHeader(_ title:, symbol:, fetchedAt: Date?, isStale: Bool)` | same, without an entry |
+| `AWHeader(_ title: String, symbol: String? = nil, entry: AWEntry<M>, lines: Int = 1)` | small caps title with an SF Symbol, freshness (“5m ago”) and a stale badge; `lines: 2` for long titles |
+| `AWHeader(_ title:, symbol:, fetchedAt: Date?, isStale: Bool, lines:)` | same, without an entry |
 | `AWStaleBadge()` | the stale badge alone |
 | `AWEmptyState(symbol: String = "tray", title: String, subtitle: String? = nil)` | your own empty or error message |
 
@@ -74,10 +74,15 @@ AWButton(.increment, key: "cups") { Label("Cup", systemImage: "plus") }
 - Decks: `entry.state.deckIndex(count: cards.count, slot: slot)` gives the card to show; with a shuffle seed it walks a scrambled order that still visits every card once per cycle. `entry.state.isShuffled` tells the button which icon to show.
 - Buttons do not spend the reload budget.
 
+## Finding what overflows
+
+`OVERFLOW` names the tallest (or widest) kit components in the cell, for example `Tallest parts: AWSparkline 96 pt · AWList, 5 rows 140 pt`. Your own stacks and shapes show up there too once you name them: `.awBlock("Clock face")`.
+
 ## Tokens
 
 - `AWSpace`: `xxs` 2, `xs` 4, `s` 8, `m` 12, `l` 16, `xl` 24.
 - `AWMetrics.spacing(for: family)` (6 in small, 8 otherwise), `AWMetrics.padding(for:)`.
 - `AWStatus`: `.ok`, `.warning`, `.critical`, `.info`, `.neutral` with `.symbol`, `.color` and `.tint(context)` (monochrome when idle).
-- `AWFormat.compact(1234) == "1.2K"`, `AWFormat.freshness(date)` → “5m ago” / “5 мин назад”.
+- `AWFormat.compact(_ value: Double) -> String` — `1234` → `"1.2K"`, `2_000_000` → `"2M"`; pass `Double(intValue)` for integers.
+- `AWFormat.freshness(_ date: Date, now: Date = Date(), language:) -> String` → “5m ago” / “5 мин назад”; `AWFormat.updated(_:)` → “updated 5m ago”.
 - `AWTick`: `.none`, `.everyMinute(count:)`, `.every(seconds:count:)` — extra timeline entries so time-based views update without reloads.

@@ -39,8 +39,8 @@ public enum AWTimelineBuilder {
         guard let data = input.data else {
             return empty
         }
-        let phase = phase(status: input.status, refresh: input.refresh, now: now)
         let fetchedAt = input.status?.fetchedAt
+        let phaseAt = { (date: Date) in phase(status: input.status, refresh: input.refresh, now: date) }
         do {
             if let envelope = try TimelineEnvelope<Model>.decodeIfEnvelope(data) {
                 let items = envelope.visible(from: now)
@@ -48,13 +48,15 @@ public enum AWTimelineBuilder {
                     return empty
                 }
                 let entries = items.enumerated().map { index, item in
-                    AWEntry(date: index == 0 ? now : item.date, data: item.data, phase: phase, fetchedAt: fetchedAt, state: input.state)
+                    let date = index == 0 ? now : item.date
+                    return AWEntry(date: date, data: item.data, phase: phaseAt(date), fetchedAt: fetchedAt, state: input.state)
                 }
                 return AWTimelineOutput(entries: entries, reloadAfter: envelope.refreshAfter ?? reload)
             }
             let model = try AWJSON.decoder().decode(Model.self, from: data)
-            let entries = tickDates(input.tick, now: now).map {
-                AWEntry(date: $0, data: model, phase: phase, fetchedAt: fetchedAt, state: input.state)
+            let dates = input.tick == .none ? freshnessDates(now: now, until: reload) : tickDates(input.tick, now: now)
+            let entries = dates.map {
+                AWEntry(date: $0, data: model, phase: phaseAt($0), fetchedAt: fetchedAt, state: input.state)
             }
             return AWTimelineOutput(entries: entries, reloadAfter: input.tick == .none ? reload : nil)
         } catch {
@@ -72,6 +74,11 @@ public enum AWTimelineBuilder {
         }
         let age = max(0, now.timeIntervalSince(fetchedAt))
         return !status.ok || age > refresh * 2 ? .stale(age: age) : .ok
+    }
+
+    /// Same data every 15 minutes until the reload, so freshness text and the stale badge move without spending reloads.
+    public static func freshnessDates(now: Date, until reload: Date) -> [Date] {
+        Array(stride(from: now, to: max(reload, now.addingTimeInterval(1)), by: 900))
     }
 
     public static func tickDates(_ tick: AWTick, now: Date) -> [Date] {

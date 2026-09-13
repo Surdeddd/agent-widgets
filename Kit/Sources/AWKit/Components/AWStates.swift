@@ -27,6 +27,7 @@ public struct AWEmptyState: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .awBlock("AWEmptyState")
     }
 }
 

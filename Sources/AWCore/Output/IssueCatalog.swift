@@ -46,8 +46,8 @@ private let catalogEntries: [IssueExplanation] = [
             "Свёрстанному содержимому нужно больше места, чем есть в размере внутри полей, или оно вылезает за край. WidgetKit его обрежет."
         ),
         fix: text(
-            "Show less in smaller families: branch on @Environment(\\.aw).family, cap lists with AWList(maxRows:), drop secondary lines.",
-            "Показывай меньше в маленьких размерах: ветвись по @Environment(\\.aw).family, ограничь AWList(maxRows:), убери второстепенные строки."
+            "Start with the tallest parts the message names. Show less in smaller families: branch on @Environment(\\.aw).family, cap lists with AWList(maxRows:), drop secondary lines. Name your own views with .awBlock(\"…\") to see them in the message.",
+            "Начни с самых высоких частей из сообщения. Показывай меньше в маленьких размерах: ветвись по @Environment(\\.aw).family, ограничь AWList(maxRows:), убери второстепенные строки. Свои вьюхи подпиши .awBlock(\"…\"), чтобы видеть их в сообщении."
         ),
         example: "if context.family == .small {\n    AWMetric(value, unit: unit)\n} else {\n    AWMetric(value, unit: unit, label: caption)\n    AWSparkline(history)\n}"
     ),
