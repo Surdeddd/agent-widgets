@@ -2,11 +2,14 @@ import AppKit
 import SwiftUI
 import WidgetKit
 
+private let appGroup = __APP_GROUP_LITERAL__
+private let appName = __APP_NAME_LITERAL__
+
 final class AWHostDelegate: NSObject, NSApplicationDelegate {
     private var window: NSWindow?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        _ = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "__APP_GROUP__")
+        _ = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroup)
         WidgetCenter.shared.reloadAllTimelines()
     }
 
@@ -35,7 +38,7 @@ final class AWHostDelegate: NSObject, NSApplicationDelegate {
                 backing: .buffered,
                 defer: false
             )
-            window.title = "__APP_NAME__"
+            window.title = appName
             window.contentView = NSHostingView(rootView: AWHostHelp())
             window.isReleasedWhenClosed = false
             window.center()
@@ -56,11 +59,11 @@ struct AWHostHelp: View {
             Image(systemName: "square.grid.2x2.fill")
                 .font(.system(size: 40, weight: .light))
                 .foregroundStyle(.secondary)
-            Text("__APP_NAME__")
+            Text(appName)
                 .font(.title2.weight(.semibold))
             Text(russian
-                ? "Виджеты установлены.\nПравый клик по столу → «Изменить виджеты» → найди «__APP_NAME__»."
-                : "Widgets are installed.\nRight-click the desktop → Edit Widgets → search for “__APP_NAME__”.")
+                ? "Виджеты установлены.\nПравый клик по столу → «Изменить виджеты» → найди «\(appName)»."
+                : "Widgets are installed.\nRight-click the desktop → Edit Widgets → search for “\(appName)”.")
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)
             Text(russian ? "Для агентов: aw doctor" : "For agents: aw doctor")
