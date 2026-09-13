@@ -1,0 +1,8 @@
+import Testing
+@testable import AWCore
+
+@Test func engineVersionIsSemver() {
+    let parts = EngineVersion.current.split(separator: ".")
+    #expect(parts.count == 3)
+    #expect(parts.allSatisfy { Int($0) != nil })
+}

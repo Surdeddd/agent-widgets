@@ -1,0 +1,22 @@
+included:
+  - Sources
+  - Kit/Sources
+  - Tests
+  - Kit/Tests
+excluded:
+  - .build
+  - Kit/.build
+  - spikes
+  - .aw
+line_length:
+  warning: 140
+  error: 180
+identifier_name:
+  min_length: 1
+type_body_length:
+  warning: 400
+file_length:
+  warning: 600
+disabled_rules:
+  - todo
+  - trailing_comma

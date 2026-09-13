@@ -1,0 +1,8 @@
+.build/
+.swiftpm/
+.aw/
+spikes/
+MEMORY_BANK/
+DerivedData/
+.DS_Store
+aw.local.json
