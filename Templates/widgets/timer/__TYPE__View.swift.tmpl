@@ -21,26 +21,40 @@ struct __TYPE__View: AWView {
 
     var body: some View {
         AWPhaseView(entry) { data in
-            let remaining = data.date.timeIntervalSince(entry.date)
             VStack(alignment: .leading, spacing: AWMetrics.spacing(for: context.family)) {
                 AWHeader(data.title, symbol: data.symbol ?? "hourglass", entry: entry)
-                AWText(data.event, .headline, lines: context.isSmall ? 2 : 1)
-                if remaining > 86_400 {
-                    AWMetric("\(Int(remaining / 86_400))", unit: context.pick(en: "days", ru: "дн"))
-                } else if remaining > 0 {
-                    AWCountdown(to: data.date)
+                if context.isSmall {
+                    AWText(data.event, .headline, lines: 2)
+                    countdown(data)
+                    Spacer(minLength: 0)
                 } else {
-                    AWText(context.pick(en: "Now", ru: "Сейчас"), .hero)
-                }
-                Spacer(minLength: 0)
-                if !context.isSmall {
-                    AWText(Self.format(data.date, language: context.language), .caption)
-                        .foregroundStyle(.secondary)
+                    HStack(alignment: .bottom, spacing: AWSpace.m) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            AWText(data.event, .headline)
+                            countdown(data)
+                        }
+                        Spacer(minLength: AWSpace.s)
+                        AWText(Self.format(data.date, language: context.language), .caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer(minLength: 0)
                     if let since = data.since {
                         AWBar(progress: Self.fraction(since: since, until: data.date, now: entry.date), tint: .orange)
                     }
                 }
             }
+        }
+    }
+
+    @ViewBuilder
+    private func countdown(_ data: __TYPE__Data) -> some View {
+        let remaining = data.date.timeIntervalSince(entry.date)
+        if remaining > 86_400 {
+            AWMetric("\(Int(remaining / 86_400))", unit: context.pick(en: "days", ru: "дн"))
+        } else if remaining > 0 {
+            AWCountdown(to: data.date)
+        } else {
+            AWText(context.pick(en: "Now", ru: "Сейчас"), .hero)
         }
     }
 

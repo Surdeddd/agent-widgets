@@ -22,25 +22,33 @@ struct __TYPE__View: AWView {
         AWPhaseView(entry) { data in
             VStack(alignment: .leading, spacing: AWMetrics.spacing(for: context.family)) {
                 AWHeader(data.title, symbol: "internaldrive", entry: entry)
-                AWMetric(format(data.value), unit: data.unit, trend: data.change.map { AWTrend.percent($0) })
-                if let caption = data.caption, !context.isSmall {
-                    AWText(caption, .caption)
-                        .foregroundStyle(.secondary)
-                }
-                Spacer(minLength: 0)
-                if data.history.count > 1 {
-                    AWSparkline(data.history)
-                        .frame(height: sparklineHeight)
+                if context.family == .medium {
+                    HStack(alignment: .bottom, spacing: AWSpace.m) {
+                        summary(data)
+                        if data.history.count > 1 {
+                            AWSparkline(data.history)
+                                .frame(height: 64)
+                        }
+                    }
+                } else {
+                    summary(data)
+                    Spacer(minLength: 0)
+                    if data.history.count > 1 {
+                        AWSparkline(data.history)
+                            .frame(height: context.isSmall ? 26 : 110)
+                    }
                 }
             }
         }
     }
 
-    private var sparklineHeight: CGFloat {
-        switch context.family {
-        case .small: 26
-        case .medium: 34
-        default: 110
+    private func summary(_ data: __TYPE__Data) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            AWMetric(format(data.value), unit: data.unit, trend: data.change.map { AWTrend.percent($0) })
+            if let caption = data.caption, !context.isSmall {
+                AWText(caption, .caption)
+                    .foregroundStyle(.secondary)
+            }
         }
     }
 
