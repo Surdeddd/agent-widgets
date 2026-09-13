@@ -17,9 +17,17 @@ public struct AWRing<Center: View>: View {
     }
 
     public var body: some View {
-        let width = lineWidth ?? (context.isSmall ? 9 : 11)
+        GeometryReader { proxy in
+            let side = min(proxy.size.width, proxy.size.height)
+            ring(width: lineWidth ?? min(max(side * 0.14, 3), context.isSmall ? 9 : 11))
+                .frame(width: proxy.size.width, height: proxy.size.height)
+        }
+        .aspectRatio(1, contentMode: .fit)
+    }
+
+    private func ring(width: CGFloat) -> some View {
         let color = context.isVibrant ? Color.primary : tint
-        ZStack {
+        return ZStack {
             Circle()
                 .stroke(color.opacity(0.18), lineWidth: width)
             Circle()
