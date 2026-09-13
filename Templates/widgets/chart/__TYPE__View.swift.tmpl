@@ -1,0 +1,52 @@
+import AWKit
+import SwiftUI
+
+struct __TYPE__Bar: Codable, Sendable {
+    let label: String
+    let value: Double
+}
+
+struct __TYPE__Data: Codable, Sendable {
+    let title: String
+    let total: String
+    let caption: String
+    let bars: [__TYPE__Bar]
+    let highlight: Int?
+}
+
+struct __TYPE__View: AWView {
+    let entry: AWEntry<__TYPE__Data>
+    @Environment(\.aw) private var context
+
+    init(entry: AWEntry<__TYPE__Data>) {
+        self.entry = entry
+    }
+
+    var body: some View {
+        AWPhaseView(entry) { data in
+            VStack(alignment: .leading, spacing: AWMetrics.spacing(for: context.family)) {
+                AWHeader(data.title, symbol: "chart.bar.fill", entry: entry)
+                if context.family == .medium {
+                    HStack(alignment: .bottom, spacing: AWSpace.m) {
+                        AWMetric(data.total, label: data.caption)
+                            .frame(width: 104, alignment: .leading)
+                        chart(data)
+                    }
+                } else {
+                    AWMetric(data.total, label: data.caption)
+                    Spacer(minLength: 0)
+                    chart(data)
+                        .frame(height: context.isSmall ? 38 : 150)
+                }
+            }
+        }
+    }
+
+    private func chart(_ data: __TYPE__Data) -> some View {
+        let highlight = data.highlight ?? data.bars.count - 1
+        let items = data.bars.enumerated().map { index, bar in
+            AWBarItem(bar.label, bar.value, highlighted: index == highlight, id: "\(index)")
+        }
+        return AWBarChart(items, tint: .purple, showsLabels: !context.isSmall)
+    }
+}

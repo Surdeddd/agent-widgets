@@ -1,0 +1,15 @@
+{
+  "title": "Commits",
+  "total": "42",
+  "caption": "last 7 days",
+  "bars": [
+    { "label": "Mon", "value": 4 },
+    { "label": "Tue", "value": 7 },
+    { "label": "Wed", "value": 3 },
+    { "label": "Thu", "value": 9 },
+    { "label": "Fri", "value": 6 },
+    { "label": "Sat", "value": 2 },
+    { "label": "Sun", "value": 11 }
+  ],
+  "highlight": 6
+}

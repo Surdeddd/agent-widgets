@@ -1,0 +1,26 @@
+import AWKit
+import SwiftUI
+
+struct __TYPE__Data: Codable, Sendable {
+    let title: String
+    let text: String
+}
+
+struct __TYPE__View: AWView {
+    let entry: AWEntry<__TYPE__Data>
+    @Environment(\.aw) private var context
+
+    init(entry: AWEntry<__TYPE__Data>) {
+        self.entry = entry
+    }
+
+    var body: some View {
+        AWPhaseView(entry) { data in
+            VStack(alignment: .leading, spacing: AWMetrics.spacing(for: context.family)) {
+                AWHeader(data.title, symbol: "sparkles", entry: entry)
+                AWText(data.text, .title, lines: 3)
+                Spacer(minLength: 0)
+            }
+        }
+    }
+}

@@ -1,0 +1,44 @@
+import AWKit
+import SwiftUI
+
+struct __TYPE__Data: Codable, Sendable {
+    let title: String
+    let caption: String?
+    let image: String
+    let credit: String?
+}
+
+struct __TYPE__View: AWView {
+    let entry: AWEntry<__TYPE__Data>
+    @Environment(\.aw) private var context
+
+    init(entry: AWEntry<__TYPE__Data>) {
+        self.entry = entry
+    }
+
+    var body: some View {
+        AWPhaseView(entry) { data in
+            let inset = AWMetrics.padding(for: context.family)
+            ZStack(alignment: .bottomLeading) {
+                Color.clear
+                    .overlay { AWImage(widget: "__ID__", name: data.image) }
+                    .clipped()
+                    .padding(-inset)
+                LinearGradient(colors: [.clear, .black.opacity(0.7)], startPoint: .center, endPoint: .bottom)
+                    .padding(-inset)
+                VStack(alignment: .leading, spacing: 2) {
+                    AWText(data.title, .headline, lines: 2)
+                    if let caption = data.caption, !context.isSmall {
+                        AWText(caption, .caption, lines: 2)
+                            .opacity(0.85)
+                    }
+                    if let credit = data.credit, context.family == .large {
+                        AWText(credit, .label)
+                            .opacity(0.7)
+                    }
+                }
+                .foregroundStyle(.white)
+            }
+        }
+    }
+}

@@ -1,0 +1,60 @@
+import AWKit
+import SwiftUI
+
+struct __TYPE__Data: Codable, Sendable {
+    let title: String
+    let event: String
+    let date: Date
+    let since: Date?
+    let symbol: String?
+}
+
+struct __TYPE__View: AWView {
+    static var tick: AWTick { .every(seconds: 3600, count: 24) }
+
+    let entry: AWEntry<__TYPE__Data>
+    @Environment(\.aw) private var context
+
+    init(entry: AWEntry<__TYPE__Data>) {
+        self.entry = entry
+    }
+
+    var body: some View {
+        AWPhaseView(entry) { data in
+            let remaining = data.date.timeIntervalSince(entry.date)
+            VStack(alignment: .leading, spacing: AWMetrics.spacing(for: context.family)) {
+                AWHeader(data.title, symbol: data.symbol ?? "hourglass", entry: entry)
+                AWText(data.event, .headline, lines: context.isSmall ? 2 : 1)
+                if remaining > 86_400 {
+                    AWMetric("\(Int(remaining / 86_400))", unit: context.pick(en: "days", ru: "дн"))
+                } else if remaining > 0 {
+                    AWCountdown(to: data.date)
+                } else {
+                    AWText(context.pick(en: "Now", ru: "Сейчас"), .hero)
+                }
+                Spacer(minLength: 0)
+                if !context.isSmall {
+                    AWText(Self.format(data.date, language: context.language), .caption)
+                        .foregroundStyle(.secondary)
+                    if let since = data.since {
+                        AWBar(progress: Self.fraction(since: since, until: data.date, now: entry.date), tint: .orange)
+                    }
+                }
+            }
+        }
+    }
+
+    static func format(_ date: Date, language: Language) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: language == .ru ? "ru_RU" : "en_US")
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .short
+        return formatter.string(from: date)
+    }
+
+    static func fraction(since: Date, until: Date, now: Date) -> Double {
+        let total = until.timeIntervalSince(since)
+        guard total > 0 else { return 1 }
+        return min(max(now.timeIntervalSince(since) / total, 0), 1)
+    }
+}

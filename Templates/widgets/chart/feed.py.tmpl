@@ -1,0 +1,35 @@
+#!/usr/bin/env python3
+import json
+import os
+import subprocess
+from datetime import date, timedelta
+
+russian = os.environ.get("AW_LANG") == "ru"
+settings = json.loads(os.environ.get("AW_SETTINGS") or "{}")
+repo = os.path.expanduser(settings.get("repo", "."))
+days = [date.today() - timedelta(days=offset) for offset in range(6, -1, -1)]
+counts = {day.isoformat(): 0 for day in days}
+try:
+    output = subprocess.run(
+        ["git", "-C", repo, "log", "--since=7.days", "--format=%ad", "--date=short"],
+        capture_output=True,
+        text=True,
+        timeout=20,
+        check=True,
+    ).stdout
+    for line in output.split():
+        if line in counts:
+            counts[line] += 1
+except (OSError, subprocess.SubprocessError):
+    pass
+
+names = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"] if russian else ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+bars = [{"label": names[day.weekday()], "value": counts[day.isoformat()]} for day in days]
+
+print(json.dumps({
+    "title": "Коммиты" if russian else "Commits",
+    "total": str(sum(bar["value"] for bar in bars)),
+    "caption": "за 7 дней" if russian else "last 7 days",
+    "bars": bars,
+    "highlight": len(bars) - 1,
+}, ensure_ascii=False))

@@ -1,0 +1,8 @@
+{
+  "id": "image",
+  "summary": {
+    "en": "Full-bleed photo with a caption",
+    "ru": "Фото на весь виджет с подписью"
+  },
+  "families": ["small", "medium", "large"]
+}

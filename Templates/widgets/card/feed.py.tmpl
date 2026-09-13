@@ -1,0 +1,18 @@
+#!/usr/bin/env python3
+import json
+import os
+from datetime import date
+
+russian = os.environ.get("AW_LANG") == "ru"
+deck_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "deck.json")
+with open(deck_path, encoding="utf-8") as handle:
+    deck = json.load(handle)
+card = deck[date.today().toordinal() % len(deck)]
+
+print(json.dumps({
+    "kicker": "Слово дня" if russian else "Word of the day",
+    "headline": card["headline"],
+    "subtitle": card.get("subtitle"),
+    "body": card["body_ru"] if russian else card["body_en"],
+    "footnote": card.get("example"),
+}, ensure_ascii=False))

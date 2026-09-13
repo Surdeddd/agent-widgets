@@ -1,0 +1,22 @@
+#!/usr/bin/env python3
+import json
+import os
+import random
+import urllib.request
+
+russian = os.environ.get("AW_LANG") == "ru"
+images = os.environ.get("AW_IMAGES_DIR", ".")
+os.makedirs(images, exist_ok=True)
+
+with urllib.request.urlopen(f"https://picsum.photos/v2/list?page={random.randint(1, 900)}&limit=1", timeout=15) as response:
+    photo = json.load(response)[0]
+with urllib.request.urlopen(f"https://picsum.photos/id/{photo['id']}/900/700", timeout=30) as response:
+    with open(os.path.join(images, "photo.jpg"), "wb") as handle:
+        handle.write(response.read())
+
+print(json.dumps({
+    "title": "Фото дня" if russian else "Photo of the day",
+    "caption": f"Picsum #{photo['id']}",
+    "image": "photo.jpg",
+    "credit": photo.get("author"),
+}, ensure_ascii=False))

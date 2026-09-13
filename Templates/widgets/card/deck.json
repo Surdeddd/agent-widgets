@@ -1,0 +1,58 @@
+[
+  {
+    "headline": "serendipity",
+    "subtitle": "/ˌser.ənˈdɪp.ə.ti/",
+    "body_en": "Finding something good without looking for it.",
+    "body_ru": "Счастливая случайность: найти хорошее, не ища его.",
+    "example": "Meeting her in that tiny bookshop was pure serendipity."
+  },
+  {
+    "headline": "resilient",
+    "subtitle": "/rɪˈzɪl.i.ənt/",
+    "body_en": "Able to recover quickly after something difficult.",
+    "body_ru": "Быстро восстанавливающийся после трудностей.",
+    "example": "The service stayed resilient during the outage."
+  },
+  {
+    "headline": "glance",
+    "subtitle": "/ɡlɑːns/",
+    "body_en": "A quick look, just enough to understand.",
+    "body_ru": "Быстрый взгляд, которого хватает, чтобы понять.",
+    "example": "A good widget tells you everything at a glance."
+  },
+  {
+    "headline": "tidy",
+    "subtitle": "/ˈtaɪ.di/",
+    "body_en": "Arranged neatly and in order.",
+    "body_ru": "Аккуратный, в порядке.",
+    "example": "Keep your desktop tidy and your widgets few."
+  },
+  {
+    "headline": "nudge",
+    "subtitle": "/nʌdʒ/",
+    "body_en": "A gentle push toward doing something.",
+    "body_ru": "Мягкий толчок к действию.",
+    "example": "The streak counter is a daily nudge to practice."
+  },
+  {
+    "headline": "wayfinding",
+    "subtitle": "/ˈweɪˌfaɪn.dɪŋ/",
+    "body_en": "How people figure out where they are and where to go.",
+    "body_ru": "То, как люди понимают, где они и куда идти.",
+    "example": "Clear headers are wayfinding for your eyes."
+  },
+  {
+    "headline": "cadence",
+    "subtitle": "/ˈkeɪ.dəns/",
+    "body_en": "The regular rhythm of something that repeats.",
+    "body_ru": "Регулярный ритм повторяющегося действия.",
+    "example": "A fifteen-minute cadence keeps the widget fresh."
+  },
+  {
+    "headline": "frugal",
+    "subtitle": "/ˈfruː.ɡəl/",
+    "body_en": "Careful not to waste resources.",
+    "body_ru": "Бережливый, не тратящий лишнего.",
+    "example": "Widgets must be frugal with their reload budget."
+  }
+]

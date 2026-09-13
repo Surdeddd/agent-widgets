@@ -1,0 +1,8 @@
+{
+  "id": "blank",
+  "summary": {
+    "en": "Minimal starting point",
+    "ru": "Минимальная заготовка"
+  },
+  "families": ["small", "medium"]
+}

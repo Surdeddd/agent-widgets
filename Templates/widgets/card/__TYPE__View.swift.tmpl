@@ -1,0 +1,58 @@
+import AWKit
+import SwiftUI
+
+struct __TYPE__Data: Codable, Sendable {
+    let kicker: String
+    let headline: String
+    let subtitle: String?
+    let body: String
+    let footnote: String?
+}
+
+struct __TYPE__View: AWView {
+    let entry: AWEntry<__TYPE__Data>
+    @Environment(\.aw) private var context
+
+    init(entry: AWEntry<__TYPE__Data>) {
+        self.entry = entry
+    }
+
+    var body: some View {
+        AWPhaseView(entry) { data in
+            VStack(alignment: .leading, spacing: context.isSmall ? AWSpace.xs : AWSpace.s) {
+                AWHeader(data.kicker, symbol: "text.book.closed", entry: entry)
+                VStack(alignment: .leading, spacing: 1) {
+                    AWText(data.headline, .title, lines: context.isSmall ? 2 : 1)
+                    if let subtitle = data.subtitle {
+                        AWText(subtitle, .caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                AWText(data.body, .body, lines: bodyLines)
+                Spacer(minLength: 0)
+                if let footnote = data.footnote, !context.isSmall {
+                    quote(footnote)
+                }
+            }
+        }
+    }
+
+    private var bodyLines: Int {
+        switch context.family {
+        case .small: 3
+        case .medium: 2
+        default: 6
+        }
+    }
+
+    private func quote(_ text: String) -> some View {
+        HStack(spacing: AWSpace.s) {
+            RoundedRectangle(cornerRadius: 1.5)
+                .fill(.tertiary)
+                .frame(width: 3)
+            AWText(text, .caption, lines: context.family == .medium ? 1 : 3)
+                .foregroundStyle(.secondary)
+        }
+        .fixedSize(horizontal: false, vertical: true)
+    }
+}

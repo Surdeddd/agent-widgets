@@ -1,0 +1,13 @@
+{
+  "title": "Pull requests merged across every repository",
+  "total": "1,284",
+  "caption": "last 14 days, whole organization",
+  "bars": [
+    { "label": "1", "value": 64 }, { "label": "2", "value": 81 }, { "label": "3", "value": 97 },
+    { "label": "4", "value": 88 }, { "label": "5", "value": 102 }, { "label": "6", "value": 34 },
+    { "label": "7", "value": 21 }, { "label": "8", "value": 110 }, { "label": "9", "value": 126 },
+    { "label": "10", "value": 118 }, { "label": "11", "value": 131 }, { "label": "12", "value": 142 },
+    { "label": "13", "value": 45 }, { "label": "14", "value": 125 }
+  ],
+  "highlight": 11
+}

@@ -1,0 +1,8 @@
+{
+  "id": "chart",
+  "summary": {
+    "en": "Bars for the last days with a total",
+    "ru": "Столбцы за последние дни и итог"
+  },
+  "families": ["small", "medium", "large"]
+}
