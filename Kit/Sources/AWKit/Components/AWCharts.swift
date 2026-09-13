@@ -53,12 +53,13 @@ public struct AWSparkline: View {
 }
 
 public struct AWBarItem: Identifiable, Sendable {
-    public var id: String { label }
+    public var id: String
     public var label: String
     public var value: Double
     public var highlighted: Bool
 
-    public init(_ label: String, _ value: Double, highlighted: Bool = false) {
+    public init(_ label: String, _ value: Double, highlighted: Bool = false, id: String? = nil) {
+        self.id = id ?? label
         self.label = label
         self.value = value
         self.highlighted = highlighted

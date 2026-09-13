@@ -53,7 +53,7 @@ public struct AWPhaseView<Model: Sendable, Content: View>: View {
             AWEmptyState(
                 symbol: "hourglass",
                 title: context.pick(en: "Waiting for data", ru: "Ждём данные"),
-                subtitle: context.isSmall ? nil : context.pick(en: "aw feed run fills it", ru: "заполнит aw feed run")
+                subtitle: context.isSmall ? nil : context.pick(en: "fill it with a feed or aw data set", ru: "заполни через feed или aw data set")
             )
         }
     }
