@@ -62,9 +62,10 @@ public enum IssueCode {
     public static let staleData = "STALE_DATA"
     public static let daemonMissing = "DAEMON_MISSING"
     public static let keptExisting = "KEPT_EXISTING"
+    public static let previewCrashed = "PREVIEW_CRASHED"
 
     public static let all: [String] = [
-        keptExisting,
+        keptExisting, previewCrashed,
         overflow, truncation, decode, tinyText, emptyScenario, unrenderable,
         manifestInvalid, duplicateKind, budgetRisk, missingDefaultSample,
         workspaceNotFound, workspaceExists, engineNotFound, invalidJSON,
