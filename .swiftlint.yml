@@ -17,6 +17,8 @@ type_body_length:
   warning: 400
 file_length:
   warning: 600
+cyclomatic_complexity:
+  ignores_case_statements: true
 disabled_rules:
   - todo
   - trailing_comma

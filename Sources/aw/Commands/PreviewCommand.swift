@@ -47,7 +47,7 @@ struct PreviewCommand: AWCommand {
             language: global.language
         )
         let outcome = try await PreviewPipeline(workspace: workspace, cache: cache, runner: runner).run(widget, request)
-        let issues = Self.unique(outcome.allIssues)
+        let issues = outcome.allIssues.deduplicated()
         let artifacts = outcome.report.map { report in
             [report.sheet, URL(fileURLWithPath: report.sheet).deletingLastPathComponent().appendingPathComponent("report.json").path]
         } ?? []
@@ -60,11 +60,6 @@ struct PreviewCommand: AWCommand {
             _ = try? await runner.run("/usr/bin/open", [sheet])
         }
         return result.ok ? 0 : 1
-    }
-
-    static func unique(_ issues: [Issue]) -> [Issue] {
-        var seen = Set<String>()
-        return issues.filter { seen.insert("\($0.code)|\($0.message)|\($0.file ?? "")").inserted }
     }
 
     static func summary(_ outcome: PreviewOutcome) -> String {

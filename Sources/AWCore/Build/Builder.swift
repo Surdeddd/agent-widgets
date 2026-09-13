@@ -49,7 +49,7 @@ public struct Builder: Sendable {
         let fileManager = FileManager.default
         try fileManager.createDirectory(at: projectDir.appendingPathComponent("App"), withIntermediateDirectories: true)
         try fileManager.createDirectory(at: projectDir.appendingPathComponent("Extension"), withIntermediateDirectories: true)
-        try write(RegistryGenerator.generate(widgets), to: "Extension/Registry.swift")
+        try write(RegistryGenerator.generate(widgets, devName: workspace.config.devSlotName), to: "Extension/Registry.swift")
         let host = try String(contentsOf: engine.templates.appendingPathComponent("app/HostApp.swift.tmpl"), encoding: .utf8)
             .replacingOccurrences(of: "__APP_GROUP_LITERAL__", with: RegistryGenerator.literal(workspace.config.resolvedAppGroup))
             .replacingOccurrences(of: "__APP_NAME_LITERAL__", with: RegistryGenerator.literal(workspace.config.appName))

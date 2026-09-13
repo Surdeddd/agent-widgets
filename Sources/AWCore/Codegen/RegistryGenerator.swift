@@ -5,14 +5,14 @@ public enum RegistryGenerator {
     public static let devKind = "aw.dev"
     public static let chunkSize = 10
 
-    public static func generate(_ widgets: [WidgetSource]) -> String {
+    public static func generate(_ widgets: [WidgetSource], devName: String = "Agent Widgets · Dev") -> String {
         let sorted = widgets.sorted { $0.id < $1.id }
         var lines = ["import AWKit", "import SwiftUI", "import WidgetKit", ""]
         lines += samples(sorted)
         for widget in sorted {
             lines += widgetStruct(widget.manifest)
         }
-        lines += devView(sorted.map(\.manifest))
+        lines += devView(sorted.map(\.manifest), devName: devName)
         lines += bundles(sorted.map(\.manifest))
         return lines.joined(separator: "\n") + "\n"
     }
@@ -82,7 +82,7 @@ public enum RegistryGenerator {
         ]
     }
 
-    private static func devView(_ manifests: [WidgetManifest]) -> [String] {
+    private static func devView(_ manifests: [WidgetManifest], devName: String) -> [String] {
         var lines = [
             "struct AWDevView: View {",
             "    let entry: AWDevEntry",
@@ -104,7 +104,7 @@ public enum RegistryGenerator {
             "        StaticConfiguration(kind: \(literal(devKind)), provider: AWDevProvider()) { entry in",
             "            AWWidgetContainer { AWDevView(entry: entry) }",
             "        }",
-            "        .configurationDisplayName(\"Agent Widgets · Dev\")",
+            "        .configurationDisplayName(\(literal(devName)))",
             "        .description(L10n.pick(en: \"Shows the widget an agent is working on.\", ru: \"Показывает виджет, над которым работает агент.\"))",
             "        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge, .systemExtraLarge])",
             "        .contentMarginsDisabled()",

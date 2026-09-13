@@ -36,6 +36,12 @@ struct GlobalOptions: ParsableArguments {
     }
 }
 
+enum Console {
+    static func note(_ text: String) {
+        FileHandle.standardError.write(Data("\(text)\n".utf8))
+    }
+}
+
 protocol AWCommand: AsyncParsableCommand {
     var global: GlobalOptions { get }
     func execute() async throws -> Int32

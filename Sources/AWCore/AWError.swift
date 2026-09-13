@@ -10,9 +10,25 @@ public enum AWError: Error, Equatable, Sendable {
     case widgetExists(String)
     case templateUnknown(String, [String])
     case toolFailed(tool: String, status: Int32, output: String)
+    case installFailed(String)
+    case scenarioNotFound(widget: String, scenario: String, available: [String])
 
     public var issue: Issue {
         switch self {
+        case .installFailed(let reason):
+            Issue(
+                code: IssueCode.installFailed,
+                severity: .error,
+                message: reason,
+                hint: L10n.pick(en: "Run `aw doctor` to check the setup", ru: "Проверь окружение: `aw doctor`")
+            )
+        case .scenarioNotFound(let widget, let scenario, let available):
+            Issue(
+                code: IssueCode.scenarioNotFound,
+                severity: .error,
+                message: L10n.pick(en: "Widget \(widget) has no samples/\(scenario).json", ru: "У виджета \(widget) нет samples/\(scenario).json"),
+                hint: L10n.pick(en: "Available: \(available.joined(separator: ", "))", ru: "Есть: \(available.joined(separator: ", "))")
+            )
         case .widgetExists(let id):
             Issue(
                 code: IssueCode.widgetExists,

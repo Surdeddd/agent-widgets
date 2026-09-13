@@ -73,6 +73,10 @@ public struct WorkspaceConfig: Codable, Equatable, Sendable {
         installDir ?? "/Applications"
     }
 
+    public var devSlotName: String {
+        "\(appName) · Dev"
+    }
+
     public static func load(base: URL, local: URL?) throws -> WorkspaceConfig {
         var merged = try readJSON(base)
         if let local, FileManager.default.fileExists(atPath: local.path) {
