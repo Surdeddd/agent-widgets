@@ -27,9 +27,17 @@ public struct AWImage: View {
 
     public var body: some View {
         if let url = store.imageURL(widget: widget, name: name), let image = NSImage(contentsOf: url) {
-            Image(nsImage: image)
-                .resizable()
-                .aspectRatio(contentMode: contentMode)
+            if contentMode == .fill {
+                Image(nsImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+                    .clipped()
+            } else {
+                Image(nsImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+            }
         } else {
             RoundedRectangle(cornerRadius: 10, style: .continuous)
                 .fill(.quaternary)

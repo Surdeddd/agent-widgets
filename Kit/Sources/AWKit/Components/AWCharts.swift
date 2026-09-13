@@ -80,21 +80,34 @@ public struct AWBarChart: View {
 
     public var body: some View {
         let color = context.isVibrant ? Color.primary : tint
-        Chart(items) { item in
-            BarMark(x: .value("label", item.label), y: .value("value", item.value), width: .ratio(0.62))
+        let slots = Self.slots(for: items)
+        Chart(Array(items.enumerated()), id: \.offset) { index, item in
+            BarMark(x: .value("slot", slots[index]), y: .value("value", item.value), width: .ratio(0.62))
                 .cornerRadius(3)
                 .foregroundStyle(item.highlighted ? color : color.opacity(0.35))
         }
+        .chartXScale(domain: slots)
         .chartYAxis(.hidden)
         .chartLegend(.hidden)
         .chartXAxis {
             if showsLabels {
-                AxisMarks { _ in
-                    AxisValueLabel()
-                        .font(.system(size: AWType.size(.label, context.family), weight: .medium))
+                AxisMarks(values: slots) { value in
+                    AxisValueLabel {
+                        Text(Self.label(for: value.as(String.self), in: items))
+                            .font(.system(size: AWType.size(.label, context.family), weight: .medium))
+                    }
                 }
             }
         }
         .widgetAccentable()
+    }
+
+    static func slots(for items: [AWBarItem]) -> [String] {
+        items.indices.map(String.init)
+    }
+
+    static func label(for slot: String?, in items: [AWBarItem]) -> String {
+        guard let index = slot.flatMap(Int.init), items.indices.contains(index) else { return "" }
+        return items[index].label
     }
 }
