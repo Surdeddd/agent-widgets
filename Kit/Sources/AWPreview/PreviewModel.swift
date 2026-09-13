@@ -1,0 +1,89 @@
+import AWKit
+import AWSchema
+import CoreGraphics
+import Foundation
+
+public struct PreviewScenario: Sendable {
+    public var name: String
+    public var data: Data?
+    public var state: AWState
+    public var status: FeedStatus?
+    public var source: String?
+
+    public init(name: String, data: Data?, state: AWState = AWState(), status: FeedStatus? = nil, source: String? = nil) {
+        self.name = name
+        self.data = data
+        self.state = state
+        self.status = status
+        self.source = source
+    }
+
+    public static func load(name: String, path: URL) -> PreviewScenario {
+        let raw = try? Data(contentsOf: path)
+        let trimmed = raw.map { String(bytes: $0, encoding: .utf8) ?? "" }?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let data = trimmed.isEmpty || trimmed == "null" ? nil : raw
+        let base = path.deletingPathExtension()
+        let state = sidecar(base.appendingPathExtension("state.json")).flatMap { try? AWJSON.decoder().decode(AWState.self, from: $0) }
+        let status = sidecar(base.appendingPathExtension("status.json")).flatMap { try? AWJSON.decoder().decode(FeedStatus.self, from: $0) }
+        return PreviewScenario(name: name, data: data, state: state ?? AWState(), status: status, source: path.path)
+    }
+
+    private static func sidecar(_ url: URL) -> Data? {
+        try? Data(contentsOf: url)
+    }
+}
+
+public struct PreviewJob: Sendable {
+    public var family: Family
+    public var appearance: Appearance
+    public var mode: RenderMode
+    public var scenario: PreviewScenario
+
+    public init(family: Family, appearance: Appearance, mode: RenderMode, scenario: PreviewScenario) {
+        self.family = family
+        self.appearance = appearance
+        self.mode = mode
+        self.scenario = scenario
+    }
+
+    public var fileName: String {
+        "\(family.rawValue)-\(appearance.rawValue)-\(mode.rawValue)-\(scenario.name).png"
+    }
+
+    public var rowLabel: String {
+        "\(scenario.name) · \(appearance.rawValue) · \(mode == .idle ? "desktop idle" : "color")"
+    }
+}
+
+public enum PreviewPlan {
+    public static func jobs(families: [Family], scenarios: [PreviewScenario], full: Bool) -> [PreviewJob] {
+        let ordered = scenarios.sorted { lhs, rhs in
+            if lhs.name == "default" { return rhs.name != "default" }
+            if rhs.name == "default" { return false }
+            return lhs.name < rhs.name
+        }
+        var jobs: [PreviewJob] = []
+        for scenario in ordered {
+            for (appearance, mode) in combinations(for: scenario, full: full) {
+                jobs += families.map { PreviewJob(family: $0, appearance: appearance, mode: mode, scenario: scenario) }
+            }
+        }
+        return jobs
+    }
+
+    private static func combinations(for scenario: PreviewScenario, full: Bool) -> [(Appearance, RenderMode)] {
+        if full {
+            return [(.light, .color), (.dark, .color), (.light, .idle), (.dark, .idle)]
+        }
+        if scenario.name == "default" {
+            return [(.light, .color), (.dark, .color), (.dark, .idle)]
+        }
+        return [(.dark, .color)]
+    }
+}
+
+public struct RenderedCell {
+    public var job: PreviewJob
+    public var cell: PreviewCell
+    public var image: CGImage
+}
