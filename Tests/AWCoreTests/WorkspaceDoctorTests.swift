@@ -42,6 +42,26 @@ private func doctorPaths(_ root: URL) -> InstallPaths {
     #expect(checks[1].issue?.hint?.contains("aw ship") == true)
 }
 
+@Test func feedsWithoutADaemonAreFlagged() async throws {
+    let root = try ProbeWorkspace.make()
+    defer { try? FileManager.default.removeItem(at: root) }
+    let manifest = WidgetManifest(
+        id: "probe",
+        name: LocalizedText(en: "Probe"),
+        families: [.small],
+        view: "ProbeView",
+        feed: FeedSpec(command: "./feed.sh", every: Interval(seconds: 900))
+    )
+    try JSONEncoder().encode(manifest).write(to: root.appendingPathComponent("widgets/probe/widget.json"))
+    let workspace = try Workspace.load(at: root)
+    let missing = await Doctor(runner: FakeProcessRunner()).workspaceChecks(workspace, paths: doctorPaths(root), screenRecording: false, windows: [])
+    #expect(missing.first { $0.id == "daemon" }?.issue?.code == IssueCode.daemonMissing)
+    let runner = FakeProcessRunner()
+    runner.respond(to: "/bin/launchctl print", with: .ok("gui/501/com.agentwidgets.probe.tick = {\n\tstate = not running\n}\n"))
+    let running = await Doctor(runner: runner).workspaceChecks(workspace, paths: doctorPaths(root), screenRecording: false, windows: [])
+    #expect(running.first { $0.id == "daemon" }?.status == .pass)
+}
+
 @Test func devSlotAwayFromTheDesktopComesWithPlacementSteps() async throws {
     let root = try ProbeWorkspace.make()
     defer { try? FileManager.default.removeItem(at: root) }

@@ -21,7 +21,8 @@ let package = Package(
                 .product(name: "ArgumentParser", package: "swift-argument-parser")
             ]
         ),
-        .testTarget(name: "AWCoreTests", dependencies: ["AWCore"], resources: [.copy("Fixtures")])
+        .testTarget(name: "AWCoreTests", dependencies: ["AWCore"], resources: [.copy("Fixtures")]),
+        .testTarget(name: "AWMCPTests", dependencies: ["AWMCP", "AWCore", .product(name: "MCP", package: "swift-sdk")])
     ],
     swiftLanguageModes: [.v5]
 )

@@ -45,7 +45,7 @@ struct FeedRunCommand: AWCommand {
         )
         let run = await feeds.run(widget, validate: check)
         if run.changed {
-            await DataReload.after(publishing: widget, workspace: workspace, runner: runner)
+            await Reloader(config: workspace.config, runner: runner).reload(afterPublishing: widget, store: AppGroupStore(config: workspace.config))
         }
         global.printer.emit(CommandResult(issues: run.issues, artifacts: [feeds.logFile(for: widget.id).path], data: run)) { run in
             guard let run else { return "" }
@@ -205,7 +205,7 @@ struct DataSetCommand: AWCommand {
         let changed = try store.publish(data, widget: widget.id)
         try store.writeStatus(FeedStatus(ok: true, checkedAt: Date(), fetchedAt: Date()), widget: widget.id)
         if changed {
-            await DataReload.after(publishing: widget, workspace: workspace, runner: runner)
+            await Reloader(config: workspace.config, runner: runner).reload(afterPublishing: widget, store: AppGroupStore(config: workspace.config))
         }
         let path = store.url(AppGroupLayout.data(widget.id)).path
         global.printer.emit(CommandResult(artifacts: [path], data: ["changed": changed])) { _ in
@@ -282,15 +282,6 @@ struct LogsCommand: AWCommand {
 }
 
 enum DataReload {
-    static func after(publishing widget: WidgetSource, workspace: Workspace, runner: any ProcessRunning) async {
-        let reloader = Reloader(config: workspace.config, runner: runner)
-        await reloader.reload(kind: widget.manifest.resolvedKind)
-        let dev = AppGroupStore(config: workspace.config).devTarget()
-        if dev?.widget == widget.id && dev?.scenario == nil {
-            await reloader.reload(kind: RegistryGenerator.devKind)
-        }
-    }
-
     static func line(_ run: FeedRun) -> String {
         let seconds = String(format: "%.1f", run.seconds)
         guard run.ok else {

@@ -23,4 +23,13 @@ public struct Reloader: Sendable {
         let result = try? await runner.run("/usr/bin/open", ["-g", url(kind: kind)], cwd: nil, environment: nil, timeout: 30)
         return result?.succeeded == true
     }
+
+    /// Redraws a widget after new data, and the dev slot too when it shows that widget live.
+    public func reload(afterPublishing widget: WidgetSource, store: AppGroupStore) async {
+        await reload(kind: widget.manifest.resolvedKind)
+        let dev = store.devTarget()
+        if dev?.widget == widget.id && dev?.scenario == nil {
+            await reload(kind: RegistryGenerator.devKind)
+        }
+    }
 }

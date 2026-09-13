@@ -11,7 +11,33 @@ extension Doctor {
             checks.append(await extensionCheck(installer))
         }
         checks.append(devSlotCheck(config, screenRecording: screenRecording, windows: windows))
+        if (try? workspace.widgets())?.contains(where: { $0.manifest.feed != nil }) == true {
+            checks.append(await daemonCheck(workspace))
+        }
         return checks
+    }
+
+    func daemonCheck(_ workspace: Workspace) async -> DoctorCheck {
+        let title = L10n.pick(en: "Feed daemon", ru: "Daemon feed")
+        let status = await Daemon(workspace: workspace, runner: runner).status()
+        guard status.loaded else {
+            return DoctorCheck(
+                id: "daemon",
+                title: title,
+                status: .warn,
+                detail: L10n.pick(en: "not installed", ru: "не установлен"),
+                issue: Issue(
+                    code: IssueCode.daemonMissing,
+                    severity: .warning,
+                    message: L10n.pick(
+                        en: "Widgets have feeds, but nothing runs them on schedule",
+                        ru: "У виджетов есть feed, но их никто не запускает по расписанию"
+                    ),
+                    hint: "aw daemon install"
+                )
+            )
+        }
+        return DoctorCheck(id: "daemon", title: title, status: .pass, detail: status.label)
     }
 
     func screenCheck(_ allowed: Bool) -> DoctorCheck {

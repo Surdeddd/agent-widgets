@@ -19,30 +19,14 @@ struct ShotCommand: AWCommand {
 
     func execute() async throws -> Int32 {
         let workspace = try global.loadWorkspace()
-        let targets = try ShotTarget.resolve(workspace, kind: kind, dev: dev)
-        guard WindowLocator.screenRecordingAllowed else {
-            global.printer.emit(CommandResult<NoPayload>(issues: [ShotIssues.screenRecording(.error)])) { _ in "" }
-            return 3
-        }
-        let windows = WindowLocator.current()
-        let shooter = Shooter(directory: workspace.shotsDir, capture: Capture(runner: SystemProcessRunner()))
-        var records: [ShotRecord] = []
-        var issues: [Issue] = []
-        let single = kind != nil || dev
-        for target in targets {
-            let found = WindowLocator.find(windows, names: target.names, descriptor: target.descriptor)
-            if found.isEmpty && single {
-                issues.append(ShotIssues.notPlaced(target.names.first ?? target.label, appName: workspace.config.appName))
-            }
-            records += await shooter.take(found, label: target.label)
-        }
-        if records.isEmpty && issues.isEmpty {
-            issues.append(ShotIssues.notPlaced(workspace.config.appName, appName: workspace.config.appName))
-        }
-        global.printer.emit(CommandResult(issues: issues, artifacts: records.map(\.path), data: records)) { records in
+        let capture = try await ShotService.capture(workspace, kind: kind, dev: dev, runner: SystemProcessRunner())
+        global.printer.emit(CommandResult(issues: capture.issues, artifacts: capture.records.map(\.path), data: capture.records)) { records in
             (records ?? []).map { "✓ \($0.label) \($0.window.family?.rawValue ?? "?") → \($0.path)" }.joined(separator: "\n")
         }
-        return records.isEmpty ? 1 : 0
+        if capture.issues.contains(where: { $0.code == IssueCode.screenRecordingDenied }) {
+            return 3
+        }
+        return capture.records.isEmpty ? 1 : 0
     }
 }
 
