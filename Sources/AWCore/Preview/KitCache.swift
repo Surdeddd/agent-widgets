@@ -29,6 +29,10 @@ public struct KitCache: Sendable {
         return String(digest.prefix(16))
     }
 
+    public func isReady() async -> Bool {
+        isComplete(base.appendingPathComponent(await fingerprint(), isDirectory: true))
+    }
+
     public func ensure() async throws -> URL {
         let key = await fingerprint()
         let target = base.appendingPathComponent(key, isDirectory: true)
