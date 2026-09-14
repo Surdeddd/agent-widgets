@@ -78,8 +78,8 @@ public struct ShipOutcome: Codable, Sendable {
                 ru: "Отгружен без снимка со стола — реальный виджет ещё никто не видел"
             ),
             hint: L10n.pick(
-                en: "Put the dev slot on the desktop and run `aw shot --dev`",
-                ru: "Поставь dev-слот на стол и запусти `aw shot --dev`"
+                en: "Ask the person to put the dev slot on the desktop and run `aw slot` — it waits for the slot and captures it",
+                ru: "Попроси поставить dev-слот на стол и запусти `aw slot` — он дождётся слота и снимет его"
             )
         )
     }
