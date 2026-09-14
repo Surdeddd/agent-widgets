@@ -370,6 +370,21 @@ private let catalogEntries: [IssueExplanation] = [
         example: nil
     ),
     IssueExplanation(
+        code: IssueCode.feedCommandNotFound,
+        title: text("The feed command cannot be run", "Команду feed не запустить"),
+        cause: text(
+            "The shell could not find the program (exit 127) or was not allowed to run it (exit 126). Feeds run through /bin/zsh -c "
+                + "with PATH=/opt/homebrew/bin:/usr/local/bin:~/.local/bin plus the PATH aw itself got — not your interactive shell profile.",
+            "Оболочка не нашла программу (код 127) или ей не дали её запустить (код 126). Feed идёт через /bin/zsh -c "
+                + "с PATH=/opt/homebrew/bin:/usr/local/bin:~/.local/bin плюс PATH самого aw — без профиля твоей оболочки."
+        ),
+        fix: text(
+            "Install the program or put its full path in widget.json; make scripts executable with chmod +x or call them through the interpreter.",
+            "Установи программу или впиши полный путь в widget.json; скрипты сделай исполняемыми (chmod +x) или вызывай через интерпретатор."
+        ),
+        example: "\"feed\": {\"command\": \"/opt/homebrew/bin/python3 feed.py\", \"every\": \"30m\"}"
+    ),
+    IssueExplanation(
         code: IssueCode.daemonMissing,
         title: text("Feeds are not scheduled", "Feed не запланированы"),
         cause: text(

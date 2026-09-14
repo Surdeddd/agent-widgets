@@ -83,9 +83,42 @@ private struct FeedFixture {
     #expect(!status.ok)
     #expect(status.fetchedAt == feedNow)
     #expect(status.checkedAt == later)
+    #expect(status.exitCode == 3)
+    #expect(status.stderrTail == ["boom"])
     let log = try String(contentsOf: fixture.root.appendingPathComponent(".aw/logs/probe.log"), encoding: .utf8)
     #expect(log.contains("exit 3"))
     #expect(log.contains("boom"))
+}
+
+@Test func aMissingProgramIsNamedWithTheFeedPath() async throws {
+    let fixture = try FeedFixture(command: "aw-missing-binary-xyz --flag")
+    defer { fixture.cleanup() }
+    let run = try await fixture.run()
+    let issue = try #require(run.issues.first)
+    #expect(issue.code == IssueCode.feedCommandNotFound)
+    #expect(issue.message.contains("`aw-missing-binary-xyz`"))
+    #expect(issue.hint?.contains("PATH=/opt/homebrew/bin") == true)
+    let status = try #require(fixture.store.status(widget: "probe"))
+    #expect(status.exitCode == 127)
+    #expect(status.stderrTail?.contains { $0.contains("aw-missing-binary-xyz") } == true)
+}
+
+@Test func aToolMissingInsideAScriptIsNamed() async throws {
+    let fixture = try FeedFixture(command: "sh -c 'aw-missing-tool-xyz --version'")
+    defer { fixture.cleanup() }
+    let run = try await fixture.run()
+    #expect(run.issues.first?.code == IssueCode.feedCommandNotFound)
+    #expect(run.issues.first?.message.contains("`aw-missing-tool-xyz`") == true)
+}
+
+@Test func aScriptWithoutTheExecutableBitIsExplained() async throws {
+    let fixture = try FeedFixture(command: "./feed.sh")
+    defer { fixture.cleanup() }
+    try Data("#!/bin/sh\necho '{}'\n".utf8).write(to: fixture.root.appendingPathComponent("widgets/probe/feed.sh"))
+    let run = try await fixture.run()
+    #expect(run.issues.first?.code == IssueCode.feedCommandNotFound)
+    #expect(run.issues.first?.hint?.contains("chmod +x ./feed.sh") == true)
+    #expect(fixture.store.status(widget: "probe")?.exitCode == 126)
 }
 
 @Test func garbageOutputIsRejected() async throws {

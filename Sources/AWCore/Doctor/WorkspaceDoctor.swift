@@ -7,7 +7,8 @@ extension Doctor {
         paths: InstallPaths,
         screenRecording: Bool,
         windows: [WidgetWindow],
-        geometry: DeskGeometry?
+        geometry: DeskGeometry?,
+        now: Date = Date()
     ) async -> [DoctorCheck] {
         let config = workspace.config
         let installer = Installer(config: config, runner: runner, paths: paths)
@@ -20,6 +21,7 @@ extension Doctor {
         checks.append(geometryCheck(geometry))
         if (try? workspace.widgets())?.contains(where: { $0.manifest.feed != nil }) == true {
             checks.append(await daemonCheck(workspace))
+            checks += feedChecks(workspace, store: AppGroupStore(root: paths.groupContainer), now: now)
         }
         return checks
     }

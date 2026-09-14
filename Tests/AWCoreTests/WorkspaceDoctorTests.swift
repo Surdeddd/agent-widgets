@@ -76,6 +76,42 @@ private let measuredDesk = DeskGeometry(
     #expect(running.first { $0.id == "daemon" }?.status == .pass)
 }
 
+@Test func everyFeedReportsItsHealth() async throws {
+    let root = try ProbeWorkspace.make()
+    defer { try? FileManager.default.removeItem(at: root) }
+    let manifest = WidgetManifest(
+        id: "probe",
+        name: LocalizedText(en: "Probe"),
+        families: [.small],
+        view: "ProbeView",
+        feed: FeedSpec(command: "./feed.sh", every: Interval(seconds: 900))
+    )
+    try JSONEncoder().encode(manifest).write(to: root.appendingPathComponent("widgets/probe/widget.json"))
+    let workspace = try Workspace.load(at: root)
+    let paths = doctorPaths(root)
+    let store = AppGroupStore(root: paths.groupContainer)
+    let now = Date(timeIntervalSince1970: 1_800_000_000)
+    func feed() async -> DoctorCheck? {
+        await Doctor(runner: FakeProcessRunner())
+            .workspaceChecks(workspace, paths: paths, screenRecording: false, windows: [], geometry: nil, now: now)
+            .first { $0.id == "feed-probe" }
+    }
+    #expect(await feed()?.issue?.code == IssueCode.staleData)
+    try store.writeStatus(FeedStatus(ok: true, checkedAt: now.addingTimeInterval(-600), fetchedAt: now.addingTimeInterval(-600)), widget: "probe")
+    let fresh = try #require(await feed())
+    #expect(fresh.status == .pass)
+    #expect(fresh.detail.contains("10"))
+    let failed = FeedStatus(ok: false, checkedAt: now.addingTimeInterval(-60), fetchedAt: now.addingTimeInterval(-600), error: "boom", exitCode: 3)
+    try store.writeStatus(failed, widget: "probe")
+    let failing = try #require(await feed())
+    #expect(failing.issue?.code == IssueCode.feedFailed)
+    #expect(failing.detail.contains("boom"))
+    try store.writeStatus(FeedStatus(ok: false, checkedAt: now, fetchedAt: now.addingTimeInterval(-3 * 900 - 60), error: "boom"), widget: "probe")
+    let stale = try #require(await feed())
+    #expect(stale.issue?.code == IssueCode.staleData)
+    #expect(stale.detail.contains("boom"))
+}
+
 @Test func devSlotAwayFromTheDesktopComesWithPlacementSteps() async throws {
     let root = try ProbeWorkspace.make()
     defer { try? FileManager.default.removeItem(at: root) }

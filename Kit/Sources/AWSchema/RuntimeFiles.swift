@@ -5,12 +5,23 @@ public struct FeedStatus: Codable, Equatable, Sendable {
     public var checkedAt: Date
     public var fetchedAt: Date?
     public var error: String?
+    public var exitCode: Int32?
+    public var stderrTail: [String]?
 
-    public init(ok: Bool, checkedAt: Date, fetchedAt: Date? = nil, error: String? = nil) {
+    public init(
+        ok: Bool,
+        checkedAt: Date,
+        fetchedAt: Date? = nil,
+        error: String? = nil,
+        exitCode: Int32? = nil,
+        stderrTail: [String]? = nil
+    ) {
         self.ok = ok
         self.checkedAt = checkedAt
         self.fetchedAt = fetchedAt
         self.error = error
+        self.exitCode = exitCode
+        self.stderrTail = stderrTail
     }
 }
 

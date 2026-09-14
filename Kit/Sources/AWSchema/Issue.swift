@@ -68,6 +68,7 @@ public enum IssueCode {
     public static let shipUnverified = "SHIP_UNVERIFIED"
     public static let geometryUnknown = "GEOMETRY_UNKNOWN"
     public static let shotMismatch = "SHOT_MISMATCH"
+    public static let feedCommandNotFound = "FEED_COMMAND_NOT_FOUND"
 
     public static let all: [String] = [
         keptExisting, previewCrashed,
@@ -78,6 +79,6 @@ public enum IssueCode {
         screenRecordingDenied, widgetNotPlaced, shotUnchanged, shipUnverified, geometryUnknown,
         widgetExists, widgetNotFound, templateUnknown, scenarioNotFound,
         feedFailed, feedTimeout, feedInvalidOutput, staleData, daemonMissing,
-        shotMismatch
+        shotMismatch, feedCommandNotFound
     ]
 }

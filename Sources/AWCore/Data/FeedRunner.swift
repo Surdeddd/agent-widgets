@@ -52,13 +52,14 @@ public struct FeedRunner: Sendable {
         }
         let images = store.url(AppGroupLayout.widgetDirectory(widget.id) + "/images")
         try? FileManager.default.createDirectory(at: images, withIntermediateDirectories: true)
+        let feedEnvironment = environment(for: widget)
         let result: ProcessResult
         do {
             result = try await runner.run(
                 "/bin/zsh",
                 ["-c", feed.command],
                 cwd: widget.directory,
-                environment: environment(for: widget),
+                environment: feedEnvironment,
                 timeout: TimeInterval(feed.resolvedTimeout.seconds)
             )
         } catch {
@@ -70,15 +71,16 @@ public struct FeedRunner: Sendable {
             ))
         }
         appendLog(widget.id, result: result, now: now)
-        if let failure = Self.failure(of: result, widget: widget.id, timeout: feed.resolvedTimeout.seconds) {
-            return fail(widget, started: started, now: now, issue: failure)
+        let path = feedEnvironment["PATH"] ?? ""
+        if let failure = Self.failure(of: result, widget: widget.id, command: feed.command, path: path, timeout: feed.resolvedTimeout.seconds) {
+            return fail(widget, started: started, now: now, issue: failure, result: result)
         }
         let output = Data(result.stdout.trimmingCharacters(in: .whitespacesAndNewlines).utf8)
         guard case .object? = try? JSONDecoder().decode(JSONValue.self, from: output) else {
-            return fail(widget, started: started, now: now, issue: Self.invalidOutput(widget.id, result.stdout))
+            return fail(widget, started: started, now: now, issue: Self.invalidOutput(widget.id, result.stdout), result: result)
         }
         if let validate, let issue = await validate(output) {
-            return fail(widget, started: started, now: now, issue: issue)
+            return fail(widget, started: started, now: now, issue: issue, result: result)
         }
         do {
             let changed = try store.publish(output, widget: widget.id)
@@ -94,10 +96,22 @@ public struct FeedRunner: Sendable {
         }
     }
 
-    private func fail(_ widget: WidgetSource, started: Date, now: Date, issue: Issue) -> FeedRun {
+    private func fail(_ widget: WidgetSource, started: Date, now: Date, issue: Issue, result: ProcessResult? = nil) -> FeedRun {
         let previous = store.status(widget: widget.id)
-        try? store.writeStatus(FeedStatus(ok: false, checkedAt: now, fetchedAt: previous?.fetchedAt, error: issue.message), widget: widget.id)
+        let status = FeedStatus(
+            ok: false,
+            checkedAt: now,
+            fetchedAt: previous?.fetchedAt,
+            error: issue.message,
+            exitCode: result?.status,
+            stderrTail: result.map { Self.tail($0.stderr) }
+        )
+        try? store.writeStatus(status, widget: widget.id)
         return FeedRun(widget: widget.id, ok: false, changed: false, seconds: Date().timeIntervalSince(started), issues: [issue])
+    }
+
+    static func tail(_ stderr: String, lines: Int = 5) -> [String] {
+        Array(stderr.split(whereSeparator: \.isNewline).map(String.init).suffix(lines))
     }
 
     private func appendLog(_ id: String, result: ProcessResult, now: Date) {
@@ -109,7 +123,7 @@ public struct FeedRunner: Sendable {
         LogFile.append(text, to: logFile(for: id), limit: Self.logLimit)
     }
 
-    static func failure(of result: ProcessResult, widget id: String, timeout: Int) -> Issue? {
+    static func failure(of result: ProcessResult, widget id: String, command: String, path: String, timeout: Int) -> Issue? {
         if result.timedOut {
             return issue(
                 IssueCode.feedTimeout,
@@ -121,6 +135,9 @@ public struct FeedRunner: Sendable {
                 )
             )
         }
+        if result.status == 126 || result.status == 127 {
+            return commandIssue(result, widget: id, command: command, path: path)
+        }
         guard result.status == 0 else {
             let tail = result.stderr.split(whereSeparator: \.isNewline).suffix(3).joined(separator: " · ")
             let detail = tail.isEmpty ? "" : ": \(tail)"
@@ -130,6 +147,47 @@ public struct FeedRunner: Sendable {
                 ru: "Feed виджета \(id) завершился с кодом \(result.status)\(detail)",
                 hint: runHint(id)
             )
+        }
+        return nil
+    }
+
+    static func commandIssue(_ result: ProcessResult, widget id: String, command: String, path: String) -> Issue {
+        let denied = result.status == 126
+        let name = missingName(in: result.stderr, denied: denied) ?? command.split(separator: " ").first.map(String.init) ?? command
+        guard !denied else {
+            return issue(
+                IssueCode.feedCommandNotFound,
+                en: "The feed of \(id) is not allowed to run `\(name)` (exit 126)",
+                ru: "Feed виджета \(id) не может запустить `\(name)`: нет прав (код 126)",
+                hint: L10n.pick(
+                    en: "Make it executable with `chmod +x \(name)`, or call it through its interpreter, for example `python3 \(name)`",
+                    ru: "Сделай файл исполняемым: `chmod +x \(name)` — или вызывай через интерпретатор, например `python3 \(name)`"
+                )
+            )
+        }
+        return issue(
+            IssueCode.feedCommandNotFound,
+            en: "The feed of \(id) could not find `\(name)` (exit 127)",
+            ru: "Feed виджета \(id) не нашёл `\(name)` (код 127)",
+            hint: L10n.pick(
+                en: "Install it or write its full path in widget.json; feeds run with PATH=\(path)",
+                ru: "Установи его или впиши полный путь в widget.json; feed запускается с PATH=\(path)"
+            )
+        )
+    }
+
+    static func missingName(in stderr: String, denied: Bool) -> String? {
+        let patterns = denied
+            ? [#"permission denied: (\S+)"#, #"(\S+): [Pp]ermission denied"#]
+            : [#"command not found: (\S+)"#, #"(\S+): command not found"#, #"(\S+): not found"#]
+        for pattern in patterns {
+            guard let regex = try? NSRegularExpression(pattern: pattern),
+                  let match = regex.firstMatch(in: stderr, range: NSRange(stderr.startIndex..., in: stderr)),
+                  let range = Range(match.range(at: 1), in: stderr)
+            else {
+                continue
+            }
+            return String(stderr[range])
         }
         return nil
     }
