@@ -66,6 +66,7 @@ public struct ProjectGenerator {
             "        CFBundleURLTypes:",
             "          - CFBundleURLName: \(quoted(config.appBundleID))",
             "            CFBundleURLSchemes: [\(quoted(config.resolvedURLScheme))]",
+            "        AWAppGroup: \(group)",
             "    entitlements:",
             "      path: App/App.entitlements",
             "      properties:",
@@ -79,7 +80,9 @@ public struct ProjectGenerator {
             "      - target: \(Self.extensionTarget)",
             "        embed: true",
             "        copy:",
-            "          destination: plugins"
+            "          destination: plugins",
+            "      - package: Kit",
+            "        product: AWKit"
         ]
     }
 

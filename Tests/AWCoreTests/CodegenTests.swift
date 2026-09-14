@@ -100,6 +100,24 @@ private let config = WorkspaceConfig(
     #expect(yaml.contains("AWAppGroup: \"ABCDE12345.com.example.demo\""))
 }
 
+@Test func hostAppCanPerformWidgetButtons() throws {
+    let generator = ProjectGenerator(
+        config: config,
+        widgets: [source("weather")],
+        buildDir: URL(fileURLWithPath: "/ws/.aw/build"),
+        kitPackage: URL(fileURLWithPath: "/engine/Kit"),
+        version: "0.1.0",
+        buildNumber: "42"
+    )
+    let lines = generator.generate().components(separatedBy: "\n")
+    let start = try #require(lines.firstIndex(of: "  \(ProjectGenerator.appTarget):"))
+    let app = lines[(start + 1)...].prefix { $0.hasPrefix("   ") || $0.isEmpty }.joined(separator: "\n")
+    #expect(app.contains("AWAppGroup: \"ABCDE12345.com.example.demo\""))
+    #expect(app.contains("product: AWKit"))
+    let host = try String(contentsOf: ProbeWorkspace.repoRoot.appendingPathComponent("Templates/app/HostApp.swift.tmpl"), encoding: .utf8)
+    #expect(host.contains("AWKitIntents.self"))
+}
+
 @Test func relativePathsWalkUpFromTheBuildDir() {
     let generator = ProjectGenerator(
         config: config,
