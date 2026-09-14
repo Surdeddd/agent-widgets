@@ -111,8 +111,12 @@ public struct Doctor: Sendable {
                         ru: "В связке ключей нет сертификата Apple Development"
                     ),
                     hint: L10n.pick(
-                        en: "Xcode → Settings → Accounts → Manage Certificates → + Apple Development (a free Apple ID works)",
-                        ru: "Xcode → Settings → Accounts → Manage Certificates → + Apple Development (подойдёт бесплатный Apple ID)"
+                        en: "Xcode → Settings → Accounts → + Apple ID (free is fine, no payment) "
+                            + "→ Manage Certificates → + Apple Development, then `aw init --refresh-signing`. "
+                            + "`aw preview` works without signing.",
+                        ru: "Xcode → Settings → Accounts → + Apple ID (бесплатный подойдёт, платить не нужно) "
+                            + "→ Manage Certificates → + Apple Development, затем `aw init --refresh-signing`. "
+                            + "`aw preview` работает без подписи."
                     )
                 )
             )

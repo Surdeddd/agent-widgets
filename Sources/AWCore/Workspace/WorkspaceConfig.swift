@@ -133,8 +133,12 @@ public struct WorkspaceConfig: Codable, Equatable, Sendable {
                     ru: "В aw.json / aw.local.json нет рабочей подписи или Team ID"
                 ),
                 hint: LocalizedText(
-                    en: "Xcode → Settings → Accounts → Manage Certificates → + Apple Development, then `aw init --refresh-signing`",
-                    ru: "Xcode → Settings → Accounts → Manage Certificates → + Apple Development, затем `aw init --refresh-signing`"
+                    en: "Xcode → Settings → Accounts → + Apple ID (free is fine, no payment) "
+                        + "→ Manage Certificates → + Apple Development, then `aw init --refresh-signing`. "
+                        + "`aw preview` works without signing.",
+                    ru: "Xcode → Settings → Accounts → + Apple ID (бесплатный подойдёт, платить не нужно) "
+                        + "→ Manage Certificates → + Apple Development, затем `aw init --refresh-signing`. "
+                        + "`aw preview` работает без подписи."
                 ),
                 file: "aw.local.json"
             )]

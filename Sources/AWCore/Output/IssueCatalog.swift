@@ -178,12 +178,14 @@ private let catalogEntries: [IssueExplanation] = [
         code: IssueCode.signingMissing,
         title: text("No signing identity", "Нет подписи"),
         cause: text(
-            "The widget app must be signed with an Apple Development certificate, otherwise the App Group and the widgets do not work.",
-            "Приложение с виджетами должно быть подписано сертификатом Apple Development, иначе App Group и виджеты не работают."
+            "Previews work without a certificate. Only build, install and ship sign the app.",
+            "Превью работает без сертификата. Подпись нужна только build, install и ship."
         ),
         fix: text(
-            "Xcode → Settings → Accounts → add an Apple ID (free works) → Manage Certificates → + Apple Development; then aw init --refresh-signing.",
-            "Xcode → Settings → Accounts → добавь Apple ID (бесплатный подойдёт) → Manage Certificates → + Apple Development; затем aw init --refresh-signing."
+            "Xcode → Settings → Accounts → + Apple ID (free is fine, no paid membership) "
+                + "→ Manage Certificates → + Apple Development, then aw init --refresh-signing.",
+            "Xcode → Settings → Accounts → + Apple ID (бесплатный подойдёт, платная подписка не нужна) "
+                + "→ Manage Certificates → + Apple Development, затем aw init --refresh-signing."
         ),
         example: nil
     ),

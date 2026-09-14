@@ -28,6 +28,8 @@ private func identityListing() throws -> String {
     let signing = await Doctor(runner: runner).signing()
     #expect(signing.status == .fail)
     #expect(signing.issue?.code == IssueCode.signingMissing)
+    let hint = signing.issue?.hint ?? ""
+    #expect(hint.contains("Xcode → Settings → Accounts") && hint.contains("Apple Development"))
 }
 
 @Test func doctorHumanFormatAlignsTitles() {

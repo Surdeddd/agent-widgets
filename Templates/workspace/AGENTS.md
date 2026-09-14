@@ -66,3 +66,4 @@ struct StepsView: AWView {
 - `aw explain <CODE>` — what an issue code means and how to fix it.
 - `aw doctor` — Xcode, XcodeGen, signing, Screen Recording, installed app, dev slot, feed daemon.
 - `--json` on any command gives `{ok, issues, artifacts, data}`.
+- No certificate yet: `aw preview` still works; for `aw ship` add a free Apple ID in Xcode → Settings → Accounts and create an Apple Development certificate — no payment needed.

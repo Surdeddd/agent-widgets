@@ -34,7 +34,7 @@
 
 - macOS 14 или новее, Xcode 16.3 или новее
 - `brew install xcodegen`
-- Сертификат подписи Apple Development (Xcode → Settings → Accounts). Он нужен виджетам для App Group; бесплатный Apple ID пока не проверяли.
+- Сертификат Apple Development, и бесплатного Apple ID достаточно — платная подписка разработчика не нужна: Xcode → Settings → Accounts → + → Apple ID, выбери его «(Personal Team)» → Manage Certificates → + → Apple Development; в уже существующем workspace затем запусти `aw init --refresh-signing`. Сертификат нужен виджетам для App Group. `aw preview` работает без сертификата. Путь с бесплатным аккаунтом ещё подтверждаем от начала до конца.
 
 ## Установка
 
