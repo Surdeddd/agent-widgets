@@ -6,8 +6,8 @@ The full guide is the `agent-widgets` skill (`aw skill install` links it for Cla
 
 ## Done means
 
-- `aw preview <id>` reports no errors and you looked at the sheet image: every family, light, dark and desktop idle.
-- `aw ship <id>` succeeded; with the dev slot on the desktop you checked the real screenshot.
+- `aw preview <id>` reports no errors and you looked at the sheet image: every family, light, dark, desktop idle and Tahoe clear.
+- `aw ship <id>` ends with a desktop screenshot and `.aw/shots/<id>-<family>-compare.png` (preview · desktop · outlines), and you looked at both. A ship without a desktop screenshot is not done: `aw ship` exits 5 with stage `unverified`. Ask the person to put the dev slot (“<App> · Dev”: right-click the desktop → Edit Widgets) on the desktop and run `aw slot` — it waits for the slot and captures it. Never report a widget as done from `sheet.png` alone.
 - If the widget has live data, `aw feed run <id>` is green.
 
 ## The loop
@@ -15,7 +15,7 @@ The full guide is the `agent-widgets` skill (`aw skill install` links it for Cla
 1. `aw new <id> --template <metric|list|ring|chart|card|image|timer|blank>` — scaffold `widgets/<id>/`.
 2. Edit `widgets/<id>/*.swift` (model + `AWView`) and `widgets/<id>/samples/*.json` — `default.json` is required; add `long.json` with the longest real strings and `empty.json` containing `null`.
 3. `aw preview <id> --json` — fix every error in `issues`, open `sheet.png`, fix what looks wrong, repeat. `aw explain <CODE>` explains any code.
-4. `aw ship <id>` — builds, installs, points the dev slot at the widget and captures the real window. On `WIDGET_NOT_PLACED` ask the person once to add “<App name> · Dev” to the desktop.
+4. `aw ship <id>` — builds, installs, points the dev slot at the widget and captures the real window. On `WIDGET_NOT_PLACED` ask the person once to add “<App name> · Dev” to the desktop. Run `aw slot` right after asking — it waits until the slot is on the desktop, measures the desktop sizes and captures the slot.
 5. Live data: add `"feed": {"command": "python3 feed.py", "every": "30m"}` to `widget.json`; the feed prints one JSON object shaped like the model and logs to stderr. Check it with `aw feed run <id>`, keep it fresh with `aw daemon install`.
 
 ## The view
@@ -50,7 +50,7 @@ struct StepsView: AWView {
 }
 ```
 
-`"view"` in `widget.json` must name the struct. Branch layouts on `context.family` (small 155×155, medium 329×155, large 345×345, extraLarge 715×345 points).
+`"view"` in `widget.json` must name the struct. Branch layouts on `context.family`. Sizes depend on the display: `aw geometry` prints this Mac's (on a MacBook desktop small 164×164, medium 344×164, large 344×344, extraLarge 704×344 points) and previews render at them; run `aw geometry --measure` once any widget is on the desktop.
 
 ## Rules for good widgets
 
@@ -66,3 +66,4 @@ struct StepsView: AWView {
 - `aw explain <CODE>` — what an issue code means and how to fix it.
 - `aw doctor` — Xcode, XcodeGen, signing, Screen Recording, installed app, dev slot, feed daemon.
 - `--json` on any command gives `{ok, issues, artifacts, data}`.
+- No certificate yet: `aw preview` still works; for `aw ship` add a free Apple ID in Xcode → Settings → Accounts and create an Apple Development certificate — no payment needed.
