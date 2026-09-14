@@ -36,13 +36,13 @@ public struct AWImage: View {
             if contentMode == .fill {
                 Image(nsImage: image)
                     .resizable()
-                    .aspectRatio(contentMode: .fill)
+                    .scaledToFill()
                     .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
                     .clipped()
             } else {
                 Image(nsImage: image)
                     .resizable()
-                    .aspectRatio(contentMode: .fit)
+                    .scaledToFit()
             }
         } else {
             RoundedRectangle(cornerRadius: 10, style: .continuous)
