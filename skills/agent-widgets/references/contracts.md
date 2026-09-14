@@ -5,7 +5,7 @@
 ```
 <workspace>/
   aw.json            name, slug, bundlePrefix, locale?, overrides?
-  aw.local.json      signingIdentity, teamID (machine-specific, git-ignored)
+  aw.local.json      signingIdentity, teamID, secrets (machine-specific, git-ignored)
   widgets/<id>/
     widget.json
     *.swift          model + AWView
@@ -25,7 +25,7 @@
 | `view` | string | the Swift struct conforming to `AWView` |
 | `kind` | string | optional; default `aw.<id>`; changing it makes people re-add the widget |
 | `refresh` | interval | how often WidgetKit asks for a new timeline (default `30m`) |
-| `feed` | object | `command` (run in the widget folder with `/bin/zsh -c`), `every` (≥ `60s`; < `15m` warns), `timeout` (default `60s`) |
+| `feed` | object | `command` (run in the widget folder with `/bin/zsh -c`), `every` (≥ `60s`; < `15m` warns), `timeout` (default `60s`), `secrets` (names from `secrets` in `aw.local.json` the feed gets as environment variables) |
 | `settings` | JSON | handed to the feed as `AW_SETTINGS` |
 
 Intervals: `"30s"`, `"15m"`, `"1h"`, `"1d"` or a number of seconds.
@@ -38,7 +38,7 @@ Intervals: `"30s"`, `"15m"`, `"1h"`, `"1d"` or a number of seconds.
 - `<sample>.state.json` — button state for that sample, for example `{"cursor": 2, "cups": 3}`; a shuffled deck is `{"cursor": 5, "seed": 42}` (any non-zero seed), a running timer `{"endsAt": 1789400000}`.
 - `<sample>.status.json` — feed status for that sample, for example `{"ok": false, "checkedAt": "2026-09-14T09:00:00Z", "fetchedAt": "2026-09-14T06:00:00Z"}` to preview staleness.
 - `images/` — files `AWImage` finds in previews.
-- `<sample>.ru.json` / `<sample>.en.json` — the same sample with feed text in that language; `aw preview <id> --lang ru` uses it instead of `<sample>.json`, so feed-localized strings can be checked too.
+- `<sample>.ru.json` / `<sample>.en.json` — the same sample with feed text in that language; `aw preview <id> --lang ru` uses it instead of `<sample>.json`, so feed-localized strings can be checked too. A feed widget previewed with `--lang ru` and no `default.ru.json` gets `SAMPLE_NOT_LOCALIZED`.
 
 ## What `aw preview` renders
 
@@ -49,7 +49,7 @@ Intervals: `"30s"`, `"15m"`, `"1h"`, `"1d"` or a number of seconds.
 ## Feed
 
 - Runs in the widget folder as `/bin/zsh -c "<command>"` with `PATH=/opt/homebrew/bin:/usr/local/bin:~/.local/bin:$PATH`.
-- Environment: `AW_WIDGET_ID`, `AW_LANG` (`en` / `ru`), `AW_SETTINGS` (JSON), `AW_PREVIOUS_PATH` (last published data, may not exist), `AW_STATE_PATH` (button state), `AW_IMAGES_DIR` (write images here).
+- Environment: `AW_WIDGET_ID`, `AW_LANG` (`en` / `ru`), `AW_SETTINGS` (JSON), `AW_PREVIOUS_PATH` (last published data, may not exist), `AW_STATE_PATH` (button state), `AW_IMAGES_DIR` (write images here), plus every secret listed in `feed.secrets`. A listed secret without a value in `aw.local.json` stops the feed with `FEED_SECRET_MISSING`; `aw doctor` warns when `secrets` sit in the shared `aw.json`.
 - stdout: exactly one JSON object — the model, or a timeline:
 
 ```json

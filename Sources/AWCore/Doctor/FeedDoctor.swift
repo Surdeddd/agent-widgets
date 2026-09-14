@@ -42,6 +42,35 @@ extension Doctor {
         )
     }
 
+    func sharedSecretsCheck(_ workspace: Workspace) -> DoctorCheck? {
+        let url = workspace.root.appendingPathComponent(Workspace.configFile)
+        guard let data = try? Data(contentsOf: url),
+              let value = try? JSONDecoder().decode(JSONValue.self, from: data),
+              value["secrets"] != nil
+        else {
+            return nil
+        }
+        return DoctorCheck(
+            id: "secrets",
+            title: L10n.pick(en: "Secrets", ru: "Секреты"),
+            status: .warn,
+            detail: L10n.pick(en: "found in aw.json", ru: "лежат в aw.json"),
+            issue: Issue(
+                code: IssueCode.secretsInConfig,
+                severity: .warning,
+                message: L10n.pick(
+                    en: "aw.json holds \"secrets\", and aw.json goes to git",
+                    ru: "В aw.json лежат \"secrets\", а aw.json попадает в git"
+                ),
+                hint: L10n.pick(
+                    en: "Move \"secrets\" to aw.local.json — it stays on this Mac",
+                    ru: "Перенеси \"secrets\" в aw.local.json — он остаётся на этом маке"
+                ),
+                file: Workspace.configFile
+            )
+        )
+    }
+
     static func failureNote(_ status: FeedStatus?) -> String {
         guard let status, !status.ok else { return "" }
         let fallback = [status.exitCode.map { "exit \($0)" }, status.stderrTail?.last].compactMap { $0 }.joined(separator: ": ")

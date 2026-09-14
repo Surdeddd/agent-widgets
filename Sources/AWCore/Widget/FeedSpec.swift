@@ -6,11 +6,13 @@ public struct FeedSpec: Codable, Equatable, Sendable {
     public var command: String
     public var every: Interval
     public var timeout: Interval?
+    public var secrets: [String]?
 
-    public init(command: String, every: Interval, timeout: Interval? = nil) {
+    public init(command: String, every: Interval, timeout: Interval? = nil, secrets: [String]? = nil) {
         self.command = command
         self.every = every
         self.timeout = timeout
+        self.secrets = secrets
     }
 
     public var resolvedTimeout: Interval {

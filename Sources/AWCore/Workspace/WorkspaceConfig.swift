@@ -24,6 +24,7 @@ public struct WorkspaceConfig: Codable, Equatable, Sendable {
     public var locale: Language?
     public var installDir: String?
     public var overrides: Overrides?
+    public var secrets: [String: String]?
 
     public init(
         name: String,
@@ -35,7 +36,8 @@ public struct WorkspaceConfig: Codable, Equatable, Sendable {
         urlScheme: String? = nil,
         locale: Language? = nil,
         installDir: String? = nil,
-        overrides: Overrides? = nil
+        overrides: Overrides? = nil,
+        secrets: [String: String]? = nil
     ) {
         self.name = name
         self.slug = slug
@@ -47,6 +49,7 @@ public struct WorkspaceConfig: Codable, Equatable, Sendable {
         self.locale = locale
         self.installDir = installDir
         self.overrides = overrides
+        self.secrets = secrets
     }
 
     public var appBundleID: String {

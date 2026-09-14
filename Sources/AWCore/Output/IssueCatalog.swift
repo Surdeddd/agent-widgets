@@ -385,6 +385,45 @@ private let catalogEntries: [IssueExplanation] = [
         example: "\"feed\": {\"command\": \"/opt/homebrew/bin/python3 feed.py\", \"every\": \"30m\"}"
     ),
     IssueExplanation(
+        code: IssueCode.feedSecretMissing,
+        title: text("A feed secret has no value", "У секрета feed нет значения"),
+        cause: text(
+            "widget.json lists the secret in feed.secrets, but aw.local.json has no value for it, so the feed is not started.",
+            "widget.json перечисляет секрет в feed.secrets, но в aw.local.json для него нет значения, поэтому feed не запускается."
+        ),
+        fix: text(
+            "Put the value into \"secrets\" in aw.local.json. The feed gets it as an environment variable of the same name.",
+            "Положи значение в \"secrets\" в aw.local.json. Feed получит его переменной окружения с тем же именем."
+        ),
+        example: "aw.local.json: {\"secrets\": {\"GITHUB_TOKEN\": \"ghp_…\"}}\nwidget.json: \"feed\": {\"command\": \"python3 feed.py\", \"every\": \"30m\", \"secrets\": [\"GITHUB_TOKEN\"]}"
+    ),
+    IssueExplanation(
+        code: IssueCode.secretsInConfig,
+        title: text("Secrets are in aw.json", "Секреты лежат в aw.json"),
+        cause: text(
+            "aw.json describes the workspace and goes to git with it; tokens there leak with the repository.",
+            "aw.json описывает workspace и уходит в git вместе с ним; токены в нём утекут с репозиторием."
+        ),
+        fix: text(
+            "Move \"secrets\" to aw.local.json, which is machine-specific and git-ignored.",
+            "Перенеси \"secrets\" в aw.local.json — он у каждой машины свой и в git не попадает."
+        ),
+        example: nil
+    ),
+    IssueExplanation(
+        code: IssueCode.sampleNotLocalized,
+        title: text("No Russian sample for a feed widget", "Нет русского сэмпла у виджета с feed"),
+        cause: text(
+            "The preview in Russian uses samples/default.json, so text that the feed writes in Russian (AW_LANG=ru) is never checked for fit.",
+            "Русское превью берёт samples/default.json, и текст, который feed пишет по-русски (AW_LANG=ru), на влезание не проверяется."
+        ),
+        fix: text(
+            "Run the feed with AW_LANG=ru and save its output as samples/default.ru.json.",
+            "Запусти feed с AW_LANG=ru и сохрани его вывод в samples/default.ru.json."
+        ),
+        example: "cd widgets/weather && AW_LANG=ru python3 feed.py > samples/default.ru.json"
+    ),
+    IssueExplanation(
         code: IssueCode.daemonMissing,
         title: text("Feeds are not scheduled", "Feed не запланированы"),
         cause: text(

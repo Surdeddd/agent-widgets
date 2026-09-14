@@ -9,19 +9,19 @@ private struct FeedFixture {
     let root: URL
     let store: AppGroupStore
 
-    init(command: String, timeout: Int = 10) throws {
+    init(command: String, timeout: Int = 10, secrets: [String]? = nil) throws {
         root = try ProbeWorkspace.make()
         store = AppGroupStore(root: root.appendingPathComponent("group", isDirectory: true))
-        try setCommand(command, timeout: timeout)
+        try setCommand(command, timeout: timeout, secrets: secrets)
     }
 
-    func setCommand(_ command: String, timeout: Int = 10) throws {
+    func setCommand(_ command: String, timeout: Int = 10, secrets: [String]? = nil) throws {
         let manifest = WidgetManifest(
             id: "probe",
             name: LocalizedText(en: "Probe"),
             families: [.small],
             view: "ProbeView",
-            feed: FeedSpec(command: command, every: Interval(seconds: 900), timeout: Interval(seconds: timeout)),
+            feed: FeedSpec(command: command, every: Interval(seconds: 900), timeout: Interval(seconds: timeout), secrets: secrets),
             settings: .object(["path": .string("/")])
         )
         try JSONEncoder().encode(manifest).write(to: root.appendingPathComponent("widgets/probe/widget.json"))
@@ -119,6 +119,25 @@ private struct FeedFixture {
     #expect(run.issues.first?.code == IssueCode.feedCommandNotFound)
     #expect(run.issues.first?.hint?.contains("chmod +x ./feed.sh") == true)
     #expect(fixture.store.status(widget: "probe")?.exitCode == 126)
+}
+
+@Test func declaredSecretsReachTheFeedAndOthersDoNot() async throws {
+    let fixture = try FeedFixture(command: #"printf '{"token":"%s","other":"%s"}' "$API_TOKEN" "$OTHER_TOKEN""#, secrets: ["API_TOKEN"])
+    defer { fixture.cleanup() }
+    try Data(#"{"secrets": {"API_TOKEN": "s3cret", "OTHER_TOKEN": "nope"}}"#.utf8).write(to: fixture.root.appendingPathComponent("aw.local.json"))
+    let run = try await fixture.run()
+    #expect(run.ok, "\(run.issues.map(\.message))")
+    #expect(fixture.published == #"{"other":"","token":"s3cret"}"#)
+}
+
+@Test func aMissingSecretStopsTheFeedBeforeItRuns() async throws {
+    let fixture = try FeedFixture(command: "touch ran.txt; echo '{}'", secrets: ["API_TOKEN"])
+    defer { fixture.cleanup() }
+    let run = try await fixture.run()
+    #expect(run.issues.first?.code == IssueCode.feedSecretMissing)
+    #expect(run.issues.first?.message.contains("API_TOKEN") == true)
+    #expect(run.issues.first?.hint?.contains("aw.local.json") == true)
+    #expect(!FileManager.default.fileExists(atPath: fixture.root.appendingPathComponent("widgets/probe/ran.txt").path))
 }
 
 @Test func garbageOutputIsRejected() async throws {

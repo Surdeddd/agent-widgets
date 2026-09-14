@@ -76,7 +76,7 @@ public struct PreviewPipeline: Sendable {
         var outcome = PreviewOutcome(
             widget: widget.id,
             report: nil,
-            issues: ManifestValidator.validate(widget.manifest),
+            issues: ManifestValidator.validate(widget.manifest) + Self.localizationIssues(widget, request),
             compiled: false,
             compileSeconds: 0,
             renderSeconds: 0
@@ -186,6 +186,24 @@ public struct PreviewPipeline: Sendable {
             arguments += ["--images", images.path]
         }
         return arguments
+    }
+
+    /// A feed widget previewed in Russian without samples/default.ru.json never checks the feed's Russian text.
+    static func localizationIssues(_ widget: WidgetSource, _ request: PreviewRequest) -> [Issue] {
+        guard request.language == .ru, let feed = widget.manifest.feed, widget.samples["default.ru"] == nil else { return [] }
+        return [Issue(
+            code: IssueCode.sampleNotLocalized,
+            severity: .warning,
+            message: L10n.pick(
+                en: "The Russian preview of \(widget.id) uses samples/default.json, so the Russian text of its feed is not checked",
+                ru: "Русское превью \(widget.id) берёт samples/default.json — русский текст его feed не проверяется"
+            ),
+            hint: L10n.pick(
+                en: "Save the Russian feed output: cd widgets/\(widget.id) && AW_LANG=ru \(feed.command) > samples/default.ru.json",
+                ru: "Сохрани русский вывод feed: cd widgets/\(widget.id) && AW_LANG=ru \(feed.command) > samples/default.ru.json"
+            ),
+            file: "widgets/\(widget.id)/samples"
+        )]
     }
 
     func scenarios(of widget: WidgetSource, request: PreviewRequest) -> [(String, URL)] {

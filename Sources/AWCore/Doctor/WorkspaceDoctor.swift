@@ -19,6 +19,9 @@ extension Doctor {
         }
         checks.append(devSlotCheck(config, screenRecording: screenRecording, windows: windows))
         checks.append(geometryCheck(geometry))
+        if let secrets = sharedSecretsCheck(workspace) {
+            checks.append(secrets)
+        }
         if (try? workspace.widgets())?.contains(where: { $0.manifest.feed != nil }) == true {
             checks.append(await daemonCheck(workspace))
             checks += feedChecks(workspace, store: AppGroupStore(root: paths.groupContainer), now: now)

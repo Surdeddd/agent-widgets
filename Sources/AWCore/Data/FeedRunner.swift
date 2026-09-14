@@ -33,7 +33,7 @@ public struct FeedRunner: Sendable {
         let settings = (try? widget.manifest.settings?.canonicalData()).flatMap { String(bytes: $0, encoding: .utf8) } ?? "{}"
         let home = FileManager.default.homeDirectoryForCurrentUser.path
         let inherited = ProcessInfo.processInfo.environment["PATH"] ?? "/usr/bin:/bin:/usr/sbin:/sbin"
-        return [
+        var values = [
             "AW_WIDGET_ID": id,
             "AW_LANG": language.rawValue,
             "AW_SETTINGS": settings,
@@ -42,6 +42,10 @@ public struct FeedRunner: Sendable {
             "AW_IMAGES_DIR": store.url(AppGroupLayout.widgetDirectory(id) + "/images").path,
             "PATH": "/opt/homebrew/bin:/usr/local/bin:\(home)/.local/bin:\(inherited)"
         ]
+        for name in widget.manifest.feed?.secrets ?? [] {
+            values[name] = workspace.config.secrets?[name]
+        }
+        return values
     }
 
     /// Runs the feed once; failures keep the last good data and mark the status stale.
@@ -49,6 +53,10 @@ public struct FeedRunner: Sendable {
         let started = Date()
         guard let feed = widget.manifest.feed else {
             return FeedRun(widget: widget.id, ok: false, changed: false, seconds: 0, issues: [Self.noFeed(widget.id)])
+        }
+        let missing = (feed.secrets ?? []).filter { (workspace.config.secrets?[$0] ?? "").isEmpty }
+        guard missing.isEmpty else {
+            return fail(widget, started: started, now: now, issue: Self.missingSecrets(widget.id, missing))
         }
         let images = store.url(AppGroupLayout.widgetDirectory(widget.id) + "/images")
         try? FileManager.default.createDirectory(at: images, withIntermediateDirectories: true)
@@ -82,6 +90,10 @@ public struct FeedRunner: Sendable {
         if let validate, let issue = await validate(output) {
             return fail(widget, started: started, now: now, issue: issue, result: result)
         }
+        return publish(output, widget: widget, started: started, now: now)
+    }
+
+    private func publish(_ output: Data, widget: WidgetSource, started: Date, now: Date) -> FeedRun {
         do {
             let changed = try store.publish(output, widget: widget.id)
             try store.writeStatus(FeedStatus(ok: true, checkedAt: now, fetchedAt: now), widget: widget.id)
@@ -94,6 +106,20 @@ public struct FeedRunner: Sendable {
                 hint: L10n.pick(en: "Run `aw doctor` to check the App Group", ru: "Проверь App Group: `aw doctor`")
             ))
         }
+    }
+
+    static func missingSecrets(_ id: String, _ names: [String]) -> Issue {
+        let list = names.joined(separator: ", ")
+        let example = names.map { "\"\($0)\": \"…\"" }.joined(separator: ", ")
+        return issue(
+            IssueCode.feedSecretMissing,
+            en: "The feed of \(id) needs \(list), but aw.local.json has no value for it",
+            ru: "Feed виджета \(id) нужен \(list), но в aw.local.json для него нет значения",
+            hint: L10n.pick(
+                en: "Add \"secrets\": {\(example)} to aw.local.json — it stays on this Mac and out of git",
+                ru: "Добавь в aw.local.json \"secrets\": {\(example)} — файл остаётся на этом маке и не попадает в git"
+            )
+        )
     }
 
     private func fail(_ widget: WidgetSource, started: Date, now: Date, issue: Issue, result: ProcessResult? = nil) -> FeedRun {

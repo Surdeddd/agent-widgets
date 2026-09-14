@@ -112,6 +112,22 @@ private let measuredDesk = DeskGeometry(
     #expect(stale.detail.contains("boom"))
 }
 
+@Test func secretsInTheSharedConfigAreFlagged() async throws {
+    let root = try ProbeWorkspace.make()
+    defer { try? FileManager.default.removeItem(at: root) }
+    let config = root.appendingPathComponent("aw.json")
+    let base = #""name":"Probe","slug":"probe","bundlePrefix":"com.example","teamID":"ABCDE12345","signingIdentity":"x""#
+    try Data("{\(base),\"secrets\":{\"API_TOKEN\":\"s3cret\"}}".utf8).write(to: config)
+    let shared = await Doctor(runner: FakeProcessRunner())
+        .workspaceChecks(try Workspace.load(at: root), paths: doctorPaths(root), screenRecording: false, windows: [], geometry: nil)
+    #expect(shared.first { $0.id == "secrets" }?.issue?.code == IssueCode.secretsInConfig)
+    try Data("{\(base)}".utf8).write(to: config)
+    try Data(#"{"secrets":{"API_TOKEN":"s3cret"}}"#.utf8).write(to: root.appendingPathComponent("aw.local.json"))
+    let local = await Doctor(runner: FakeProcessRunner())
+        .workspaceChecks(try Workspace.load(at: root), paths: doctorPaths(root), screenRecording: false, windows: [], geometry: nil)
+    #expect(!local.contains { $0.id == "secrets" })
+}
+
 @Test func devSlotAwayFromTheDesktopComesWithPlacementSteps() async throws {
     let root = try ProbeWorkspace.make()
     defer { try? FileManager.default.removeItem(at: root) }
