@@ -254,6 +254,47 @@ private func centerPixel(_ image: CGImage) throws -> [Int] {
     return [Int(pixel[0]), Int(pixel[1]), Int(pixel[2])]
 }
 
+struct WordView: AWView {
+    let entry: AWEntry<Numbers>
+
+    init(entry: AWEntry<Numbers>) {
+        self.entry = entry
+    }
+
+    var body: some View {
+        Text("HELLO")
+            .font(.system(size: 44, weight: .heavy))
+            .foregroundStyle(.primary)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+private func brightest(_ image: CGImage, in rect: CGRect) throws -> Int {
+    let crop = try #require(image.cropping(to: rect))
+    let width = crop.width
+    let height = crop.height
+    let context = try #require(CGContext(
+        data: nil, width: width, height: height, bitsPerComponent: 8, bytesPerRow: width,
+        space: CGColorSpaceCreateDeviceGray(), bitmapInfo: CGImageAlphaInfo.none.rawValue
+    ))
+    context.draw(crop, in: CGRect(x: 0, y: 0, width: width, height: height))
+    let pixels = try #require(context.data?.bindMemory(to: UInt8.self, capacity: width * height))
+    return (0..<(width * height)).map { Int(pixels[$0]) }.max() ?? 0
+}
+
+@MainActor
+@Test func tahoeClearGlassKeepsPrimaryTextReadable() throws {
+    let output = temporaryOutput()
+    defer { try? FileManager.default.removeItem(at: output) }
+    let jobs = PreviewPlan.jobs(families: [.small], scenarios: [scenario(#"{"value":1,"rows":1}"#)], full: false)
+    let clear = try #require(jobs.first { $0.mode == .clear })
+    let image = try MatrixRenderer.render(WordView.self, jobs: [clear], output: output, language: .en, store: AWStore(root: nil))[0].image
+    let side = CGFloat(image.width)
+    let text = try brightest(image, in: CGRect(x: side * 0.2, y: side * 0.4, width: side * 0.6, height: side * 0.2))
+    let glass = try brightest(image, in: CGRect(x: side * 0.1, y: side * 0.1, width: side * 0.2, height: side * 0.1))
+    #expect(text > glass + 80, "text \(text) vs glass \(glass)")
+}
+
 @MainActor
 @Test func tahoeClearGlassRendersAccentedWithoutColor() throws {
     let output = temporaryOutput()

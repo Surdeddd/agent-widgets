@@ -29,7 +29,7 @@ struct ContainerChrome<Content: View>: View {
         switch mode {
         case .color: content
         case .idle: content.grayscale(1)
-        case .clear: Color.white.mask(content.luminanceToAlpha())
+        case .clear: content.grayscale(1).blendMode(.screen)
         }
     }
 
