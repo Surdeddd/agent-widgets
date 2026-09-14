@@ -48,12 +48,14 @@ public struct InstallOutcome: Codable, Sendable {
 public struct Installer: Sendable {
     public static let lsregister = "/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
     public static let keptBackups = 3
+    public static let launchAttempts = 3
 
     public let config: WorkspaceConfig
     public let runner: any ProcessRunning
     public let paths: InstallPaths
     public var pollInterval: TimeInterval = 0.5
     public var containerTimeout: TimeInterval = 10
+    public var launchRetryDelay: TimeInterval = 1
     public var discard: @Sendable (URL) throws -> Void = { url in
         try FileManager.default.trashItem(at: url, resultingItemURL: nil)
     }
@@ -224,8 +226,8 @@ public struct Installer: Sendable {
         if !registered {
             issues.append(unregisteredIssue)
         }
-        let opened = try? await runner.run("/usr/bin/open", ["-g", target.path], cwd: nil, environment: nil, timeout: 30)
-        if opened?.succeeded != true {
+        let launched = await launch()
+        if !launched {
             issues.append(launchIssue)
         }
         let containerReady = await waitForContainer()
@@ -256,6 +258,19 @@ public struct Installer: Sendable {
                 return true
             }
             await pause(pollInterval)
+        }
+        return false
+    }
+
+    private func launch() async -> Bool {
+        for attempt in 0..<Self.launchAttempts {
+            if attempt > 0 {
+                await pause(launchRetryDelay)
+            }
+            let opened = try? await runner.run("/usr/bin/open", ["-g", target.path], cwd: nil, environment: nil, timeout: 30)
+            if opened?.succeeded == true {
+                return true
+            }
         }
         return false
     }

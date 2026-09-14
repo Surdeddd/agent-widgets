@@ -33,6 +33,7 @@ private struct InstallFixture {
         var installer = Installer(config: probeConfig, runner: runner, paths: paths)
         installer.pollInterval = 0
         installer.containerTimeout = 0
+        installer.launchRetryDelay = 0
         installer.discard = { url in
             try FileManager.default.createDirectory(at: trash, withIntermediateDirectories: true)
             try FileManager.default.moveItem(at: url, to: trash.appendingPathComponent(UUID().uuidString))
@@ -144,6 +145,16 @@ private struct InstallFixture {
     fixture.runner.respond(to: "/usr/bin/open -g", with: .failure("LSOpenURLsWithRole() failed"))
     let outcome = try await fixture.installer.install(try fixture.built("v1"))
     #expect(outcome.hasErrors)
+    #expect(fixture.commands.filter { $0.hasPrefix("/usr/bin/open -g") }.count == Installer.launchAttempts)
+}
+
+@Test func launchRetriesWhileTheOldCopyIsStillClosing() async throws {
+    let fixture = try InstallFixture()
+    defer { fixture.cleanup() }
+    fixture.runner.respond(to: "/usr/bin/open -g", with: [.failure("LSOpenURLsWithRole() failed"), .ok("")])
+    let outcome = try await fixture.installer.install(try fixture.built("v1"))
+    #expect(!outcome.hasErrors)
+    #expect(fixture.commands.filter { $0.hasPrefix("/usr/bin/open -g") }.count == 2)
 }
 
 @Test func rollbackSwapsWithTheLatestBackup() async throws {

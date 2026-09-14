@@ -3,11 +3,15 @@ import Foundation
 
 final class FakeProcessRunner: ProcessRunning, @unchecked Sendable {
     private let lock = NSLock()
-    private var responses: [(prefix: String, result: ProcessResult)] = []
+    private var responses: [(prefix: String, results: [ProcessResult])] = []
     private(set) var calls: [[String]] = []
 
     func respond(to prefix: String, with result: ProcessResult) {
-        lock.withLock { responses.append((prefix, result)) }
+        respond(to: prefix, with: [result])
+    }
+
+    func respond(to prefix: String, with results: [ProcessResult]) {
+        lock.withLock { responses.append((prefix, results)) }
     }
 
     func run(
@@ -20,8 +24,15 @@ final class FakeProcessRunner: ProcessRunning, @unchecked Sendable {
         let command = ([executable] + arguments).joined(separator: " ")
         return lock.withLock {
             calls.append([executable] + arguments)
-            let match = responses.last { command.hasPrefix($0.prefix) }
-            return match?.result ?? .failure("not faked: \(command)", status: 127)
+            guard let index = responses.lastIndex(where: { command.hasPrefix($0.prefix) }),
+                  let first = responses[index].results.first
+            else {
+                return .failure("not faked: \(command)", status: 127)
+            }
+            if responses[index].results.count > 1 {
+                responses[index].results.removeFirst()
+            }
+            return first
         }
     }
 }
