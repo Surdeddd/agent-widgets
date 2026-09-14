@@ -81,7 +81,7 @@ struct HabitsView: AWView {
                         }
                         HStack(spacing: AWSpace.s) {
                             ForEach(0..<7, id: \.self) { column in
-                                dayCell(habit: habit, column: column, diameter: 24)
+                                dayCell(habit: habit, column: column, diameter: 22)
                             }
                         }
                     }
@@ -103,7 +103,7 @@ struct HabitsView: AWView {
         }
     }
 
-    private func dayLetterHeader(diameter: CGFloat = 24, spacing: CGFloat = AWSpace.s) -> some View {
+    private func dayLetterHeader(diameter: CGFloat = 22, spacing: CGFloat = AWSpace.s) -> some View {
         HStack(spacing: spacing) {
             ForEach(0..<7, id: \.self) { column in
                 Text(dayLetter(column))
