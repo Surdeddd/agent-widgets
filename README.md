@@ -23,7 +23,7 @@ Coding agents write good SwiftUI, but they cannot see WidgetKit. **agent-widgets
 
 ## What you get
 
-- **A preview the agent can trust.** Every family × light / dark × idle desktop × sample, rendered in about a second, with `OVERFLOW`, `TRUNCATION`, `DECODE` and other checks. Every issue comes with a hint, and `aw explain` goes deeper.
+- **A preview the agent can trust.** Every family × light / dark / idle desktop / Tahoe clear glass × sample, at this Mac's real widget sizes, rendered in about a second, with `OVERFLOW`, `TRUNCATION`, `DECODE` and other checks. Every issue comes with a hint, and `aw explain` goes deeper.
 - **Real WidgetKit, not a mockup.** `aw ship` builds a signed app, swaps it into `/Applications` with a backup, points the dev slot at the widget and screenshots the real window.
 - **Live data.** Feeds in any language print JSON; `aw` checks it against the model, publishes only real changes and schedules feeds with a LaunchAgent.
 - **Interactive widgets.** Buttons with state — next, previous, toggles, counters, shuffled decks — that do not spend the reload budget.

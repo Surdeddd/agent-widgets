@@ -11,7 +11,7 @@ Use the MCP tools (`aw_new`, `aw_preview`, `aw_ship`, …) when they are connect
 
 ## Done means
 
-- `aw preview <id>` reports no errors **and** you opened the sheet image and it looks right in every family, light and dark, and desktop-idle (monochrome).
+- `aw preview <id>` reports no errors **and** you opened the sheet image and it looks right in every family, light and dark, desktop-idle (monochrome) and Tahoe clear (glass, no color).
 - A ship without a desktop screenshot is not done: `aw ship` exits 5 with stage `unverified`. Put the dev slot (“<App> · Dev”: right-click the desktop → Edit Widgets) on the desktop and run `aw shot --dev`. Never report a widget as done from `sheet.png` alone.
 - If the widget has live data, `aw feed run <id>` is green.
 
@@ -97,7 +97,7 @@ Content sizes depend on the display. `aw geometry` prints this Mac's (run `aw ge
 - Readable at a glance: one hero value, everything else smaller and secondary.
 - Each family gets its own layout; show less in small, never shrink everything.
 - Nothing hides behind a tap and nothing ends in an ellipsis — shorten, drop, or add a line.
-- Color never carries meaning alone: the idle desktop turns widgets monochrome. Pair color with a symbol, a word or position.
+- Color never carries meaning alone: the idle desktop turns widgets monochrome and Tahoe clear glass drops color entirely. Pair color with a symbol, a word or position.
 - Freshness is visible: pass `entry:` to `AWHeader`; stale data gets a badge automatically.
 - Use kit components; native `Gauge`, `ProgressView` and `Toggle` do not render in previews.
 

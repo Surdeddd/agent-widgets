@@ -42,8 +42,8 @@ Intervals: `"30s"`, `"15m"`, `"1h"`, `"1d"` or a number of seconds.
 
 ## What `aw preview` renders
 
-- By default: `default` in light, dark and desktop-idle for every family, every other sample in dark, plus the next two entries of timeline samples.
-- `--full`: every sample in light, dark, light-idle and dark-idle.
+- By default: `default` in light, dark, desktop-idle and Tahoe clear (dark glass, no color) for every family, every other sample in dark, plus the next two entries of timeline samples.
+- `--full`: every sample in light, dark, light-idle, dark-idle and clear.
 - Each cell is a PNG next to `sheet.png` (`<family>-<appearance>-<mode>-<sample>.png`); `report.json` lists the issues per cell.
 
 ## Feed

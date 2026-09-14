@@ -91,7 +91,7 @@ public struct PreviewJob: Sendable {
     }
 
     public var rowLabel: String {
-        "\(scenario.name) · \(appearance.rawValue) · \(mode == .idle ? "desktop idle" : "color")"
+        "\(scenario.name) · \(appearance.rawValue) · \(mode.label)"
     }
 }
 
@@ -113,12 +113,30 @@ public enum PreviewPlan {
 
     private static func combinations(for scenario: PreviewScenario, full: Bool) -> [(Appearance, RenderMode)] {
         if full {
-            return [(.light, .color), (.dark, .color), (.light, .idle), (.dark, .idle)]
+            return [(.light, .color), (.dark, .color), (.light, .idle), (.dark, .idle), (.dark, .clear)]
         }
         if scenario.name == "default" {
-            return [(.light, .color), (.dark, .color), (.dark, .idle)]
+            return [(.light, .color), (.dark, .color), (.dark, .idle), (.dark, .clear)]
         }
         return [(.dark, .color)]
+    }
+}
+
+extension RenderMode {
+    var label: String {
+        switch self {
+        case .color: "color"
+        case .idle: "desktop idle"
+        case .clear: "clear (Tahoe)"
+        }
+    }
+
+    var renderingMode: AWRenderingMode {
+        switch self {
+        case .color: .fullColor
+        case .idle: .vibrant
+        case .clear: .accented
+        }
     }
 }
 

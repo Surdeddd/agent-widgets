@@ -6,7 +6,7 @@ The full guide is the `agent-widgets` skill (`aw skill install` links it for Cla
 
 ## Done means
 
-- `aw preview <id>` reports no errors and you looked at the sheet image: every family, light, dark and desktop idle.
+- `aw preview <id>` reports no errors and you looked at the sheet image: every family, light, dark, desktop idle and Tahoe clear.
 - A ship without a desktop screenshot is not done: `aw ship` exits 5 with stage `unverified`. Put the dev slot (“<App> · Dev”: right-click the desktop → Edit Widgets) on the desktop and run `aw shot --dev`. Never report a widget as done from `sheet.png` alone.
 - If the widget has live data, `aw feed run <id>` is green.
 

@@ -28,7 +28,7 @@ public enum MatrixRenderer {
         language: Language,
         store: AWStore
     ) throws -> RenderedCell {
-        let context = AWContext(family: job.family, renderingMode: job.mode == .idle ? .vibrant : .fullColor, isPreview: true, language: language)
+        let context = AWContext(family: job.family, renderingMode: job.mode.renderingMode, isPreview: true, language: language)
         let content = AWFrame(context: context) { V(entry: entry(type, scenario: job.scenario)) }
             .environment(\.colorScheme, job.appearance == .dark ? .dark : .light)
             .environment(\.awStore, store)

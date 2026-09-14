@@ -8,6 +8,7 @@ public enum Appearance: String, Codable, CaseIterable, Sendable {
 public enum RenderMode: String, Codable, CaseIterable, Sendable {
     case color
     case idle
+    case clear
 }
 
 public struct PreviewCell: Codable, Equatable, Sendable {

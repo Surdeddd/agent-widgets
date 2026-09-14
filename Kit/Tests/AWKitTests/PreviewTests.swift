@@ -218,7 +218,7 @@ private func scenario(_ json: String, name: String = "default") -> PreviewScenar
     let report = try AWPreviewRunner.run(TallView.self, options)
     #expect(FileManager.default.fileExists(atPath: output.appendingPathComponent("sheet.png").path))
     #expect(FileManager.default.fileExists(atPath: output.appendingPathComponent("report.json").path))
-    #expect(report.cells.count == 3 * 2 + 1 * 2)
+    #expect(report.cells.count == 4 * 2 + 1 * 2)
     #expect(report.hasErrors)
 }
 
@@ -229,6 +229,45 @@ private func scenario(_ json: String, name: String = "default") -> PreviewScenar
     let options = PreviewOptions(widget: "tall", families: [.small, .medium], scenarios: [scenario(#"{"value":"x"}"#)], output: output)
     let report = try AWPreviewRunner.run(TallView.self, options)
     #expect(report.issues.filter { $0.code == IssueCode.decode }.count == 1)
+}
+
+struct TintView: AWView {
+    let entry: AWEntry<Numbers>
+
+    init(entry: AWEntry<Numbers>) {
+        self.entry = entry
+    }
+
+    var body: some View {
+        Rectangle().fill(Color.red)
+    }
+}
+
+private func centerPixel(_ image: CGImage) throws -> [Int] {
+    let context = try #require(CGContext(
+        data: nil, width: 1, height: 1, bitsPerComponent: 8, bytesPerRow: 4,
+        space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+    ))
+    let crop = try #require(image.cropping(to: CGRect(x: image.width / 2, y: image.height / 2, width: 1, height: 1)))
+    context.draw(crop, in: CGRect(x: 0, y: 0, width: 1, height: 1))
+    let pixel = try #require(context.data?.bindMemory(to: UInt8.self, capacity: 4))
+    return [Int(pixel[0]), Int(pixel[1]), Int(pixel[2])]
+}
+
+@MainActor
+@Test func tahoeClearGlassRendersAccentedWithoutColor() throws {
+    let output = temporaryOutput()
+    defer { try? FileManager.default.removeItem(at: output) }
+    let jobs = PreviewPlan.jobs(families: [.small], scenarios: [scenario(#"{"value":1,"rows":1}"#)], full: false)
+    #expect(jobs.map(\.rowLabel).contains("default · dark · clear (Tahoe)"))
+    #expect(RenderMode.clear.renderingMode == .accented)
+    let color = try #require(jobs.first { $0.appearance == .dark && $0.mode == .color })
+    let clear = try #require(jobs.first { $0.mode == .clear })
+    let cells = try MatrixRenderer.render(TintView.self, jobs: [color, clear], output: output, language: .en, store: AWStore(root: nil))
+    let red = try centerPixel(cells[0].image)
+    let glass = try centerPixel(cells[1].image)
+    #expect(red[0] > 200 && red[1] < 110 && red[2] < 110, "\(red)")
+    #expect(glass[0] <= glass[2], "\(glass)")
 }
 
 @MainActor
