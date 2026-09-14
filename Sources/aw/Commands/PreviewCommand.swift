@@ -74,7 +74,7 @@ struct PreviewCommand: AWCommand {
             en: "\(report.cells.count) cells in \(String(format: "%.1f", outcome.renderSeconds)) s",
             ru: "\(report.cells.count) ячеек за \(String(format: "%.1f", outcome.renderSeconds)) с"
         )
-        return "\(mark) \(outcome.widget): \(compile), \(render)\n  sheet: \(report.sheet)"
+        return "\(mark) \(outcome.widget): \(compile), \(render)\n" + L10n.pick(en: "  sheet: \(report.sheet)", ru: "  лист: \(report.sheet)")
     }
 }
 
