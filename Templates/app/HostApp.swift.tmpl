@@ -1,15 +1,9 @@
-import AppIntents
 import AppKit
-import AWKit
 import SwiftUI
 import WidgetKit
 
 private let appGroup = __APP_GROUP_LITERAL__
 private let appName = __APP_NAME_LITERAL__
-
-struct AWHostIntents: AppIntentsPackage {
-    static var includedPackages: [any AppIntentsPackage.Type] { [AWKitIntents.self] }
-}
 
 final class AWHostDelegate: NSObject, NSApplicationDelegate {
     private var window: NSWindow?

@@ -1,0 +1,37 @@
+import AppIntents
+import AWKit
+
+struct AWWidgetAction: AppIntent {
+    static let title: LocalizedStringResource = "Widget action"
+    static let isDiscoverable = false
+
+    @Parameter(title: "Widget")
+    var widget: String
+
+    @Parameter(title: "Kind")
+    var kind: String
+
+    @Parameter(title: "Action")
+    var action: String
+
+    @Parameter(title: "Key")
+    var key: String
+
+    @Parameter(title: "Value")
+    var value: String
+
+    init() {}
+
+    init(request: AWActionRequest) {
+        self.widget = request.widget
+        self.kind = request.kind
+        self.action = request.action.rawValue
+        self.key = request.key
+        self.value = request.value
+    }
+
+    func perform() async throws -> some IntentResult {
+        try AWActionRunner.run(widget: widget, kind: kind, action: action, key: key, value: value)
+        return .result()
+    }
+}

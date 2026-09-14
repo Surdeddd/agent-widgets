@@ -1,9 +1,56 @@
 import AppIntents
 import AWSchema
+import os
 import SwiftUI
 import WidgetKit
 
-public struct AWKitIntents: AppIntentsPackage {}
+private let actionLog = Logger(subsystem: "com.agentwidgets.kit", category: "action")
+
+public struct AWActionRequest: Sendable, Equatable {
+    public var widget: String
+    public var kind: String
+    public var action: AWAction
+    public var key: String
+    public var value: String
+
+    public init(widget: String, kind: String, action: AWAction, key: String, value: String) {
+        self.widget = widget
+        self.kind = kind
+        self.action = action
+        self.key = key
+        self.value = value
+    }
+}
+
+public enum AWActionRunner {
+    /// Applies a button action to the widget's state and reloads its timelines.
+    public static func run(widget: String, kind: String, action: String, key: String, value: String, store: AWStore = .shared) throws {
+        let process = Bundle.main.bundleIdentifier ?? "?"
+        actionLog.notice("perform \(action, privacy: .public) key=\(key, privacy: .public) widget=\(widget, privacy: .public) in \(process, privacy: .public)")
+        if let action = AWAction(rawValue: action), !widget.isEmpty {
+            do {
+                try store.save(store.state(widget: widget).applying(action, key: key, value: value), widget: widget)
+            } catch {
+                let root = store.root?.path ?? "nil"
+                actionLog.error("save failed in \(process, privacy: .public), root \(root, privacy: .public): \(String(describing: error), privacy: .public)")
+                throw error
+            }
+        }
+        if !kind.isEmpty {
+            WidgetCenter.shared.reloadTimelines(ofKind: kind)
+        }
+        WidgetCenter.shared.reloadTimelines(ofKind: "aw.dev")
+    }
+}
+
+public enum AWButtonIntents {
+    /// Set by the generated widget bundle: the intent type must live in the extension's own module for macOS to register it.
+    public nonisolated(unsafe) static var factory: (@Sendable (AWActionRequest) -> any AppIntent)?
+
+    public static func intent(for request: AWActionRequest) -> any AppIntent {
+        factory?(request) ?? AWActionIntent(widget: request.widget, kind: request.kind, action: request.action, key: request.key, value: request.value)
+    }
+}
 
 public struct AWActionIntent: AppIntent {
     public static let title: LocalizedStringResource = "Widget action"
@@ -35,14 +82,7 @@ public struct AWActionIntent: AppIntent {
     }
 
     public func perform() async throws -> some IntentResult {
-        if let action = AWAction(rawValue: action), !widget.isEmpty {
-            let store = AWStore.shared
-            try store.save(store.state(widget: widget).applying(action, key: key, value: value), widget: widget)
-        }
-        if !kind.isEmpty {
-            WidgetCenter.shared.reloadTimelines(ofKind: kind)
-        }
-        WidgetCenter.shared.reloadTimelines(ofKind: "aw.dev")
+        try AWActionRunner.run(widget: widget, kind: kind, action: action, key: key, value: value)
         return .result()
     }
 }
@@ -62,10 +102,17 @@ public struct AWButton<Label: View>: View {
     }
 
     public var body: some View {
-        Button(intent: AWActionIntent(widget: context.widget ?? "", kind: context.kind ?? "", action: action, key: key, value: value)) {
-            label
-        }
-        .buttonStyle(.plain)
+        let request = AWActionRequest(widget: context.widget ?? "", kind: context.kind ?? "", action: action, key: key, value: value)
+        button(AWButtonIntents.intent(for: request))
+    }
+
+    private func button<Intent: AppIntent>(_ intent: Intent) -> AnyView {
+        AnyView(
+            Button(intent: intent) {
+                label
+            }
+            .buttonStyle(.plain)
+        )
     }
 }
 

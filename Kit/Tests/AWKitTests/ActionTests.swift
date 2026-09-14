@@ -1,3 +1,4 @@
+import AppIntents
 import AWSchema
 import Foundation
 import Testing
@@ -83,4 +84,29 @@ import Testing
     #expect(intent.widget == "cards")
     #expect(intent.kind == "aw.cards")
     #expect(intent.action == "next")
+}
+
+@Test func runnerSavesStateForTheWidget() throws {
+    let root = FileManager.default.temporaryDirectory.appendingPathComponent("aw-runner-\(UUID().uuidString)", isDirectory: true)
+    defer { try? FileManager.default.removeItem(at: root) }
+    let store = AWStore(root: root)
+    try AWActionRunner.run(widget: "cards", kind: "", action: "next", key: "cursor", value: "", store: store)
+    try AWActionRunner.run(widget: "cards", kind: "", action: "next", key: "cursor", value: "", store: store)
+    #expect(store.state(widget: "cards").cursor == 2)
+    try AWActionRunner.run(widget: "", kind: "", action: "next", key: "cursor", value: "", store: store)
+    #expect(store.state(widget: "cards").cursor == 2)
+}
+
+private struct ProbeIntent: AppIntent {
+    static let title: LocalizedStringResource = "Probe"
+    func perform() async throws -> some IntentResult { .result() }
+}
+
+@Test func buttonsUseTheGeneratedIntentWhenTheBundleProvidesOne() {
+    let request = AWActionRequest(widget: "cards", kind: "aw.cards", action: .next, key: "cursor", value: "")
+    AWButtonIntents.factory = nil
+    #expect(AWButtonIntents.intent(for: request) is AWActionIntent)
+    AWButtonIntents.factory = { _ in ProbeIntent() }
+    defer { AWButtonIntents.factory = nil }
+    #expect(AWButtonIntents.intent(for: request) is ProbeIntent)
 }

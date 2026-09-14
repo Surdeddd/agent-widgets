@@ -56,7 +56,7 @@ public struct ProjectGenerator {
             "  \(Self.appTarget):",
             "    type: application",
             "    platform: macOS",
-            "    sources: [App]",
+            "    sources: [App, Shared]",
             "    info:",
             "      path: App/Info.plist",
             "      properties:",
@@ -93,7 +93,8 @@ public struct ProjectGenerator {
             "    type: app-extension",
             "    platform: macOS",
             "    sources:",
-            "      - path: Extension"
+            "      - path: Extension",
+            "      - path: Shared"
         ]
         for widget in widgets.sorted(by: { $0.id < $1.id }) {
             lines += [

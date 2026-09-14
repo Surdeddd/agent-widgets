@@ -54,6 +54,9 @@ public struct Builder: Sendable {
             .replacingOccurrences(of: "__APP_GROUP_LITERAL__", with: RegistryGenerator.literal(workspace.config.resolvedAppGroup))
             .replacingOccurrences(of: "__APP_NAME_LITERAL__", with: RegistryGenerator.literal(workspace.config.appName))
         try write(host, to: "App/HostApp.swift")
+        try fileManager.createDirectory(at: projectDir.appendingPathComponent("Shared"), withIntermediateDirectories: true)
+        let action = try String(contentsOf: engine.templates.appendingPathComponent("app/WidgetAction.swift.tmpl"), encoding: .utf8)
+        try write(action, to: "Shared/AWWidgetAction.swift")
         let project = ProjectGenerator(
             config: workspace.config,
             widgets: widgets,
@@ -63,7 +66,7 @@ public struct Builder: Sendable {
             buildNumber: buildNumber
         )
         try write(project.generate(), to: "project.yml")
-        return ["Extension/Registry.swift", "App/HostApp.swift", "project.yml"].map { ".aw/build/\($0)" }
+        return ["Extension/Registry.swift", "App/HostApp.swift", "Shared/AWWidgetAction.swift", "project.yml"].map { ".aw/build/\($0)" }
     }
 
     public func build(sign: Bool = true, configuration: String = "Release") async throws -> BuildOutcome {
@@ -95,6 +98,7 @@ public struct Builder: Sendable {
         if !sign {
             arguments.append("CODE_SIGNING_ALLOWED=NO")
         }
+        try? FileManager.default.removeItem(at: productPath(configuration: configuration))
         let result = try await runner.run("/usr/bin/xcodebuild", arguments, cwd: projectDir, environment: nil, timeout: 1800)
         try? result.combinedOutput.write(to: logFile, atomically: true, encoding: .utf8)
         let app = productPath(configuration: configuration)

@@ -125,12 +125,14 @@ public enum RegistryGenerator {
             lines += ["    }", "}", ""]
         }
         lines += [
-            "struct AWIntents: AppIntentsPackage {",
-            "    static var includedPackages: [any AppIntentsPackage.Type] { [AWKitIntents.self] }",
-            "}",
-            ""
+            "@main",
+            "struct AWMainBundle: WidgetBundle {",
+            "    init() {",
+            "        AWButtonIntents.factory = { AWWidgetAction(request: $0) }",
+            "    }",
+            "",
+            "    var body: some Widget {"
         ]
-        lines += ["@main", "struct AWMainBundle: WidgetBundle {", "    var body: some Widget {"]
         lines += chunks.indices.map { "        AWBundle\($0)().body" }
         lines += ["        AWDevWidget()", "    }", "}"]
         return lines

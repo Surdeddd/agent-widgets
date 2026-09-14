@@ -66,7 +66,7 @@ Intervals: `"30s"`, `"15m"`, `"1h"`, `"1d"` or a number of seconds.
 
 ## State and actions
 
-`AWButton` runs `AWActionIntent` inside the widget: it updates `state.json` for that widget and redraws it (and the dev slot). Actions: `next`, `prev`, `toggle`, `increment`, `set`, `shuffle`, `reset`, `stamp`. The view reads `entry.state`; feeds can read `AW_STATE_PATH`.
+`AWButton` runs the generated `AWWidgetAction` intent (compiled into the extension and the host app, so macOS can register it): it updates `state.json` for that widget and redraws it (and the dev slot). Actions: `next`, `prev`, `toggle`, `increment`, `set`, `shuffle`, `reset`, `stamp`. The view reads `entry.state`; feeds can read `AW_STATE_PATH`.
 
 ## CLI output
 

@@ -39,7 +39,8 @@ private let config = WorkspaceConfig(
     #expect(code.contains("L10n.pick(en: \"Name weather\", ru: \"Имя weather\")"))
     #expect(code.contains("AWWidgetContainer(widget: \"weather\", kind: \"aw.weather\") { WeatherView(entry: entry) }"))
     #expect(code.contains("AWWidgetContainer(widget: entry.widget, kind: \"aw.dev\") { AWDevView(entry: entry) }"))
-    #expect(code.contains("static var includedPackages: [any AppIntentsPackage.Type] { [AWKitIntents.self] }"))
+    #expect(code.contains("AWButtonIntents.factory = { AWWidgetAction(request: $0) }"))
+    #expect(!code.contains("AppIntentsPackage"))
 }
 
 @Test func registryChunksLargeBundles() {
@@ -110,12 +111,21 @@ private let config = WorkspaceConfig(
         buildNumber: "42"
     )
     let lines = generator.generate().components(separatedBy: "\n")
-    let start = try #require(lines.firstIndex(of: "  \(ProjectGenerator.appTarget):"))
-    let app = lines[(start + 1)...].prefix { $0.hasPrefix("   ") || $0.isEmpty }.joined(separator: "\n")
+    func section(_ target: String) throws -> String {
+        let start = try #require(lines.firstIndex(of: "  \(target):"))
+        return lines[(start + 1)...].prefix { $0.hasPrefix("   ") || $0.isEmpty }.joined(separator: "\n")
+    }
+    let app = try section(ProjectGenerator.appTarget)
+    #expect(app.contains("sources: [App, Shared]"))
     #expect(app.contains("AWAppGroup: \"ABCDE12345.com.example.demo\""))
     #expect(app.contains("product: AWKit"))
-    let host = try String(contentsOf: ProbeWorkspace.repoRoot.appendingPathComponent("Templates/app/HostApp.swift.tmpl"), encoding: .utf8)
-    #expect(host.contains("AWKitIntents.self"))
+    #expect(try section(ProjectGenerator.extensionTarget).contains("- path: Shared"))
+    let templates = ProbeWorkspace.repoRoot.appendingPathComponent("Templates/app")
+    let action = try String(contentsOf: templates.appendingPathComponent("WidgetAction.swift.tmpl"), encoding: .utf8)
+    #expect(action.contains("struct AWWidgetAction: AppIntent"))
+    #expect(action.contains("AWActionRunner.run("))
+    let host = try String(contentsOf: templates.appendingPathComponent("HostApp.swift.tmpl"), encoding: .utf8)
+    #expect(!host.contains("AppIntentsPackage"))
 }
 
 @Test func relativePathsWalkUpFromTheBuildDir() {

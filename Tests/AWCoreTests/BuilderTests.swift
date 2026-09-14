@@ -3,12 +3,26 @@ import Foundation
 import Testing
 @testable import AWCore
 
+@Test func buildStartsFromAFreshProduct() async throws {
+    let root = try ProbeWorkspace.make()
+    defer { try? FileManager.default.removeItem(at: root) }
+    let runner = FakeProcessRunner()
+    runner.respond(to: "xcodegen", with: .ok(""))
+    runner.respond(to: "/usr/bin/xcodebuild", with: .ok(""))
+    let builder = Builder(workspace: try Workspace.load(at: root), engine: Engine(root: ProbeWorkspace.repoRoot), runner: runner)
+    let stale = builder.productPath().appendingPathComponent("Contents/Resources/Metadata.appintents/extract.packagedata")
+    try FileManager.default.createDirectory(at: stale.deletingLastPathComponent(), withIntermediateDirectories: true)
+    try Data("{}".utf8).write(to: stale)
+    _ = try await builder.build(sign: false)
+    #expect(!FileManager.default.fileExists(atPath: stale.path))
+}
+
 @Test func generateWritesRegistryHostAndProject() throws {
     let root = try ProbeWorkspace.make()
     defer { try? FileManager.default.removeItem(at: root) }
     let builder = Builder(workspace: try Workspace.load(at: root), engine: Engine(root: ProbeWorkspace.repoRoot), runner: FakeProcessRunner())
     let files = try builder.generate(buildNumber: "7")
-    #expect(files == [".aw/build/Extension/Registry.swift", ".aw/build/App/HostApp.swift", ".aw/build/project.yml"])
+    #expect(files == [".aw/build/Extension/Registry.swift", ".aw/build/App/HostApp.swift", ".aw/build/Shared/AWWidgetAction.swift", ".aw/build/project.yml"])
     let registry = try String(contentsOf: root.appendingPathComponent(files[0]), encoding: .utf8)
     #expect(registry.contains("struct AWWidget_probe: Widget"))
     #expect(registry.contains("L10n.pick(en: \"Probe / Test\", ru: \"Проба\")"))
@@ -16,7 +30,9 @@ import Testing
     #expect(host.contains(#"private let appName = "Probe \"Widgets\"""#))
     #expect(host.contains(#"private let appGroup = "ABCDE12345.com.example.probe""#))
     #expect(!host.contains("__"))
-    let project = try String(contentsOf: root.appendingPathComponent(files[2]), encoding: .utf8)
+    let action = try String(contentsOf: root.appendingPathComponent(files[2]), encoding: .utf8)
+    #expect(action.contains("struct AWWidgetAction: AppIntent"))
+    let project = try String(contentsOf: root.appendingPathComponent(files[3]), encoding: .utf8)
     #expect(project.contains("CURRENT_PROJECT_VERSION: \"7\""))
     #expect(project.contains("- path: \"../../widgets/probe\""))
 }
