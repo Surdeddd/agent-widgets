@@ -1,0 +1,9 @@
+{
+  "city": "Bangkok",
+  "temp": 31.4,
+  "condition": "Partly cloudy",
+  "symbol": "cloud.sun.fill",
+  "hourly": [31.4, 31.0, 30.2, 29.6, 28.9, 28.2, 27.8, 28.5],
+  "hourlyLabels": ["14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00"],
+  "hourlySymbols": ["cloud.sun.fill", "cloud.sun.fill", "cloud.fill", "cloud.rain.fill", "cloud.rain.fill", "cloud.fill", "cloud.fill", "sun.max.fill"]
+}

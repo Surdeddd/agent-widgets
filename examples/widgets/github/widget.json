@@ -1,0 +1,17 @@
+{
+  "description": {
+    "en": "Stars, forks and open issues at a glance",
+    "ru": "Звёзды, форки и открытые проблемы одним взглядом"
+  },
+  "families": ["small", "medium"],
+  "feed": {
+    "command": "python3 feed.py",
+    "every": "30m",
+    "timeout": "20s"
+  },
+  "id": "github",
+  "name": {"en": "GitHub", "ru": "GitHub"},
+  "refresh": "30m",
+  "settings": {"owner": "apple", "repo": "swift"},
+  "view": "GithubView"
+}

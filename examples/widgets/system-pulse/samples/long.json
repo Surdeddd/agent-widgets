@@ -1,0 +1,16 @@
+{
+  "overallStatus": "critical",
+  "worstMetric": "cpu",
+  "cpuPercent": 100.0,
+  "cpuStatus": "critical",
+  "cpuHistory": [62.3, 74.1, 88.9, 95.2, 97.0, 99.4, 100.0, 100.0, 98.7, 100.0, 100.0, 100.0],
+  "memoryPercent": 92.5,
+  "memoryStatus": "warning",
+  "diskFreeGB": 1834.7,
+  "diskFreePercent": 91.0,
+  "diskStatus": "ok",
+  "hasBattery": true,
+  "batteryPercent": 99,
+  "batteryState": "charging",
+  "batteryStatus": "ok"
+}

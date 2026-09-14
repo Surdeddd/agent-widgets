@@ -1,0 +1,29 @@
+{
+  "id": "habits",
+  "name": {
+    "en": "Habits",
+    "ru": "Привычки"
+  },
+  "description": {
+    "en": "Mark daily habits done and keep an eye on your streak.",
+    "ru": "Отмечайте привычки и следите за своей серией."
+  },
+  "families": [
+    "medium",
+    "large"
+  ],
+  "view": "HabitsView",
+  "feed": {
+    "command": "python3 feed.py",
+    "every": "1h",
+    "timeout": "15s"
+  },
+  "settings": {
+    "habits": [
+      {"id": "water", "en": "Drink water", "ru": "Пить воду"},
+      {"id": "meditate", "en": "Meditate", "ru": "Медитация"},
+      {"id": "read", "en": "Read", "ru": "Читать"},
+      {"id": "stretch", "en": "Stretch", "ru": "Растяжка"}
+    ]
+  }
+}

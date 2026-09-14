@@ -1,0 +1,9 @@
+{
+  "id": "world-clock",
+  "name": {"en": "World Clock", "ru": "Мировые часы"},
+  "families": ["small", "medium", "large"],
+  "view": "WorldClockView",
+  "refresh": "1h",
+  "feed": {"command": "python3 feed.py", "every": "6h"},
+  "settings": {"cities": ["bangkok", "london", "new-york", "moscow"]}
+}

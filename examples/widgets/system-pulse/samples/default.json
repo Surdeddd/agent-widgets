@@ -1,0 +1,16 @@
+{
+  "overallStatus": "ok",
+  "worstMetric": "none",
+  "cpuPercent": 18.4,
+  "cpuStatus": "ok",
+  "cpuHistory": [12.1, 14.5, 10.2, 22.7, 15.6, 18.4],
+  "memoryPercent": 54.2,
+  "memoryStatus": "ok",
+  "diskFreeGB": 412.6,
+  "diskFreePercent": 41.0,
+  "diskStatus": "ok",
+  "hasBattery": true,
+  "batteryPercent": 82,
+  "batteryState": "discharging",
+  "batteryStatus": "ok"
+}

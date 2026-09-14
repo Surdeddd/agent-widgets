@@ -1,0 +1,9 @@
+{
+  "id": "system-pulse",
+  "name": {"en": "System Pulse", "ru": "Пульс системы"},
+  "description": {"en": "CPU, memory, disk and battery at a glance", "ru": "Загрузка, память, диск и батарея одним взглядом"},
+  "families": ["small", "medium", "large"],
+  "view": "SystemPulseView",
+  "feed": {"command": "python3 feed.py", "every": "15m", "timeout": "30s"},
+  "refresh": "15m"
+}

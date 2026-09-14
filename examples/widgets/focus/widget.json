@@ -1,0 +1,10 @@
+{
+  "id": "focus",
+  "name": {"en": "Focus", "ru": "Фокус"},
+  "description": {"en": "Pomodoro focus timer with a session count", "ru": "Помодоро-таймер со счётчиком сессий"},
+  "families": ["small", "medium"],
+  "view": "FocusView",
+  "refresh": "6h",
+  "feed": {"command": "python3 feed.py", "every": "6h"},
+  "settings": {"focusMinutes": 25, "breakMinutes": 5}
+}

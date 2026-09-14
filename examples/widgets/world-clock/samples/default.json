@@ -1,0 +1,8 @@
+{
+  "cities": [
+    {"id": "bangkok", "name": "Bangkok", "timeZoneId": "Asia/Bangkok"},
+    {"id": "london", "name": "London", "timeZoneId": "Europe/London"},
+    {"id": "new-york", "name": "New York", "timeZoneId": "America/New_York"},
+    {"id": "moscow", "name": "Moscow", "timeZoneId": "Europe/Moscow"}
+  ]
+}
