@@ -35,6 +35,7 @@ public struct InstallOutcome: Codable, Sendable {
     public var app: String
     public var backup: String?
     public var retired: [String]
+    public var unregistered: [String]
     public var registered: Bool
     public var containerReady: Bool
     public var issues: [Issue]
@@ -215,6 +216,7 @@ public struct Installer: Sendable {
 
     private func activate(started: Date, backup: URL?, retired: [String], hard: Bool) async -> InstallOutcome {
         _ = try? await runner.run(Self.lsregister, ["-f", target.path], cwd: nil, environment: nil, timeout: 60)
+        let unregistered = await unregisterStrays()
         for path in [target.path] + retired {
             _ = try? await runner.run("/usr/bin/pkill", ["-9", "-f", Self.pattern(path)], cwd: nil, environment: nil, timeout: 10)
         }
@@ -238,6 +240,7 @@ public struct Installer: Sendable {
             app: target.path,
             backup: backup?.path,
             retired: retired,
+            unregistered: unregistered,
             registered: registered,
             containerReady: containerReady,
             issues: issues,
@@ -260,6 +263,38 @@ public struct Installer: Sendable {
             await pause(pollInterval)
         }
         return false
+    }
+
+    private func unregisterStrays() async -> [String] {
+        let arguments = ["-m", "-v", "-D", "-i", config.extensionBundleID]
+        guard let listing = try? await runner.run("/usr/bin/pluginkit", arguments, cwd: nil, environment: nil, timeout: 30) else {
+            return []
+        }
+        var removed: [String] = []
+        for plugin in Self.strays(listing.stdout, keeping: target) {
+            _ = try? await runner.run("/usr/bin/pluginkit", ["-r", plugin], cwd: nil, environment: nil, timeout: 30)
+            let app = Self.hostApp(of: plugin)
+            _ = try? await runner.run(Self.lsregister, ["-u", app], cwd: nil, environment: nil, timeout: 60)
+            removed.append(app)
+        }
+        return removed
+    }
+
+    /// Registered copies of the extension that live outside `app`, e.g. in build folders.
+    public static func strays(_ listing: String, keeping app: URL) -> [String] {
+        let own = app.standardizedFileURL.path + "/Contents/PlugIns/"
+        var seen = Set<String>()
+        return listing.split(whereSeparator: \.isNewline).compactMap { line in
+            guard let field = line.split(separator: "\t").last else { return nil }
+            let path = field.trimmingCharacters(in: .whitespaces)
+            guard path.hasPrefix("/"), path.hasSuffix(".appex"), !path.hasPrefix(own), seen.insert(path).inserted else { return nil }
+            return path
+        }
+    }
+
+    public static func hostApp(of plugin: String) -> String {
+        guard let range = plugin.range(of: "/Contents/PlugIns/") else { return plugin }
+        return String(plugin[..<range.lowerBound])
     }
 
     private func launch() async -> Bool {

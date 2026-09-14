@@ -28,7 +28,7 @@ public struct Builder: Sendable {
     }
 
     public var derivedData: URL {
-        workspace.buildDir.appendingPathComponent("DerivedData", isDirectory: true)
+        workspace.buildDir.appendingPathComponent("DerivedData.noindex", isDirectory: true)
     }
 
     public var logFile: URL {

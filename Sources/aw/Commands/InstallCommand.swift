@@ -61,6 +61,9 @@ struct InstallCommand: AWCommand {
         for path in outcome.retired {
             lines.append(L10n.pick(en: "  old copy moved to backups: \(path)", ru: "  старая копия убрана в бэкапы: \(path)"))
         }
+        for path in outcome.unregistered {
+            lines.append(L10n.pick(en: "  stale registration removed: \(path)", ru: "  снята старая регистрация: \(path)"))
+        }
         return lines.joined(separator: "\n")
     }
 }

@@ -148,6 +148,25 @@ private struct InstallFixture {
     #expect(fixture.commands.filter { $0.hasPrefix("/usr/bin/open -g") }.count == Installer.launchAttempts)
 }
 
+@Test func strayRegistrationsOfTheExtensionAreRemoved() async throws {
+    let fixture = try InstallFixture()
+    defer { fixture.cleanup() }
+    let own = "\(fixture.installer.target.path)/Contents/PlugIns/Widgets.appex"
+    let strayApp = "/Users/someone/w/.aw/build/DerivedData/Build/Products/Release/Probe.app"
+    let stray = "\(strayApp)/Contents/PlugIns/Widgets.appex"
+    let listing = """
+    +    com.example.probe.widgets(1.0)\tA1\t2026-09-14 00:00:00 +0000\t\(own)
+     from spotlight     com.example.probe.widgets(1.0)\tB2\t2026-09-14 00:00:00 +0000\t\(stray)
+     (2 plug-ins)
+    """
+    fixture.runner.respond(to: "/usr/bin/pluginkit -m -v -D", with: .ok(listing))
+    let outcome = try await fixture.installer.install(try fixture.built("v1"))
+    #expect(outcome.unregistered == [strayApp])
+    #expect(fixture.commands.contains("/usr/bin/pluginkit -r \(stray)"))
+    #expect(fixture.commands.contains("\(Installer.lsregister) -u \(strayApp)"))
+    #expect(!fixture.commands.contains("/usr/bin/pluginkit -r \(own)"))
+}
+
 @Test func launchRetriesWhileTheOldCopyIsStillClosing() async throws {
     let fixture = try InstallFixture()
     defer { fixture.cleanup() }
