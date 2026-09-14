@@ -91,6 +91,7 @@ Exit codes: `0` ok, `1` checks failed, `2` usage, `3` environment, `4` build fai
 | `aw build [--no-sign]` / `aw install [--hard]` / `aw rollback` | build and install the app with backups |
 | `aw dev <id> [--scenario s] [--live]` | point the dev slot at a widget |
 | `aw shot [--kind k] [--dev]` | capture real widget windows; the dev slot also gets `.aw/shots/<id>-<family>-compare.png` (preview · desktop · outlines) and `SHOT_MISMATCH` when they differ |
+| `aw slot [--family f,…] [--timeout s]` | wait until the person puts the dev slot on the desktop, then measure sizes and capture it |
 | `aw geometry [--measure]` | desktop widget sizes previews render at; `--measure` reads them from this Mac's system log |
 | `aw feed run <id>` / `aw data set <id> <json\|@file>` / `aw data get <id>` | run a feed / push data / read data |
 | `aw tick` / `aw daemon install\|status\|uninstall` / `aw logs <id>` | scheduling and logs |
@@ -99,4 +100,4 @@ Exit codes: `0` ok, `1` checks failed, `2` usage, `3` environment, `4` build fai
 
 ## MCP tools
 
-`aw_templates`, `aw_new`, `aw_preview` (sheet image + report), `aw_ship` (desktop screenshots), `aw_shot`, `aw_dev`, `aw_doctor`, `aw_list`, `aw_data_set`, `aw_feed_run`, `aw_explain`. Each takes an optional `workspace` path.
+`aw_templates`, `aw_new`, `aw_preview` (sheet image + report), `aw_ship` (desktop screenshots), `aw_shot`, `aw_slot`, `aw_dev`, `aw_doctor`, `aw_list`, `aw_data_set`, `aw_feed_run`, `aw_explain`. Each takes an optional `workspace` path.

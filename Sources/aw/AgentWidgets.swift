@@ -20,6 +20,7 @@ struct AgentWidgets: AsyncParsableCommand {
             InstallCommand.self,
             DevCommand.self,
             ShotCommand.self,
+            SlotCommand.self,
             GeometryCommand.self,
             RollbackCommand.self,
             FeedCommand.self,

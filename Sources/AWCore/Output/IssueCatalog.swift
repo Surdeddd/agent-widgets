@@ -258,6 +258,21 @@ private let catalogEntries: [IssueExplanation] = [
         example: nil
     ),
     IssueExplanation(
+        code: IssueCode.slotTimeout,
+        title: text("The dev slot did not appear in time", "Dev-слот не появился вовремя"),
+        cause: text(
+            "aw slot waited for the person to put the dev slot on the desktop, and the window did not show up before the timeout.",
+            "aw slot ждал, пока человек поставит dev-слот на стол, и окно не появилось до истечения времени."
+        ),
+        fix: text(
+            "Right-click the desktop → Edit Widgets → search the app name → add “<App> · Dev” in the requested sizes, "
+                + "then run aw slot again if it already timed out.",
+            "Правый клик по столу → «Изменить виджеты» → найди приложение → добавь «<App> · Dev» в нужных размерах "
+                + "и снова запусти aw slot, если ожидание уже кончилось."
+        ),
+        example: nil
+    ),
+    IssueExplanation(
         code: IssueCode.shotUnchanged,
         title: text("The widget did not redraw", "Виджет не перерисовался"),
         cause: text(

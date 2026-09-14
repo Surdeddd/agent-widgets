@@ -53,6 +53,7 @@ public enum IssueCode {
     public static let installFailed = "INSTALL_FAILED"
     public static let screenRecordingDenied = "SCREEN_RECORDING_DENIED"
     public static let widgetNotPlaced = "WIDGET_NOT_PLACED"
+    public static let slotTimeout = "SLOT_TIMEOUT"
     public static let widgetExists = "WIDGET_EXISTS"
     public static let widgetNotFound = "WIDGET_NOT_FOUND"
     public static let templateUnknown = "TEMPLATE_UNKNOWN"
@@ -79,7 +80,7 @@ public enum IssueCode {
         manifestInvalid, duplicateKind, budgetRisk, missingDefaultSample,
         workspaceNotFound, workspaceExists, engineNotFound, invalidJSON,
         signingMissing, toolMissing, compileError, buildError, installFailed,
-        screenRecordingDenied, widgetNotPlaced, shotUnchanged, shipUnverified, geometryUnknown,
+        screenRecordingDenied, widgetNotPlaced, slotTimeout, shotUnchanged, shipUnverified, geometryUnknown,
         widgetExists, widgetNotFound, templateUnknown, scenarioNotFound,
         feedFailed, feedTimeout, feedInvalidOutput, staleData, daemonMissing,
         shotMismatch, feedCommandNotFound, feedSecretMissing, secretsInConfig, sampleNotLocalized

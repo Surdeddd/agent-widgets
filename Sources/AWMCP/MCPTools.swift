@@ -4,7 +4,7 @@ import Foundation
 import MCP
 
 enum AWTools {
-    static let all: [AWTool] = [templates, create, preview, ship, shot, dev, doctor, list, dataSet, feedRun, explain]
+    static let all: [AWTool] = [templates, create, preview, ship, shot, slot, dev, doctor, list, dataSet, feedRun, explain]
 
     static let templates = AWTool(
         "aw_templates",
@@ -123,6 +123,78 @@ enum AWTools {
     }
 
     struct ShotPayload: Codable {
+        let shots: [ShotRecord]
+        let comparisons: [ShotComparison]
+    }
+
+    static let slot = AWTool(
+        "aw_slot",
+        "Call right after asking the person to add the dev slot, when aw_ship or aw_shot reports WIDGET_NOT_PLACED. "
+            + "Waits until the slot is on the desktop, then measures desktop sizes and captures it.",
+        schema: Schema.object([
+            "families": Schema.strings("Families that must appear, for example medium and large"),
+            "timeout": Schema.number("Seconds to wait (default 300)")
+        ])
+    ) { arguments, context in
+        guard WindowLocator.screenRecordingAllowed else {
+            return Reply.failure([ShotIssues.screenRecording(.error)])
+        }
+        let workspace = try context.workspace(arguments)
+        let families = Set((arguments.list("families") ?? []).compactMap(Family.init(rawValue:)))
+        let timeout = arguments.number("timeout") ?? 300
+        let config = workspace.config
+        let windows = await SlotWaiter(families: families, timeout: timeout).wait(
+            target: ShotTarget.dev(config),
+            locate: { WindowLocator.current() },
+            sleep: { interval in
+                guard interval > 0 else { return }
+                try? await Task.sleep(nanoseconds: UInt64(interval * 1_000_000_000))
+            }
+        )
+        guard let windows else {
+            let issue = SlotIssues.timeout(
+                seconds: timeout,
+                slot: config.devSlotName,
+                appName: config.appName,
+                families: families
+            )
+            return Reply.make(
+                L10n.pick(en: "The dev slot did not appear in \(Int(timeout)) s", ru: "Dev-слот не появился за \(Int(timeout)) с"),
+                issues: [issue],
+                payload: SlotPayload(windows: [], shots: [], comparisons: [])
+            )
+        }
+        var issues: [Issue] = []
+        if GeometryStore.load() == nil {
+            if let measured = await GeometryProbe.measure(runner: context.runner) {
+                try GeometryStore.save(measured)
+            } else {
+                issues.append(GeometryIssues.unknown)
+            }
+        }
+        if AppGroupStore(config: config).devTarget() != nil {
+            await Reloader(config: config, runner: context.runner).reload(kind: RegistryGenerator.devKind)
+            try? await Task.sleep(nanoseconds: 2_000_000_000)
+        }
+        let capture = try await ShotService.capture(workspace, kind: nil, dev: true, runner: context.runner)
+        let review = ShotCompare.review(
+            capture.records,
+            workspace: workspace,
+            target: AppGroupStore(config: config).devTarget()
+        )
+        issues += capture.issues + review.issues
+        let payload = SlotPayload(windows: windows, shots: capture.records, comparisons: review.comparisons)
+        let captured = L10n.pick(en: "\(capture.records.count) window(s) captured", ru: "снято окон: \(capture.records.count)")
+        return Reply.make(
+            ([captured] + review.comparisons.map(\.summary)).joined(separator: "\n"),
+            issues: issues,
+            payload: payload,
+            images: payload.shots.map(\.path) + payload.comparisons.map(\.image)
+        )
+    }
+
+    struct SlotPayload: Codable {
+        let windows: [WidgetWindow]
         let shots: [ShotRecord]
         let comparisons: [ShotComparison]
     }

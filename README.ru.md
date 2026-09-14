@@ -155,7 +155,7 @@ flowchart LR
 | `aw preview <id>` | отрендерить лист и проверить вёрстку |
 | `aw ship <id>` | превью → сборка → установка → dev-слот → снимок |
 | `aw build` · `aw install` · `aw rollback` | собрать и поставить приложение, с бэкапами |
-| `aw dev <id>` · `aw shot` · `aw geometry` | переключить dev-слот, снять реальные окна, замерить размеры виджетов на столе |
+| `aw dev <id>` · `aw shot` · `aw slot` · `aw geometry` | переключить dev-слот, снять реальные окна, дождаться пока человек поставит слот, замерить размеры виджетов на столе |
 | `aw feed run <id>` · `aw data set <id>` · `aw data get <id>` | прогнать feed, пушнуть данные, прочитать данные |
 | `aw tick` · `aw daemon install` · `aw logs <id>` | держать feed'ы свежими и читать их логи |
 | `aw doctor` · `aw list` · `aw explain [CODE]` | здоровье, виджеты, коды проблем |

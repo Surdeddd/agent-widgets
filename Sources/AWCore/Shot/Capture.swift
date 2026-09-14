@@ -178,8 +178,10 @@ public enum ShotIssues {
             severity: .warning,
             message: L10n.pick(en: "“\(name)” is not on the desktop, so there is nothing to capture", ru: "«\(name)» нет на столе — снимать нечего"),
             hint: L10n.pick(
-                en: "Right-click the desktop → Edit Widgets → search “\(appName)” → add “\(name)”, then run `aw shot`",
-                ru: "Правый клик по столу → «Изменить виджеты» → найди «\(appName)» → добавь «\(name)», затем `aw shot`"
+                en: "Right-click the desktop → Edit Widgets → search “\(appName)” → add “\(name)”, "
+                    + "then run `aw slot` (it waits until the slot appears)",
+                ru: "Правый клик по столу → «Изменить виджеты» → найди «\(appName)» → добавь «\(name)», "
+                    + "затем `aw slot` (ждёт, пока слот появится)"
             )
         )
     }
