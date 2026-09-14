@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.2.0 — 2026-09-14
 
 - `aw slot` waits until the person puts the dev slot on the desktop, then measures sizes and captures it (`SLOT_TIMEOUT`).
 - A free Apple ID is enough for signing: docs and `SIGNING_MISSING` now say so; `aw preview` needs no certificate. Verified: this repository is built, signed and installed with a free Personal Team.
