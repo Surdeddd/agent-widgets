@@ -26,7 +26,7 @@ Things that look fine in code and break on the desktop. The preview catches many
 
 ## Install and desktop
 
-- **Signing is mandatory:** the App Group (`<TeamID>.<bundle>`) needs an Apple Development certificate. `aw doctor` checks it.
+- **Signing is mandatory:** the App Group (`<TeamID>.<bundle>`) needs an Apple Development certificate — a free Apple ID with its Personal Team is enough. `aw doctor` checks it.
 - **Placing widgets is a human action.** Ask once for the dev slot “<App> · Dev” in medium and large; `aw dev` / `aw ship` switch it afterwards.
 - **Changing `id` or `kind` is a new widget** to macOS; the old one disappears from the desktop.
 - **Screenshots need Screen Recording** for the app that runs `aw`.

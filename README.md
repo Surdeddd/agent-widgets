@@ -34,7 +34,7 @@ Coding agents write good SwiftUI, but they cannot see WidgetKit. **agent-widgets
 
 - macOS 14 or newer, Xcode 16.3 or newer
 - `brew install xcodegen`
-- An Apple Development certificate, and a free Apple ID is enough — no paid developer membership: Xcode → Settings → Accounts → + → Apple ID, select its "(Personal Team)" → Manage Certificates → + → Apple Development; in an existing workspace then run `aw init --refresh-signing`. Widgets need the certificate for their App Group. `aw preview` works without any certificate. The free-account path is still being confirmed end to end.
+- An Apple Development certificate, and a free Apple ID is enough — no paid developer membership: Xcode → Settings → Accounts → + → Apple ID, select its "(Personal Team)" → Manage Certificates → + → Apple Development; in an existing workspace then run `aw init --refresh-signing`. Widgets need the certificate for their App Group. `aw preview` works without any certificate. Verified: every widget in this repository was built, signed and installed with a free Personal Team.
 
 ## Install
 
