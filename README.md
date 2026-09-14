@@ -17,6 +17,10 @@
 
 Coding agents write good SwiftUI, but they cannot see WidgetKit. **agent-widgets** gives them eyes and hands. The agent writes only what is unique — a Codable model, a SwiftUI view and, for live data, a small feed script. The `aw` CLI does the rest: it renders every size and theme into one sheet with layout checks, builds and signs the app, installs it, shows the widget in a dev slot on your desktop and captures the real window so the agent can look at it.
 
+<p align="center">
+  <img src=".github/assets/agent-loop.gif" alt="aw preview catches a truncated label, the agent fixes the view, the next preview is clean" width="100%">
+</p>
+
 ## What you get
 
 - **A preview the agent can trust.** Every family × light / dark × idle desktop × sample, rendered in about a second, with `OVERFLOW`, `TRUNCATION`, `DECODE` and other checks. Every issue comes with a hint, and `aw explain` goes deeper.
