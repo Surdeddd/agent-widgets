@@ -4,5 +4,5 @@
     "en": "Live countdown to an event",
     "ru": "Живой обратный отсчёт до события"
   },
-  "families": ["small", "medium"]
+  "families": ["small", "medium", "large", "extraLarge"]
 }

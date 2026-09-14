@@ -26,10 +26,10 @@ struct __TYPE__View: AWView {
         AWPhaseView(entry) { data in
             VStack(alignment: .leading, spacing: AWMetrics.spacing(for: context.family)) {
                 AWHeader(data.title, symbol: "chart.bar.fill", entry: entry)
-                if context.family == .medium {
-                    HStack(alignment: .bottom, spacing: AWSpace.m) {
+                if context.isWide {
+                    HStack(alignment: .bottom, spacing: context.family == .medium ? AWSpace.m : AWSpace.xl) {
                         AWMetric(data.total, label: data.caption)
-                            .frame(width: 104, alignment: .leading)
+                            .frame(width: context.family == .medium ? 104 : 240, alignment: .leading)
                         chart(data)
                     }
                 } else {

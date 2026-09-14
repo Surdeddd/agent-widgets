@@ -4,5 +4,5 @@
     "en": "One number that matters, with trend and history",
     "ru": "Одна важная цифра с трендом и историей"
   },
-  "families": ["small", "medium", "large"]
+  "families": ["small", "medium", "large", "extraLarge"]
 }

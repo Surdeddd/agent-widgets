@@ -4,5 +4,5 @@
     "en": "Status list with health at a glance",
     "ru": "Список статусов, здоровье с одного взгляда"
   },
-  "families": ["small", "medium", "large"]
+  "families": ["small", "medium", "large", "extraLarge"]
 }

@@ -28,6 +28,14 @@ struct __TYPE__View: AWView {
                 AWHeader(data.title, symbol: "waveform.path.ecg", entry: entry)
                 if context.isSmall {
                     summary(data)
+                } else if context.family == .extraLarge {
+                    HStack(alignment: .top, spacing: AWSpace.xl) {
+                        summary(data)
+                            .frame(width: 150, alignment: .leading)
+                        AWList(data.items, maxRows: 6) { item in
+                            AWRow(item.name, value: item.value, detail: item.detail, status: item.status)
+                        }
+                    }
                 } else {
                     AWList(data.items) { item in
                         AWRow(item.name, value: item.value, detail: context.family == .medium ? nil : item.detail, status: item.status)

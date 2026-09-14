@@ -23,11 +23,12 @@ struct __TYPE__View: AWView {
         AWPhaseView(entry) { data in
             VStack(alignment: .leading, spacing: AWMetrics.spacing(for: context.family)) {
                 AWHeader(data.title, symbol: data.symbol ?? "hourglass", entry: entry)
-                if context.isSmall {
+                switch context.family {
+                case .small:
                     AWText(data.event, .headline, lines: 2)
                     countdown(data)
                     Spacer(minLength: 0)
-                } else {
+                case .medium:
                     HStack(alignment: .bottom, spacing: AWSpace.m) {
                         VStack(alignment: .leading, spacing: 2) {
                             AWText(data.event, .headline)
@@ -41,8 +42,40 @@ struct __TYPE__View: AWView {
                     if let since = data.since {
                         AWBar(progress: Self.fraction(since: since, until: data.date, now: entry.date), tint: .orange)
                     }
+                case .large, .extraLarge:
+                    Spacer(minLength: 0)
+                    HStack(alignment: .center, spacing: context.family == .large ? AWSpace.m : AWSpace.xl) {
+                        summary(data)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        elapsed(data, size: context.family == .large ? 120 : 220)
+                    }
+                    Spacer(minLength: 0)
                 }
             }
+        }
+    }
+
+    private func summary(_ data: __TYPE__Data) -> some View {
+        VStack(alignment: .leading, spacing: AWSpace.xs) {
+            AWText(data.event, .display, lines: 2)
+            countdown(data)
+            AWText(Self.format(data.date, language: context.language), .caption)
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    @ViewBuilder
+    private func elapsed(_ data: __TYPE__Data, size: CGFloat) -> some View {
+        if let since = data.since {
+            let fraction = Self.fraction(since: since, until: data.date, now: entry.date)
+            AWRing(progress: fraction, tint: .orange) {
+                VStack(spacing: 0) {
+                    AWText("\(Int((fraction * 100).rounded()))%", .title)
+                    AWText(context.pick(en: "elapsed", ru: "прошло"), .label)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .frame(width: size, height: size)
         }
     }
 

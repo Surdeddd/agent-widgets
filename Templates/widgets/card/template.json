@@ -4,5 +4,5 @@
     "en": "Text card: word, quote or note of the day",
     "ru": "Текстовая карточка: слово, цитата или заметка дня"
   },
-  "families": ["small", "medium", "large"]
+  "families": ["small", "medium", "large", "extraLarge"]
 }

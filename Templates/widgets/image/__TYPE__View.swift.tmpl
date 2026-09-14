@@ -32,7 +32,7 @@ struct __TYPE__View: AWView {
                         AWText(caption, .caption, lines: 2)
                             .opacity(0.85)
                     }
-                    if let credit = data.credit, context.family == .large {
+                    if let credit = data.credit, context.family == .large || context.family == .extraLarge {
                         AWText(credit, .label)
                             .opacity(0.7)
                     }

@@ -19,20 +19,47 @@ struct __TYPE__View: AWView {
 
     var body: some View {
         AWPhaseView(entry) { data in
-            VStack(alignment: .leading, spacing: context.isSmall ? AWSpace.xs : AWSpace.s) {
+            VStack(alignment: .leading, spacing: spacing) {
                 AWHeader(data.kicker, symbol: "text.book.closed", entry: entry)
-                VStack(alignment: .leading, spacing: 1) {
-                    AWText(data.headline, .title, lines: context.isSmall ? 2 : 1)
-                    if let subtitle = data.subtitle {
-                        AWText(subtitle, .caption)
-                            .foregroundStyle(.secondary)
+                if context.family == .extraLarge {
+                    title(data)
+                    Spacer(minLength: 0)
+                    HStack(alignment: .bottom, spacing: AWSpace.xl) {
+                        AWText(data.body, .body, lines: 4)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        if let footnote = data.footnote {
+                            quote(footnote)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                    }
+                } else {
+                    text(data)
+                    Spacer(minLength: 0)
+                    if let footnote = data.footnote, !context.isSmall {
+                        quote(footnote)
                     }
                 }
-                AWText(data.body, .body, lines: bodyLines)
-                Spacer(minLength: 0)
-                if let footnote = data.footnote, !context.isSmall {
-                    quote(footnote)
-                }
+            }
+        }
+    }
+
+    private var spacing: CGFloat {
+        context.isSmall ? AWSpace.xs : AWSpace.s
+    }
+
+    private func text(_ data: __TYPE__Data) -> some View {
+        VStack(alignment: .leading, spacing: spacing) {
+            title(data)
+            AWText(data.body, .body, lines: bodyLines)
+        }
+    }
+
+    private func title(_ data: __TYPE__Data) -> some View {
+        VStack(alignment: .leading, spacing: 1) {
+            AWText(data.headline, context.family == .extraLarge ? .display : .title, lines: context.isSmall || context.family == .extraLarge ? 2 : 1)
+            if let subtitle = data.subtitle {
+                AWText(subtitle, .caption)
+                    .foregroundStyle(.secondary)
             }
         }
     }
@@ -50,9 +77,17 @@ struct __TYPE__View: AWView {
             RoundedRectangle(cornerRadius: 1.5)
                 .fill(.tertiary)
                 .frame(width: 3)
-            AWText(text, .caption, lines: context.family == .medium ? 1 : 3)
+            AWText(text, .caption, lines: quoteLines)
                 .foregroundStyle(.secondary)
         }
         .fixedSize(horizontal: false, vertical: true)
+    }
+
+    private var quoteLines: Int {
+        switch context.family {
+        case .medium: 1
+        case .extraLarge: 4
+        default: 3
+        }
     }
 }

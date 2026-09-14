@@ -32,6 +32,11 @@ struct __TYPE__View: AWView {
                     primary(data)
                 case .medium:
                     row(data)
+                case .extraLarge:
+                    HStack(alignment: .center, spacing: AWSpace.xl) {
+                        primary(data)
+                        details(data)
+                    }
                 default:
                     primary(data)
                     details(data)
@@ -53,9 +58,17 @@ struct __TYPE__View: AWView {
                             .foregroundStyle(.secondary)
                     }
                 }
-                .frame(width: context.isSmall ? 96 : 150, height: context.isSmall ? 96 : 150)
+                .frame(width: ringSize, height: ringSize)
                 Spacer(minLength: 0)
             }
+        }
+    }
+
+    private var ringSize: CGFloat {
+        switch context.family {
+        case .small: 96
+        case .extraLarge: 230
+        default: 150
         }
     }
 

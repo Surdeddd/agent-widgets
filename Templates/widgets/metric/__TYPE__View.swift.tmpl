@@ -30,6 +30,15 @@ struct __TYPE__View: AWView {
                                 .frame(height: 64)
                         }
                     }
+                } else if context.family == .extraLarge {
+                    HStack(alignment: .bottom, spacing: AWSpace.xl) {
+                        summary(data)
+                            .frame(width: 200, alignment: .bottomLeading)
+                        if data.history.count > 1 {
+                            AWSparkline(data.history)
+                                .frame(maxHeight: .infinity)
+                        }
+                    }
                 } else {
                     summary(data)
                     Spacer(minLength: 0)
@@ -46,7 +55,7 @@ struct __TYPE__View: AWView {
         VStack(alignment: .leading, spacing: 2) {
             AWMetric(format(data.value), unit: data.unit, trend: data.change.map { AWTrend.percent($0) })
             if let caption = data.caption, !context.isSmall {
-                AWText(caption, .caption)
+                AWText(caption, .caption, lines: context.family == .extraLarge ? 3 : 1)
                     .foregroundStyle(.secondary)
             }
         }
