@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- `aw geometry [--measure]` reads the real desktop widget sizes of this Mac from the system log; previews, the sheet and window matching use them, and `aw doctor` warns while they are unknown (`GEOMETRY_UNKNOWN`).
+
 ## 0.1.0 — 2026-09-14
 
 First public version.

@@ -6,12 +6,20 @@ public struct PreviewRequest: Sendable {
     public var scenarios: [String]?
     public var full: Bool
     public var language: Language
+    public var geometry: DeskGeometry?
 
-    public init(families: [Family]? = nil, scenarios: [String]? = nil, full: Bool = false, language: Language = L10n.language) {
+    public init(
+        families: [Family]? = nil,
+        scenarios: [String]? = nil,
+        full: Bool = false,
+        language: Language = L10n.language,
+        geometry: DeskGeometry? = nil
+    ) {
         self.families = families
         self.scenarios = scenarios
         self.full = full
         self.language = language
+        self.geometry = geometry
     }
 }
 
@@ -157,7 +165,7 @@ public struct PreviewPipeline: Sendable {
         return binary
     }
 
-    private func renderArguments(_ widget: WidgetSource, _ request: PreviewRequest, output: URL) -> [String] {
+    func renderArguments(_ widget: WidgetSource, _ request: PreviewRequest, output: URL) -> [String] {
         let families = request.families ?? widget.manifest.families
         var arguments = [
             "render", "--widget", widget.id, "--out", output.path,
@@ -169,6 +177,9 @@ public struct PreviewPipeline: Sendable {
         }
         if request.full {
             arguments.append("--full")
+        }
+        if let geometry = request.geometry, let data = try? JSONEncoder().encode(geometry), let json = String(bytes: data, encoding: .utf8) {
+            arguments += ["--geometry", json]
         }
         let images = widget.directory.appendingPathComponent("samples/images", isDirectory: true)
         if FileManager.default.fileExists(atPath: images.path) {

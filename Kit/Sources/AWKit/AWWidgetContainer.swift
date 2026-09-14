@@ -17,7 +17,7 @@ public enum AWMetrics {
     }
 
     public static func cornerRadius(for family: Family) -> CGFloat {
-        22
+        DeskGeometry.current.cornerRadius
     }
 }
 

@@ -17,6 +17,23 @@ import Testing
     #expect(Family.nearest(windowSize: CGSize(width: 1200, height: 900)) == nil)
 }
 
+@Test func familySizesFollowTheMeasuredDesk() {
+    let desk = DeskGeometry(
+        small: CGSize(width: 164, height: 164),
+        medium: CGSize(width: 344, height: 164),
+        large: CGSize(width: 344, height: 344),
+        extraLarge: CGSize(width: 704, height: 344),
+        cornerRadius: 27.88,
+        source: "chronod"
+    )
+    DeskGeometry.$current.withValue(desk) {
+        #expect(Family.small.size == CGSize(width: 164, height: 164))
+        #expect(Family.extraLarge.size == CGSize(width: 704, height: 344))
+        #expect(Family.nearest(windowSize: CGSize(width: 360, height: 180)) == .medium)
+    }
+    #expect(Family.small.size == CGSize(width: 155, height: 155))
+}
+
 @Test func familyWidgetKitNames() {
     #expect(Family.allCases.map(\.widgetKitCase) == [".systemSmall", ".systemMedium", ".systemLarge", ".systemExtraLarge"])
 }

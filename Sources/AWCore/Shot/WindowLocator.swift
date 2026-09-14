@@ -21,10 +21,10 @@ public enum WindowLocator {
     public static func current() -> [WidgetWindow] {
         let owners = Set(NSRunningApplication.runningApplications(withBundleIdentifier: ownerBundleID).map(\.processIdentifier))
         let info = CGWindowListCopyWindowInfo([.optionAll], kCGNullWindowID) as? [[String: Any]] ?? []
-        return parse(info, owners: owners)
+        return parse(info, owners: owners, geometry: GeometryStore.current())
     }
 
-    public static func parse(_ info: [[String: Any]], owners: Set<Int32>) -> [WidgetWindow] {
+    public static func parse(_ info: [[String: Any]], owners: Set<Int32>, geometry: DeskGeometry = .fallback) -> [WidgetWindow] {
         info.compactMap { window -> WidgetWindow? in
             guard let owner = number(window[kCGWindowOwnerPID as String]), owners.contains(Int32(owner)),
                   let layer = number(window[kCGWindowLayer as String]), layer < 0,
@@ -40,7 +40,7 @@ public enum WindowLocator {
                 name: window[kCGWindowName as String] as? String ?? "",
                 width: width,
                 height: height,
-                family: Family.nearest(windowSize: CGSize(width: width, height: height))
+                family: Family.nearest(windowSize: CGSize(width: width, height: height), in: geometry)
             )
         }
         .sorted { $0.id < $1.id }

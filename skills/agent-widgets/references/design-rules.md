@@ -11,12 +11,14 @@ A desktop widget is read from the corner of the eye in under a second. Everythin
 
 ## Layout per family
 
-| family | content (pt) | what fits |
+| family | content on a MacBook desktop (pt) | what fits |
 |---|---|---|
-| small | 155 × 155 | header, hero value, one line or a tiny sparkline |
-| medium | 329 × 155 | two columns: hero on the left, chart / ring / 2–3 rows on the right |
-| large | 345 × 345 | header, hero, chart, a short list (4–6 rows) |
-| extraLarge | 715 × 345 | a small dashboard: 2–3 columns |
+| small | 164 × 164 | header, hero value, one line or a tiny sparkline |
+| medium | 344 × 164 | two columns: hero on the left, chart / ring / 2–3 rows on the right |
+| large | 344 × 344 | header, hero, chart, a short list (4–6 rows) |
+| extraLarge | 704 × 344 | a small dashboard: 2–3 columns |
+
+Sizes change with the display. `aw geometry --measure` reads them from this Mac once a widget is on the desktop, and every preview renders at the measured sizes; without a measurement previews use 155 × 155, 329 × 155, 345 × 345 and 715 × 345. The desktop window around a widget is 16 pt larger than its content — `aw shot` matches windows to families by the same table.
 
 - Branch on `context.family`; do not scale one layout down.
 - Fill the family: header on top, the hero next, one detail pinned to the bottom (sparkline, bar, controls, the next hours) with `Spacer(minLength: 0)` in between. An empty bottom third reads as broken; `ideal 109/155` under a cell on the sheet shows how much of the height the content really uses. Charts get explicit heights per family.

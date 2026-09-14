@@ -89,6 +89,7 @@ Exit codes: `0` ok, `1` checks failed, `2` usage, `3` environment, `4` build fai
 | `aw build [--no-sign]` / `aw install [--hard]` / `aw rollback` | build and install the app with backups |
 | `aw dev <id> [--scenario s] [--live]` | point the dev slot at a widget |
 | `aw shot [--kind k] [--dev]` | capture real widget windows |
+| `aw geometry [--measure]` | desktop widget sizes previews render at; `--measure` reads them from this Mac's system log |
 | `aw feed run <id>` / `aw data set <id> <json\|@file>` / `aw data get <id>` | run a feed / push data / read data |
 | `aw tick` / `aw daemon install\|status\|uninstall` / `aw logs <id>` | scheduling and logs |
 | `aw doctor` / `aw list` / `aw explain [CODE]` | health, widgets, issue codes |

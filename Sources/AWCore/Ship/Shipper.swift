@@ -111,7 +111,7 @@ public struct Shipper: Sendable {
 
     private func preview(_ widget: WidgetSource, _ options: ShipOptions, into outcome: inout ShipOutcome) async throws -> Bool {
         let preview = try await PreviewPipeline(workspace: workspace, cache: KitCache(engine: engine, runner: runner), runner: runner)
-            .run(widget, PreviewRequest())
+            .run(widget, PreviewRequest(geometry: GeometryStore.load()))
         outcome.preview = preview
         let errors = preview.allIssues.filter { $0.severity == .error }.deduplicated()
         guard !errors.isEmpty else {

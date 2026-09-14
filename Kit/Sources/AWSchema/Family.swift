@@ -6,15 +6,10 @@ public enum Family: String, Codable, CaseIterable, Sendable {
     case large
     case extraLarge
 
-    public static let windowInset: CGFloat = 15
+    public static let windowInset: CGFloat = 16
 
     public var size: CGSize {
-        switch self {
-        case .small: CGSize(width: 155, height: 155)
-        case .medium: CGSize(width: 329, height: 155)
-        case .large: CGSize(width: 345, height: 345)
-        case .extraLarge: CGSize(width: 715, height: 345)
-        }
+        DeskGeometry.current.size(of: self)
     }
 
     public var widgetKitCase: String {
@@ -26,10 +21,11 @@ public enum Family: String, Codable, CaseIterable, Sendable {
         }
     }
 
-    public static func nearest(windowSize: CGSize, maxDistance: CGFloat = 40) -> Family? {
+    public static func nearest(windowSize: CGSize, in geometry: DeskGeometry = DeskGeometry.current, maxDistance: CGFloat = 40) -> Family? {
         let ranked = allCases.map { family -> (family: Family, distance: CGFloat) in
-            let dx = family.size.width + windowInset - windowSize.width
-            let dy = family.size.height + windowInset - windowSize.height
+            let size = geometry.size(of: family)
+            let dx = size.width + windowInset - windowSize.width
+            let dy = size.height + windowInset - windowSize.height
             return (family, (dx * dx + dy * dy).squareRoot())
         }
         guard let best = ranked.min(by: { $0.distance < $1.distance }), best.distance <= maxDistance else {

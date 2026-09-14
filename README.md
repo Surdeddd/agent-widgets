@@ -155,7 +155,7 @@ flowchart LR
 | `aw preview <id>` | render the sheet and check the layout |
 | `aw ship <id>` | preview → build → install → dev slot → screenshot |
 | `aw build` · `aw install` · `aw rollback` | build and install the app, with backups |
-| `aw dev <id>` · `aw shot` | switch the dev slot, capture real windows |
+| `aw dev <id>` · `aw shot` · `aw geometry` | switch the dev slot, capture real windows, measure desktop widget sizes |
 | `aw feed run <id>` · `aw data set <id>` · `aw data get <id>` | run a feed, push data, read data |
 | `aw tick` · `aw daemon install` · `aw logs <id>` | keep feeds running and read their logs |
 | `aw doctor` · `aw list` · `aw explain [CODE]` | health, widgets, issue codes |

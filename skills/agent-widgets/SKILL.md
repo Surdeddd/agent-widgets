@@ -90,7 +90,7 @@ struct WeatherView: AWView {
 }
 ```
 
-Content sizes in points: small 155×155, medium 329×155, large 345×345, extraLarge 715×345; the frame already adds 14–18 pt of padding, so do not pad the root view.
+Content sizes depend on the display. `aw geometry` prints this Mac's (run `aw geometry --measure` once any widget is on the desktop) and previews render at exactly those sizes — on a MacBook desktop small 164×164, medium 344×164, large 344×344, extraLarge 704×344 points. Unmeasured previews fall back to 155×155, 329×155, 345×345, 715×345. The frame already adds 14–18 pt of padding, so do not pad the root view.
 
 ## Design rules
 

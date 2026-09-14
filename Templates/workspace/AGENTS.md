@@ -50,7 +50,7 @@ struct StepsView: AWView {
 }
 ```
 
-`"view"` in `widget.json` must name the struct. Branch layouts on `context.family` (small 155×155, medium 329×155, large 345×345, extraLarge 715×345 points).
+`"view"` in `widget.json` must name the struct. Branch layouts on `context.family`. Sizes depend on the display: `aw geometry` prints this Mac's (on a MacBook desktop small 164×164, medium 344×164, large 344×344, extraLarge 704×344 points) and previews render at them; run `aw geometry --measure` once any widget is on the desktop.
 
 ## Rules for good widgets
 

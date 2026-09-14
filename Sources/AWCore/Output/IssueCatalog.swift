@@ -328,6 +328,16 @@ private let catalogEntries: [IssueExplanation] = [
         example: nil
     ),
     IssueExplanation(
+        code: IssueCode.geometryUnknown,
+        title: text("Desktop widget sizes are unknown", "Размеры виджетов на столе неизвестны"),
+        cause: text(
+            "Widget sizes depend on the display. aw reads them from the system log of chronod; without a measurement previews use built-in sizes that can differ from the desktop by 10 pt.",
+            "Размеры виджетов зависят от экрана. aw читает их из системного лога chronod; без замера превью рисует по встроенным размерам, а они могут отличаться от стола на 10 pt."
+        ),
+        fix: text("Put any widget on the desktop, then run aw geometry --measure.", "Поставь любой виджет на стол и запусти aw geometry --measure."),
+        example: nil
+    ),
+    IssueExplanation(
         code: IssueCode.daemonMissing,
         title: text("Feeds are not scheduled", "Feed не запланированы"),
         cause: text(

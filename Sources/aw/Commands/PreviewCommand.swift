@@ -44,7 +44,8 @@ struct PreviewCommand: AWCommand {
             families: family.map { $0.split(separator: ",").compactMap { Family(rawValue: String($0)) } },
             scenarios: scenario.map { $0.split(separator: ",").map(String.init) },
             full: full,
-            language: global.language
+            language: global.language,
+            geometry: GeometryStore.load()
         )
         let outcome = try await PreviewPipeline(workspace: workspace, cache: cache, runner: runner).run(widget, request)
         let issues = outcome.allIssues.deduplicated()

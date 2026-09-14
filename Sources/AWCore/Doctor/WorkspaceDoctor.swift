@@ -2,7 +2,13 @@ import AWSchema
 import Foundation
 
 extension Doctor {
-    public func workspaceChecks(_ workspace: Workspace, paths: InstallPaths, screenRecording: Bool, windows: [WidgetWindow]) async -> [DoctorCheck] {
+    public func workspaceChecks(
+        _ workspace: Workspace,
+        paths: InstallPaths,
+        screenRecording: Bool,
+        windows: [WidgetWindow],
+        geometry: DeskGeometry?
+    ) async -> [DoctorCheck] {
         let config = workspace.config
         let installer = Installer(config: config, runner: runner, paths: paths)
         let installed = Installer.bundleID(of: installer.target) == config.appBundleID
@@ -11,10 +17,29 @@ extension Doctor {
             checks.append(await extensionCheck(installer))
         }
         checks.append(devSlotCheck(config, screenRecording: screenRecording, windows: windows))
+        checks.append(geometryCheck(geometry))
         if (try? workspace.widgets())?.contains(where: { $0.manifest.feed != nil }) == true {
             checks.append(await daemonCheck(workspace))
         }
         return checks
+    }
+
+    func geometryCheck(_ geometry: DeskGeometry?) -> DoctorCheck {
+        let title = L10n.pick(en: "Desktop sizes", ru: "Размеры на столе")
+        guard let geometry else {
+            return DoctorCheck(
+                id: "geometry",
+                title: title,
+                status: .warn,
+                detail: L10n.pick(en: "not measured — previews use built-in sizes", ru: "не сняты — превью рисует по встроенным размерам"),
+                issue: GeometryIssues.unknown
+            )
+        }
+        let sizes = [Family.small, .medium, .large].map { family in
+            let size = geometry.size(of: family)
+            return "\(family.rawValue) \(Int(size.width.rounded()))×\(Int(size.height.rounded()))"
+        }
+        return DoctorCheck(id: "geometry", title: title, status: .pass, detail: sizes.joined(separator: " · "))
     }
 
     func daemonCheck(_ workspace: Workspace) async -> DoctorCheck {

@@ -140,8 +140,12 @@ public enum AWPreviewMain {
             full: arguments.flag("full"),
             images: arguments.value("images").map { URL(fileURLWithPath: $0, isDirectory: true) }
         )
+        let geometry = arguments.value("geometry")
+            .flatMap { try? JSONDecoder().decode(DeskGeometry.self, from: Data($0.utf8)) } ?? .fallback
         do {
-            let report = try AWPreviewRunner.run(type, options)
+            let report = try DeskGeometry.$current.withValue(geometry) {
+                try AWPreviewRunner.run(type, options)
+            }
             return report.hasErrors ? 1 : 0
         } catch {
             print("render failed: \(error)")

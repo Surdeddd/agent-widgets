@@ -59,7 +59,8 @@ enum AWTools {
         let request = PreviewRequest(
             families: arguments.list("families")?.compactMap(Family.init(rawValue:)),
             scenarios: arguments.list("scenarios"),
-            full: arguments.bool("full", default: false)
+            full: arguments.bool("full", default: false),
+            geometry: GeometryStore.load()
         )
         let outcome = try await context.pipeline(workspace).run(widget, request)
         return Reply.make(Summaries.preview(outcome), issues: outcome.allIssues, payload: outcome, images: [outcome.report?.sheet].compactMap { $0 })
@@ -148,7 +149,8 @@ enum AWTools {
                 workspace,
                 paths: .standard(for: workspace.config),
                 screenRecording: screen,
-                windows: screen ? WindowLocator.current() : []
+                windows: screen ? WindowLocator.current() : [],
+                geometry: GeometryStore.load()
             )
         }
         return Reply.make(DoctorFormatter.human(checks), issues: checks.compactMap(\.issue), payload: ["checks": checks])

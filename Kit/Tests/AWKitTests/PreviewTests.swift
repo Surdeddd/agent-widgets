@@ -232,6 +232,27 @@ private func scenario(_ json: String, name: String = "default") -> PreviewScenar
 }
 
 @MainActor
+@Test func cellsRenderAtTheMeasuredDeskSize() throws {
+    let output = temporaryOutput()
+    defer { try? FileManager.default.removeItem(at: output) }
+    let desk = DeskGeometry(
+        small: CGSize(width: 164, height: 164),
+        medium: CGSize(width: 344, height: 164),
+        large: CGSize(width: 344, height: 344),
+        extraLarge: CGSize(width: 704, height: 344),
+        cornerRadius: 27.88,
+        source: "chronod"
+    )
+    let job = PreviewJob(family: .small, appearance: .dark, mode: .color, scenario: scenario(#"{"value":1,"rows":3}"#))
+    let measured = try DeskGeometry.$current.withValue(desk) {
+        try MatrixRenderer.render(TallView.self, jobs: [job], output: output, language: .en, store: AWStore(root: nil))
+    }
+    let builtIn = try MatrixRenderer.render(TallView.self, jobs: [job], output: output, language: .en, store: AWStore(root: nil))
+    #expect(measured[0].image.width == 164 * 2)
+    #expect(builtIn[0].image.width == 155 * 2)
+}
+
+@MainActor
 @Test func componentGalleryFitsEveryFamily() throws {
     let output = ProcessInfo.processInfo.environment["AW_TEST_ARTIFACTS"].map { URL(fileURLWithPath: $0, isDirectory: true) } ?? temporaryOutput()
     let options = PreviewOptions(

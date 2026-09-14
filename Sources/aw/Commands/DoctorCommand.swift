@@ -22,7 +22,8 @@ struct DoctorCommand: AWCommand {
                 workspace,
                 paths: .standard(for: workspace.config),
                 screenRecording: screen,
-                windows: screen ? WindowLocator.current() : []
+                windows: screen ? WindowLocator.current() : [],
+                geometry: GeometryStore.load()
             )
         }
         let result = CommandResult(issues: checks.compactMap(\.issue), data: checks)

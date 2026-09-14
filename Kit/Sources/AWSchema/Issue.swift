@@ -65,6 +65,7 @@ public enum IssueCode {
     public static let previewCrashed = "PREVIEW_CRASHED"
     public static let scenarioNotFound = "SCENARIO_NOT_FOUND"
     public static let shotUnchanged = "SHOT_UNCHANGED"
+    public static let geometryUnknown = "GEOMETRY_UNKNOWN"
 
     public static let all: [String] = [
         keptExisting, previewCrashed,
@@ -72,7 +73,7 @@ public enum IssueCode {
         manifestInvalid, duplicateKind, budgetRisk, missingDefaultSample,
         workspaceNotFound, workspaceExists, engineNotFound, invalidJSON,
         signingMissing, toolMissing, compileError, buildError, installFailed,
-        screenRecordingDenied, widgetNotPlaced, shotUnchanged, widgetExists, widgetNotFound, templateUnknown, scenarioNotFound,
+        screenRecordingDenied, widgetNotPlaced, shotUnchanged, geometryUnknown, widgetExists, widgetNotFound, templateUnknown, scenarioNotFound,
         feedFailed, feedTimeout, feedInvalidOutput, staleData, daemonMissing
     ]
 }
