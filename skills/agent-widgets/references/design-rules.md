@@ -19,7 +19,7 @@ A desktop widget is read from the corner of the eye in under a second. Everythin
 | extraLarge | 715 × 345 | a small dashboard: 2–3 columns |
 
 - Branch on `context.family`; do not scale one layout down.
-- Push content to the top and let `Spacer(minLength: 0)` absorb the rest; charts get explicit heights per family.
+- Fill the family: header on top, the hero next, one detail pinned to the bottom (sparkline, bar, controls, the next hours) with `Spacer(minLength: 0)` in between. An empty bottom third reads as broken; `ideal 109/155` under a cell on the sheet shows how much of the height the content really uses. Charts get explicit heights per family.
 - The frame already pads 14–18 pt; do not add outer padding or backgrounds.
 - Use the `AWSpace` grid (4 / 8 / 12 / 16) for gaps.
 

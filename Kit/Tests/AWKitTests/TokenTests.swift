@@ -7,7 +7,11 @@ import Testing
         let sizes = Family.allCases.map { AWType.size(role, $0) }
         #expect(sizes == sizes.sorted(), "\(role) should not shrink in bigger families")
     }
-    #expect(AWType.size(.hero, .small) > AWType.size(.title, .small))
+    for family in Family.allCases {
+        #expect(AWType.size(.hero, family) > AWType.size(.display, family))
+        #expect(AWType.size(.display, family) > AWType.size(.title, family))
+        #expect(AWType.size(.display, family) >= AWType.size(.title, family) + 6, "display must read as a step above title")
+    }
 }
 
 @Test func nothingShrinksBelowReadableSize() {

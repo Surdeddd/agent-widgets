@@ -21,7 +21,7 @@ Everything here comes from `import AWKit`. Every component reads `@Environment(\
 | `AWTrendLabel(_ trend: AWTrend)` | “↗ +4.2%” with status color |
 | `AWBadge(_ text: String, status: AWStatus = .neutral, showsSymbol: Bool = true)` | a status pill |
 
-`AWTextRole`: `.hero`, `.title`, `.headline`, `.body`, `.caption`, `.label` (small caps). Roles scale per family.
+`AWTextRole`: `.hero` (numbers, rounded), `.display` (big words — a card, an event, a song that is the point of the widget), `.title`, `.headline`, `.body`, `.caption`, `.label` (small caps). Roles scale per family; the preview checks the fit at each role's minimum scale.
 
 `AWTrend.percent(_ delta: Double, positiveIsGood: Bool = true)` — `delta` is a fraction (`0.042` = 4.2 %).
 

@@ -194,7 +194,7 @@ if data.cards.isEmpty {
     let slot = Int(entry.date.timeIntervalSince1970 / 900)
     let card = data.cards[entry.state.deckIndex(count: data.cards.count, slot: slot)]
     VStack(alignment: .leading, spacing: AWSpace.s) {
-        AWText(card.word, .title)
+        AWText(card.word, card.word.count > 16 ? .title : .display, lines: card.word.count > 16 ? 2 : 1)
         AWText(card.translation, .body, lines: 2)
             .foregroundStyle(.secondary)
         Spacer(minLength: 0)
@@ -208,7 +208,7 @@ if data.cards.isEmpty {
 }
 ```
 
-`AWPhaseView` covers missing data, not empty arrays — hence the guard. Add `static var tick: AWTick { .every(seconds: 900, count: 8) }` so the card changes every 15 minutes without reloads.
+`AWPhaseView` covers missing data, not empty arrays — hence the guard. `.display` makes the word the hero; long phrases step down to `.title` on two lines. Add `static var tick: AWTick { .every(seconds: 900, count: 8) }` so the card changes every 15 minutes without reloads.
 
 ## Image of the day
 

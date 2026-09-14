@@ -3,6 +3,7 @@ import SwiftUI
 
 public enum AWTextRole: String, CaseIterable, Sendable {
     case hero
+    case display
     case title
     case headline
     case body
@@ -15,6 +16,7 @@ public enum AWType {
         let column = index(family)
         switch role {
         case .hero: return [34, 36, 44, 52][column]
+        case .display: return [22, 24, 28, 32][column]
         case .title: return [15, 15, 17, 19][column]
         case .headline: return [13, 13, 14, 15][column]
         case .body: return [13, 13, 14, 15][column]
@@ -25,7 +27,7 @@ public enum AWType {
 
     public static func weight(_ role: AWTextRole) -> Font.Weight {
         switch role {
-        case .hero, .title, .headline, .label: .semibold
+        case .hero, .display, .title, .headline, .label: .semibold
         case .body: .regular
         case .caption: .medium
         }
@@ -38,6 +40,7 @@ public enum AWType {
     public static func tracking(_ role: AWTextRole, _ family: Family) -> CGFloat {
         switch role {
         case .hero: -0.02 * size(role, family)
+        case .display: -0.01 * size(role, family)
         case .title: -0.2
         case .label: 0.6
         case .caption: 0.1
@@ -48,6 +51,7 @@ public enum AWType {
     public static func minimumScale(_ role: AWTextRole) -> CGFloat {
         switch role {
         case .hero: 0.5
+        case .display: 0.7
         case .title: 0.75
         case .headline, .body: 0.8
         case .caption, .label: 0.9
