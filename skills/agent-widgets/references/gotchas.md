@@ -30,5 +30,6 @@ Things that look fine in code and break on the desktop. The preview catches many
 - **Placing widgets is a human action.** Ask once for the dev slot “<App> · Dev” in medium and large; `aw dev` / `aw ship` switch it afterwards.
 - **Changing `id` or `kind` is a new widget** to macOS; the old one disappears from the desktop.
 - **Screenshots need Screen Recording** for the app that runs `aw`.
-- **A redraw can lag.** If `aw ship` reports `SHOT_UNCHANGED`, wait and run `aw shot --dev`, or `aw install --hard`.
+- **A redraw can lag** — 1 to 20 s, WidgetKit decides. `aw ship` and `aw dev` wait until the dev slot changes before they capture it; on `SHOT_UNCHANGED` run `aw dev <id>` again or `aw install --hard`.
+- **Stateful widgets show their live state in the dev slot** (a deck's card, toggles), while the preview uses the sample state. A `SHOT_MISMATCH` there is expected; the compare image shows the difference.
 - **The desktop is the truth, not the sheet.** `aw shot` compares the dev slot with the preview cell of the same sample and writes `<id>-<family>-compare.png`; on `SHOT_MISMATCH` open it — a size gap needs `aw geometry --measure`, red outlines are things only the desktop shows.

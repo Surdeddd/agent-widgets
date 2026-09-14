@@ -53,25 +53,34 @@ struct DevCommand: AWCommand {
     @Flag(help: ArgumentHelp(L10n.pick(en: "Show the live feed data instead of a sample.", ru: "Показывать живые данные feed вместо сэмпла.")))
     var live = false
 
+    @Option(help: ArgumentHelp(L10n.pick(en: "Seconds to wait for the desktop to redraw.", ru: "Сколько секунд ждать перерисовки на столе.")))
+    var timeout: Double = 30
+
     func execute() async throws -> Int32 {
         let workspace = try global.loadWorkspace()
         let widget = try workspace.widget(id)
-        let target = try DevSwitch.apply(widget, scenario: live ? nil : (scenario ?? "default"), store: AppGroupStore(config: workspace.config))
-        let reloaded = await Reloader(config: workspace.config, runner: SystemProcessRunner()).reload(kind: RegistryGenerator.devKind)
-        let issues = reloaded ? [] : [Issue(
-            code: IssueCode.installFailed,
-            severity: .warning,
-            message: L10n.pick(
-                en: "Could not reach \(workspace.config.appName) to redraw the dev slot",
-                ru: "Не удалось достучаться до \(workspace.config.appName), чтобы перерисовать dev-слот"
-            ),
-            hint: L10n.pick(en: "Install it first: `aw ship \(widget.id)`", ru: "Сначала установи: `aw ship \(widget.id)`")
-        )]
-        global.printer.emit(CommandResult(issues: issues, data: target)) { target in
-            guard let target else { return "" }
-            let source = target.scenario.map { "samples/\($0).json" } ?? L10n.pick(en: "live data", ru: "живые данные")
-            return L10n.pick(en: "✓ dev slot → \(target.widget) (\(source))", ru: "✓ dev-слот → \(target.widget) (\(source))")
+        let outcome = try await DevSlot.show(
+            widget,
+            scenario: live ? nil : (scenario ?? "default"),
+            workspace: workspace,
+            runner: SystemProcessRunner(),
+            timeout: timeout
+        )
+        let artifacts = outcome.shots.map(\.path) + outcome.comparisons.map(\.image)
+        global.printer.emit(CommandResult(issues: outcome.issues, artifacts: artifacts, data: outcome)) { outcome in
+            outcome.map(Self.summary) ?? ""
         }
         return 0
+    }
+
+    static func summary(_ outcome: DevShowOutcome) -> String {
+        let source = outcome.target.scenario.map { "samples/\($0).json" } ?? L10n.pick(en: "live data", ru: "живые данные")
+        var lines = [L10n.pick(en: "✓ dev slot → \(outcome.target.widget) (\(source))", ru: "✓ dev-слот → \(outcome.target.widget) (\(source))")]
+        if let seconds = outcome.seconds {
+            lines.append(L10n.pick(en: "  redrawn in \(Int(seconds.rounded())) s", ru: "  перерисован за \(Int(seconds.rounded())) с"))
+        }
+        lines += outcome.shots.map { "  \($0.window.family?.rawValue ?? "?") → \($0.path)" }
+        lines += outcome.comparisons.map { "  " + $0.summary }
+        return lines.joined(separator: "\n")
     }
 }

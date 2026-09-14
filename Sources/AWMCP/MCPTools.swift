@@ -201,25 +201,32 @@ enum AWTools {
 
     static let dev = AWTool(
         "aw_dev",
-        "Switch the dev slot on the desktop to a widget and one of its samples (or live data) without rebuilding.",
+        "Switch the dev slot on the desktop to a widget and one of its samples (or live data) without rebuilding. "
+            + "Waits until the desktop redraws the slot, then returns its screenshot and the comparison with the preview.",
         schema: Schema.object([
             "id": Schema.string("Widget id"),
             "scenario": Schema.string("Sample name (default: default)"),
-            "live": Schema.boolean("Show the live feed data")
+            "live": Schema.boolean("Show the live feed data"),
+            "timeout": Schema.number("Seconds to wait for the desktop to redraw (default 30)")
         ], required: ["id"])
     ) { arguments, context in
         let workspace = try context.workspace(arguments)
         let widget = try workspace.widget(try arguments.required("id"))
         let scenario = arguments.bool("live", default: false) ? nil : (arguments.string("scenario") ?? "default")
-        let target = try DevSwitch.apply(widget, scenario: scenario, store: AppGroupStore(config: workspace.config))
-        let reloaded = await Reloader(config: workspace.config, runner: context.runner).reload(kind: RegistryGenerator.devKind)
-        let issues = reloaded ? [] : [Issue(
-            code: IssueCode.installFailed,
-            severity: .warning,
-            message: L10n.pick(en: "The widget app is not installed yet", ru: "Приложение с виджетами ещё не установлено"),
-            hint: "aw_ship"
-        )]
-        return Reply.make(L10n.pick(en: "✓ dev slot → \(target.widget)", ru: "✓ dev-слот → \(target.widget)"), issues: issues, payload: target)
+        let outcome = try await DevSlot.show(
+            widget,
+            scenario: scenario,
+            workspace: workspace,
+            runner: context.runner,
+            timeout: arguments.number("timeout") ?? 30
+        )
+        let headline = L10n.pick(en: "✓ dev slot → \(outcome.target.widget)", ru: "✓ dev-слот → \(outcome.target.widget)")
+        return Reply.make(
+            ([headline] + outcome.comparisons.map(\.summary)).joined(separator: "\n"),
+            issues: outcome.issues,
+            payload: outcome,
+            images: outcome.shots.map(\.path) + outcome.comparisons.map(\.image)
+        )
     }
 
     static let doctor = AWTool(

@@ -89,7 +89,7 @@ Exit codes: `0` ok, `1` checks failed, `2` usage, `3` environment, `4` build fai
 | `aw preview <id> [--family f] [--scenario s] [--full] [--open] [--lang ru]` | render the matrix, check the layout, write `sheet.png` + `report.json`; `--open` opens the sheet |
 | `aw ship <id> [--scenario s] [--live] [--force] [--no-shot]` | preview → build → install → dev slot → real screenshot |
 | `aw build [--no-sign]` / `aw install [--hard]` / `aw rollback` | build and install the app with backups |
-| `aw dev <id> [--scenario s] [--live]` | point the dev slot at a widget |
+| `aw dev <id> [--scenario s] [--live] [--timeout s]` | point the dev slot at a widget, wait until the desktop redraws it, capture it and compare it with the preview |
 | `aw shot [--kind k] [--dev]` | capture real widget windows; the dev slot also gets `.aw/shots/<id>-<family>-compare.png` (preview · desktop · outlines) and `SHOT_MISMATCH` when they differ |
 | `aw slot [--family f,…] [--timeout s]` | wait until the person puts the dev slot on the desktop, then measure sizes and capture it |
 | `aw geometry [--measure]` | desktop widget sizes previews render at; `--measure` reads them from this Mac's system log |

@@ -10,6 +10,7 @@
 - Feeds are never silent: exit 127 / 126 become `FEED_COMMAND_NOT_FOUND` with the missing program and the feed PATH, the status keeps the exit code and the last stderr lines, and `aw doctor` reports every feed — ok N min ago, the last failure, or `STALE_DATA` after three missed runs.
 - Feed secrets live in `aw.local.json`: a feed gets only the names it lists in `feed.secrets`, a missing value stops it with `FEED_SECRET_MISSING`, and `aw doctor` warns when `secrets` are in the shared `aw.json` (`SECRETS_IN_CONFIG`).
 - A feed widget previewed with `--lang ru` and no `samples/default.ru.json` warns with `SAMPLE_NOT_LOCALIZED`, with the command that writes that sample.
+- `aw dev` and `aw_dev` wait until the desktop has redrawn the dev slot, then capture it and compare it with the preview; before, a shot right after `aw dev` could still show the previous widget.
 - The app window edits widget settings: every widget whose feed takes `settings` gets a form (text, numbers, toggles, JSON for the rest); edits are saved in the App Group, win over widget.json in `AW_SETTINGS` and make the feed run at the next tick. The kit is unchanged.
 - Templates lay out extraLarge: metric, chart, list, ring, card, image and timer get two-column dashboards (the timer also a large layout with an elapsed ring), and new widgets from them include the family. The template test renders all of them.
 - The preview matrix gets a Tahoe clear row: `default` is also rendered as dark clear glass in the accented rendering mode, where color disappears.
