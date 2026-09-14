@@ -126,6 +126,16 @@ The [`examples`](examples) workspace holds eight widgets. Each was written by a 
 
 <img src=".github/assets/examples/world-clock.jpg" alt="world-clock in small, medium and large" width="100%">
 
+## On a real desktop
+
+The same demos, captured by `aw dev` from a MacBook desktop: real WidgetKit windows, not renders. With another app in front, macOS draws them monochrome, as the `desktop idle` row of every preview sheet predicts.
+
+<img src=".github/assets/desktop.jpg" alt="Real desktop windows of weather, system-pulse, fx, github, habits, world-clock and focus" width="100%">
+
+After every `aw ship` and `aw dev` the slot is put next to its preview cell: preview, desktop and an outline overlay — white where both agree, cyan only in the preview, red only on the desktop. Here weather agrees on 96 %; another sample or state drops the score below 60 % and raises `SHOT_MISMATCH`.
+
+<img src=".github/assets/compare.jpg" alt="Preview, desktop and outline overlay of the weather widget" width="100%">
+
 ## How it works
 
 ```mermaid

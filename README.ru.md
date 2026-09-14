@@ -126,6 +126,16 @@ args = ["mcp", "--workspace", "/Users/you/Widgets"]
 
 <img src=".github/assets/examples/world-clock.jpg" alt="world-clock в размерах small, medium и large" width="100%">
 
+## На настоящем столе
+
+Те же демо, снятые `aw dev` со стола MacBook: настоящие окна WidgetKit, а не рендеры. Когда впереди другое приложение, macOS рисует их монохромно — ровно так, как заранее показывает строка `desktop idle` на каждом листе превью.
+
+<img src=".github/assets/desktop.jpg" alt="Настоящие окна weather, system-pulse, fx, github, habits, world-clock и focus на столе" width="100%">
+
+После каждого `aw ship` и `aw dev` слот кладётся рядом со своей ячейкой превью: превью, стол и наложение контуров — белое там, где совпадает, голубое только в превью, красное только на столе. Здесь погода совпадает на 96 %; другой сэмпл или состояние роняют оценку ниже 60 % и дают `SHOT_MISMATCH`.
+
+<img src=".github/assets/compare.jpg" alt="Превью, стол и наложение контуров виджета погоды" width="100%">
+
 ## Как это устроено
 
 ```mermaid
