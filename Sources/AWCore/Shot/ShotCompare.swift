@@ -24,6 +24,15 @@ public struct ShotComparison: Codable, Equatable, Sendable {
     public var matches: Bool {
         sizeMatches && structure >= ShotCompare.structureThreshold
     }
+
+    public var summary: String {
+        let mark = matches ? "✓" : "✗"
+        let percent = Int((structure * 100).rounded())
+        return L10n.pick(
+            en: "\(mark) preview vs desktop, \(family.rawValue): outlines agree on \(percent) % → \(image)",
+            ru: "\(mark) превью и стол, \(family.rawValue): контуры совпадают на \(percent) % → \(image)"
+        )
+    }
 }
 
 public enum ShotCompare {

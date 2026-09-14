@@ -33,6 +33,7 @@ public struct ShipOutcome: Codable, Sendable {
     public var install: InstallOutcome?
     public var dev: DevTarget?
     public var shots: [ShotRecord] = []
+    public var comparisons: [ShotComparison] = []
     public var issues: [Issue] = []
     public var seconds: [String: Double] = [:]
 
@@ -140,12 +141,19 @@ public struct Shipper: Sendable {
             note(L10n.pick(en: "waiting for the desktop to redraw…", ru: "жду перерисовку на столе…"))
             outcome.shots = await shooter.settle(windows, label: RegistryGenerator.devKind, baselines: baselines, timeout: options.settleTimeout)
             outcome.seconds["shot"] = watch.lap()
-            if outcome.shots.contains(where: { !$0.settled }) {
-                outcome.issues.append(ShotIssues.unchanged(after: options.settleTimeout))
-            }
+            review(&outcome, settleTimeout: options.settleTimeout)
         }
         outcome.requireShot(options.shots)
         return outcome
+    }
+
+    private func review(_ outcome: inout ShipOutcome, settleTimeout: TimeInterval) {
+        if outcome.shots.contains(where: { !$0.settled }) {
+            outcome.issues.append(ShotIssues.unchanged(after: settleTimeout))
+        }
+        let result = ShotCompare.review(outcome.shots.filter(\.settled), workspace: workspace, target: outcome.dev)
+        outcome.comparisons = result.comparisons
+        outcome.issues += result.issues
     }
 
     private func preview(_ widget: WidgetSource, _ options: ShipOptions, into outcome: inout ShipOutcome) async throws -> Bool {

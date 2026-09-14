@@ -146,6 +146,7 @@ private let small = CGSize(width: 164, height: 164)
     #expect(review.comparisons.map { URL(fileURLWithPath: $0.cell).lastPathComponent } == ["small-dark-idle-default.png"])
     #expect(review.comparisons.first?.image == workspace.shotsDir.appendingPathComponent("probe-small-compare.png").path)
     #expect(review.issues.isEmpty)
+    #expect(review.comparisons.first?.summary.hasPrefix("✓") == true)
     #expect(ShotCompare.review([record], workspace: workspace, target: DevTarget(widget: "probe")).comparisons.isEmpty)
     var widgetShot = record
     widgetShot.label = "probe"
@@ -154,4 +155,5 @@ private let small = CGSize(width: 164, height: 164)
     let mismatch = ShotCompare.review([stale], workspace: workspace, target: DevTarget(widget: "probe", scenario: "default"))
     #expect(mismatch.comparisons.map { URL(fileURLWithPath: $0.cell).lastPathComponent } == ["small-dark-idle-default.png"])
     #expect(mismatch.issues.map(\.code) == [IssueCode.shotMismatch])
+    #expect(mismatch.comparisons.first?.summary.hasPrefix("✗") == true)
 }

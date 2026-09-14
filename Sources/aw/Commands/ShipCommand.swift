@@ -37,7 +37,7 @@ struct ShipCommand: AWCommand {
         let shipper = Shipper(workspace: workspace, engine: try Engine.current(), runner: SystemProcessRunner())
         let options = ShipOptions(scenario: scenario, live: live, force: force, shots: !noShot, settleTimeout: timeout)
         let outcome = try await shipper.ship(id, options) { Console.note($0) }
-        let artifacts = [outcome.preview?.report?.sheet].compactMap { $0 } + outcome.shots.map(\.path)
+        let artifacts = [outcome.preview?.report?.sheet].compactMap { $0 } + outcome.shots.map(\.path) + outcome.comparisons.map(\.image)
         global.printer.emit(CommandResult(issues: outcome.issues.deduplicated(), artifacts: artifacts, data: outcome)) { outcome in
             outcome.map(Self.summary) ?? ""
         }
@@ -81,6 +81,7 @@ struct ShipCommand: AWCommand {
         for shot in outcome.shots {
             lines.append(L10n.pick(en: "  desktop: \(shot.path)", ru: "  стол: \(shot.path)"))
         }
+        lines += outcome.comparisons.map { "  " + $0.summary }
         return lines.joined(separator: "\n")
     }
 }

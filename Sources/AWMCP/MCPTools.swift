@@ -88,7 +88,12 @@ enum AWTools {
             settleTimeout: arguments.number("timeout") ?? 30
         )
         let outcome = try await Shipper(workspace: workspace, engine: try context.engine(), runner: context.runner).ship(try arguments.required("id"), options)
-        return Reply.make(Summaries.ship(outcome), issues: outcome.issues, payload: outcome, images: outcome.shots.map(\.path))
+        return Reply.make(
+            Summaries.ship(outcome),
+            issues: outcome.issues,
+            payload: outcome,
+            images: outcome.shots.map(\.path) + outcome.comparisons.map(\.image)
+        )
     }
 
     static let shot = AWTool(
@@ -283,16 +288,24 @@ enum Summaries {
 
     static func ship(_ outcome: ShipOutcome) -> String {
         let timings = outcome.seconds.sorted { $0.key < $1.key }.map { "\($0.key) \(Int($0.value.rounded())) s" }.joined(separator: " · ")
-        guard outcome.stage == .done else {
+        switch outcome.stage {
+        case .done:
+            let headline = L10n.pick(
+                en: "✓ \(outcome.widget) is installed and shown in the dev slot (\(timings)); desktop shots: \(outcome.shots.count)",
+                ru: "✓ \(outcome.widget) установлен и показан в dev-слоте (\(timings)); снимков со стола: \(outcome.shots.count)"
+            )
+            return ([headline] + outcome.comparisons.map(\.summary)).joined(separator: "\n")
+        case .unverified:
+            return L10n.pick(
+                en: "✗ \(outcome.widget) is installed, but nobody has seen it on the desktop (\(timings))",
+                ru: "✗ \(outcome.widget) установлен, но на столе его никто не видел (\(timings))"
+            )
+        case .preview, .build, .install:
             return L10n.pick(
                 en: "✗ \(outcome.widget) stopped at \(outcome.stage.rawValue) (\(timings))",
                 ru: "✗ \(outcome.widget) остановился на этапе \(outcome.stage.rawValue) (\(timings))"
             )
         }
-        return L10n.pick(
-            en: "✓ \(outcome.widget) is installed and shown in the dev slot (\(timings)); desktop shots: \(outcome.shots.count)",
-            ru: "✓ \(outcome.widget) установлен и показан в dev-слоте (\(timings)); снимков со стола: \(outcome.shots.count)"
-        )
     }
 
     static func feed(_ run: FeedRun) -> String {

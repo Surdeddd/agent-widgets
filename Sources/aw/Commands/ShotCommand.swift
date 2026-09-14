@@ -24,15 +24,7 @@ struct ShotCommand: AWCommand {
         let artifacts = capture.records.map(\.path) + review.comparisons.map(\.image)
         global.printer.emit(CommandResult(issues: capture.issues + review.issues, artifacts: artifacts, data: capture.records)) { records in
             let shots = (records ?? []).map { "✓ \($0.label) \($0.window.family?.rawValue ?? "?") → \($0.path)" }
-            let comparisons = review.comparisons.map { comparison in
-                let mark = comparison.matches ? "✓" : "✗"
-                let percent = Int((comparison.structure * 100).rounded())
-                return L10n.pick(
-                    en: "\(mark) preview vs desktop, \(comparison.family.rawValue): outlines agree on \(percent) % → \(comparison.image)",
-                    ru: "\(mark) превью и стол, \(comparison.family.rawValue): контуры совпадают на \(percent) % → \(comparison.image)"
-                )
-            }
-            return (shots + comparisons).joined(separator: "\n")
+            return (shots + review.comparisons.map(\.summary)).joined(separator: "\n")
         }
         if capture.issues.contains(where: { $0.code == IssueCode.screenRecordingDenied }) {
             return 3
