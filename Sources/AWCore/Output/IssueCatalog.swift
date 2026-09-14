@@ -338,6 +338,23 @@ private let catalogEntries: [IssueExplanation] = [
         example: nil
     ),
     IssueExplanation(
+        code: IssueCode.shotMismatch,
+        title: text("The desktop widget does not match its preview", "Виджет на столе не совпадает с превью"),
+        cause: text(
+            "aw compares the real window with the closest preview cell: the size in points and the outlines of text and shapes. "
+                + "Colors are ignored because the desktop tints widgets with the wallpaper.",
+            "aw сравнивает настоящее окно с ближайшей ячейкой превью: размер в пунктах и контуры текста и фигур. "
+                + "Цвет не сравнивается — стол тонирует виджеты обоями."
+        ),
+        fix: text(
+            "Open the compare image (preview, desktop, outlines). A size gap needs aw geometry --measure and a new preview; "
+                + "different outlines mean the widget shows other data or state than the sample.",
+            "Открой картинку сравнения (превью, стол, контуры). Разница в размере — aw geometry --measure и новое превью; "
+                + "разные контуры — виджет показывает другие данные или состояние, чем сэмпл."
+        ),
+        example: nil
+    ),
+    IssueExplanation(
         code: IssueCode.daemonMissing,
         title: text("Feeds are not scheduled", "Feed не запланированы"),
         cause: text(

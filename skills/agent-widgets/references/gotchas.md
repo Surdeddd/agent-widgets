@@ -31,3 +31,4 @@ Things that look fine in code and break on the desktop. The preview catches many
 - **Changing `id` or `kind` is a new widget** to macOS; the old one disappears from the desktop.
 - **Screenshots need Screen Recording** for the app that runs `aw`.
 - **A redraw can lag.** If `aw ship` reports `SHOT_UNCHANGED`, wait and run `aw shot --dev`, or `aw install --hard`.
+- **The desktop is the truth, not the sheet.** `aw shot` compares the dev slot with the preview cell of the same sample and writes `<id>-<family>-compare.png`; on `SHOT_MISMATCH` open it — a size gap needs `aw geometry --measure`, red outlines are things only the desktop shows.

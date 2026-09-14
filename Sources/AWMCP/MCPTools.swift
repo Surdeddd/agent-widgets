@@ -107,8 +107,19 @@ enum AWTools {
             dev: arguments.bool("dev", default: false),
             runner: context.runner
         )
+        let review = ShotCompare.review(capture.records, workspace: workspace, target: AppGroupStore(config: workspace.config).devTarget())
         let summary = L10n.pick(en: "\(capture.records.count) window(s) captured", ru: "снято окон: \(capture.records.count)")
-        return Reply.make(summary, issues: capture.issues, payload: ["shots": capture.records], images: capture.records.map(\.path))
+        return Reply.make(
+            summary,
+            issues: capture.issues + review.issues,
+            payload: ShotPayload(shots: capture.records, comparisons: review.comparisons),
+            images: capture.records.map(\.path) + review.comparisons.map(\.image)
+        )
+    }
+
+    struct ShotPayload: Codable {
+        let shots: [ShotRecord]
+        let comparisons: [ShotComparison]
     }
 
     static let dev = AWTool(

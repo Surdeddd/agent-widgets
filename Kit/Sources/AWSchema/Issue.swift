@@ -66,6 +66,7 @@ public enum IssueCode {
     public static let scenarioNotFound = "SCENARIO_NOT_FOUND"
     public static let shotUnchanged = "SHOT_UNCHANGED"
     public static let geometryUnknown = "GEOMETRY_UNKNOWN"
+    public static let shotMismatch = "SHOT_MISMATCH"
 
     public static let all: [String] = [
         keptExisting, previewCrashed,
@@ -74,6 +75,7 @@ public enum IssueCode {
         workspaceNotFound, workspaceExists, engineNotFound, invalidJSON,
         signingMissing, toolMissing, compileError, buildError, installFailed,
         screenRecordingDenied, widgetNotPlaced, shotUnchanged, geometryUnknown, widgetExists, widgetNotFound, templateUnknown, scenarioNotFound,
-        feedFailed, feedTimeout, feedInvalidOutput, staleData, daemonMissing
+        feedFailed, feedTimeout, feedInvalidOutput, staleData, daemonMissing,
+        shotMismatch
     ]
 }
