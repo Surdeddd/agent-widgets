@@ -31,6 +31,13 @@ private func record(_ secondsAgo: TimeInterval) -> FeedRecord {
     #expect(Scheduler.due(widgets, records: records, now: tickNow).map(\.id) == ["never", "almost"])
 }
 
+@Test func settingsChangedInTheAppMakeAFeedDue() {
+    let widgets = [feedSource("tuned", every: 900), feedSource("same", every: 900)]
+    let records = ["tuned": record(120), "same": record(120)]
+    let changed = ["tuned": tickNow.addingTimeInterval(-60), "same": tickNow.addingTimeInterval(-600)]
+    #expect(Scheduler.due(widgets, records: records, settingsChanged: changed, now: tickNow).map(\.id) == ["tuned"])
+}
+
 private func feedWorkspace() throws -> URL {
     let root = try ProbeWorkspace.make()
     let manifest = WidgetManifest(

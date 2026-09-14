@@ -30,7 +30,9 @@ public struct FeedRunner: Sendable {
 
     public func environment(for widget: WidgetSource) -> [String: String] {
         let id = widget.id
-        let settings = (try? widget.manifest.settings?.canonicalData()).flatMap { String(bytes: $0, encoding: .utf8) } ?? "{}"
+        let saved = store.read(AppGroupLayout.settings(id)).flatMap { try? JSONDecoder().decode(JSONValue.self, from: $0) }
+        let merged = saved.map { widget.manifest.settings?.merged(with: $0) ?? $0 } ?? widget.manifest.settings
+        let settings = (try? merged?.canonicalData()).flatMap { String(bytes: $0, encoding: .utf8) } ?? "{}"
         let home = FileManager.default.homeDirectoryForCurrentUser.path
         let inherited = ProcessInfo.processInfo.environment["PATH"] ?? "/usr/bin:/bin:/usr/sbin:/sbin"
         var values = [

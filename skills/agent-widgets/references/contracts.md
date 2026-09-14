@@ -26,7 +26,7 @@
 | `kind` | string | optional; default `aw.<id>`; changing it makes people re-add the widget |
 | `refresh` | interval | how often WidgetKit asks for a new timeline (default `30m`) |
 | `feed` | object | `command` (run in the widget folder with `/bin/zsh -c`), `every` (≥ `60s`; < `15m` warns), `timeout` (default `60s`), `secrets` (names from `secrets` in `aw.local.json` the feed gets as environment variables) |
-| `settings` | JSON | handed to the feed as `AW_SETTINGS` |
+| `settings` | JSON | handed to the feed as `AW_SETTINGS`; the person can change them in the app window (open the app), the edits live in the App Group, win over widget.json and make the feed run at the next tick |
 
 Intervals: `"30s"`, `"15m"`, `"1h"`, `"1d"` or a number of seconds.
 

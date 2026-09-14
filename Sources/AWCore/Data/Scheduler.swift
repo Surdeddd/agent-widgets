@@ -10,11 +10,19 @@ public struct FeedRecord: Codable, Equatable, Sendable {
 public enum Scheduler {
     public static let tolerance: TimeInterval = 30
 
-    /// A feed is due when it never ran or its interval has passed; the tolerance absorbs launchd firing on minute boundaries.
-    public static func due(_ widgets: [WidgetSource], records: [String: FeedRecord], now: Date) -> [WidgetSource] {
+    /// Due when a feed never ran, its settings changed in the app since, or its interval passed; the tolerance absorbs launchd minute boundaries.
+    public static func due(
+        _ widgets: [WidgetSource],
+        records: [String: FeedRecord],
+        settingsChanged: [String: Date] = [:],
+        now: Date
+    ) -> [WidgetSource] {
         widgets.filter { widget in
             guard let feed = widget.manifest.feed else { return false }
             guard let last = records[widget.id]?.lastRun else { return true }
+            if let changed = settingsChanged[widget.id], changed > last {
+                return true
+            }
             return now.timeIntervalSince(last) >= TimeInterval(feed.every.seconds) - tolerance
         }
     }
@@ -78,7 +86,9 @@ public struct Ticker: Sendable {
         defer { lock.release() }
         var table = records()
         let widgets = try workspace.widgets().filter { id == nil || $0.id == id }
-        let due = force ? widgets.filter { $0.manifest.feed != nil } : Scheduler.due(widgets, records: table, now: now)
+        let due = force
+            ? widgets.filter { $0.manifest.feed != nil }
+            : Scheduler.due(widgets, records: table, settingsChanged: settingsChanges(widgets), now: now)
         let feeds = FeedRunner(workspace: workspace, store: store, runner: runner, language: workspace.config.locale ?? .current)
         let runs = await Self.runAll(due, feeds: feeds, now: now)
         for run in runs {
@@ -95,6 +105,17 @@ public struct Ticker: Sendable {
         try AWJSON.encoder().encode(table).write(to: stateFile, options: .atomic)
         let reloaded = await reload(runs.filter(\.changed), widgets: widgets)
         return TickOutcome(skipped: false, runs: runs, reloaded: reloaded)
+    }
+
+    func settingsChanges(_ widgets: [WidgetSource]) -> [String: Date] {
+        var changes: [String: Date] = [:]
+        for widget in widgets {
+            let path = store.url(AppGroupLayout.settings(widget.id)).path
+            if let date = (try? FileManager.default.attributesOfItem(atPath: path))?[.modificationDate] as? Date {
+                changes[widget.id] = date
+            }
+        }
+        return changes
     }
 
     static func runAll(_ widgets: [WidgetSource], feeds: FeedRunner, now: Date) async -> [FeedRun] {

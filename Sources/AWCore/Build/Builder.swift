@@ -53,6 +53,7 @@ public struct Builder: Sendable {
         let host = try String(contentsOf: engine.templates.appendingPathComponent("app/HostApp.swift.tmpl"), encoding: .utf8)
             .replacingOccurrences(of: "__APP_GROUP_LITERAL__", with: RegistryGenerator.literal(workspace.config.resolvedAppGroup))
             .replacingOccurrences(of: "__APP_NAME_LITERAL__", with: RegistryGenerator.literal(workspace.config.appName))
+            .replacingOccurrences(of: "__WIDGET_SETTINGS__", with: HostSettingsGenerator.literal(widgets))
         try write(host, to: "App/HostApp.swift")
         try fileManager.createDirectory(at: projectDir.appendingPathComponent("Shared"), withIntermediateDirectories: true)
         let action = try String(contentsOf: engine.templates.appendingPathComponent("app/WidgetAction.swift.tmpl"), encoding: .utf8)

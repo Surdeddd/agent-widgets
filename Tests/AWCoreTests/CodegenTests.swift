@@ -26,6 +26,23 @@ private let config = WorkspaceConfig(
     signingIdentity: "Apple Development: dev@example.com (XYZ)"
 )
 
+@Test func hostSettingsListOnlyFeedsWithSettings() {
+    let manifest = WidgetManifest(
+        id: "weather",
+        name: LocalizedText(en: "Weather", ru: "Погода"),
+        families: [.small],
+        view: "WeatherView",
+        feed: FeedSpec(command: "python3 feed.py", every: Interval(seconds: 1800)),
+        settings: .object(["city": .string("Bangkok \"TH\""), "days": .number(3)])
+    )
+    let tuned = WidgetSource(manifest: manifest, directory: URL(fileURLWithPath: "/ws/widgets/weather"), swiftFiles: [], samples: [:])
+    let literal = HostSettingsGenerator.literal([tuned, source("clock")])
+    #expect(literal.contains(#"AWHostWidget(id: "weather", en: "Weather", ru: "Погода", "#))
+    #expect(literal.contains(#"defaults: "{\"city\":\"Bangkok \\\"TH\\\"\",\"days\":3}")"#))
+    #expect(!literal.contains("clock"))
+    #expect(HostSettingsGenerator.literal([source("clock")]) == "[]")
+}
+
 @Test func registryDeclaresEveryWidgetAndTheDevSlot() {
     let code = RegistryGenerator.generate([source("weather"), source("server-health", families: [.large])])
     #expect(code.contains("struct AWWidget_weather: Widget"))

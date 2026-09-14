@@ -144,7 +144,7 @@ flowchart LR
 
 - `aw preview` compiles the widget's Swift files against a prebuilt copy of the kit and renders every family, appearance, desktop mode and sample with `ImageRenderer`, then measures the layout.
 - `aw ship` generates the WidgetKit extension (one `Widget` per widget, plus the dev slot), builds it with Xcode, swaps it into `/Applications`, points the dev slot at the widget and waits for the desktop to redraw before capturing it.
-- Data lives in the App Group: feeds write it, widgets read it, buttons keep their state there.
+- Data lives in the App Group: feeds write it, widgets read it, buttons keep their state there, and widget settings edited in the app window are stored there too.
 
 ## Commands
 

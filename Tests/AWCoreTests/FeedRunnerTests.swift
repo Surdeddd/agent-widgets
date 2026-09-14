@@ -140,6 +140,15 @@ private struct FeedFixture {
     #expect(!FileManager.default.fileExists(atPath: fixture.root.appendingPathComponent("widgets/probe/ran.txt").path))
 }
 
+@Test func settingsSavedInTheAppWinOverTheManifest() async throws {
+    let fixture = try FeedFixture(command: #"printf '%s' "$AW_SETTINGS""#)
+    defer { fixture.cleanup() }
+    try fixture.store.write(Data(#"{"path": "/Users", "extra": true}"#.utf8), to: AppGroupLayout.settings("probe"))
+    let run = try await fixture.run()
+    #expect(run.ok, "\(run.issues.map(\.message))")
+    #expect(fixture.published == #"{"extra":true,"path":"/Users"}"#)
+}
+
 @Test func garbageOutputIsRejected() async throws {
     let fixture = try FeedFixture(command: "echo not json")
     defer { fixture.cleanup() }

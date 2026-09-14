@@ -1,9 +1,26 @@
 import AppKit
+import AWKit
 import SwiftUI
 import WidgetKit
 
 private let appGroup = __APP_GROUP_LITERAL__
 private let appName = __APP_NAME_LITERAL__
+private let widgetSettings: [AWHostWidget] = __WIDGET_SETTINGS__
+
+private var russian: Bool {
+    Locale.preferredLanguages.first?.hasPrefix("ru") == true
+}
+
+private func pick(_ en: String, _ ru: String) -> String {
+    russian ? ru : en
+}
+
+struct AWHostWidget: Identifiable, Sendable {
+    let id: String
+    let en: String
+    let ru: String
+    let defaults: String
+}
 
 final class AWHostDelegate: NSObject, NSApplicationDelegate {
     private var window: NSWindow?
@@ -26,20 +43,20 @@ final class AWHostDelegate: NSObject, NSApplicationDelegate {
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
         WidgetCenter.shared.reloadAllTimelines()
-        showHelp()
+        showHome()
         return false
     }
 
-    private func showHelp() {
+    private func showHome() {
         if window == nil {
             let window = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 460, height: 260),
+                contentRect: NSRect(x: 0, y: 0, width: 520, height: widgetSettings.isEmpty ? 260 : 640),
                 styleMask: [.titled, .closable],
                 backing: .buffered,
                 defer: false
             )
             window.title = appName
-            window.contentView = NSHostingView(rootView: AWHostHelp())
+            window.contentView = NSHostingView(rootView: AWHostHome())
             window.isReleasedWhenClosed = false
             window.center()
             self.window = window
@@ -49,11 +66,20 @@ final class AWHostDelegate: NSObject, NSApplicationDelegate {
     }
 }
 
-struct AWHostHelp: View {
-    private var russian: Bool {
-        Locale.preferredLanguages.first?.hasPrefix("ru") == true
+struct AWHostHome: View {
+    var body: some View {
+        VStack(spacing: 0) {
+            AWHostHelp()
+            if !widgetSettings.isEmpty {
+                Divider()
+                AWHostSettings()
+            }
+        }
+        .frame(width: 520, height: widgetSettings.isEmpty ? 260 : 640)
     }
+}
 
+struct AWHostHelp: View {
     var body: some View {
         VStack(spacing: 14) {
             Image(systemName: "square.grid.2x2.fill")
@@ -61,17 +87,123 @@ struct AWHostHelp: View {
                 .foregroundStyle(.secondary)
             Text(appName)
                 .font(.title2.weight(.semibold))
-            Text(russian
-                ? "Виджеты установлены.\nПравый клик по столу → «Изменить виджеты» → найди «\(appName)»."
-                : "Widgets are installed.\nRight-click the desktop → Edit Widgets → search for “\(appName)”.")
-                .multilineTextAlignment(.center)
-                .foregroundStyle(.secondary)
-            Text(russian ? "Для агентов: aw doctor" : "For agents: aw doctor")
+            Text(pick(
+                "Widgets are installed.\nRight-click the desktop → Edit Widgets → search for “\(appName)”.",
+                "Виджеты установлены.\nПравый клик по столу → «Изменить виджеты» → найди «\(appName)»."
+            ))
+            .multilineTextAlignment(.center)
+            .foregroundStyle(.secondary)
+            Text(pick("For agents: aw doctor", "Для агентов: aw doctor"))
                 .font(.caption.monospaced())
                 .foregroundStyle(.tertiary)
         }
         .padding(32)
-        .frame(width: 460, height: 260)
+        .frame(maxWidth: .infinity)
+    }
+}
+
+struct AWHostSettings: View {
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 24) {
+                Text(pick("Widget settings", "Настройки виджетов"))
+                    .font(.headline)
+                ForEach(widgetSettings) { widget in
+                    AWHostSettingsForm(widget: widget)
+                }
+            }
+            .padding(24)
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+}
+
+struct AWHostSettingsForm: View {
+    let widget: AWHostWidget
+    @State private var values: [String: JSONValue] = [:]
+    @State private var note = ""
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(russian ? widget.ru : widget.en)
+                .font(.title3.weight(.semibold))
+            ForEach(values.keys.sorted(), id: \.self) { key in
+                field(key)
+            }
+            HStack(spacing: 12) {
+                Button(pick("Save", "Сохранить"), action: save)
+                Button(pick("Reset", "Сбросить")) {
+                    values = Self.decode(widget.defaults)
+                    save()
+                }
+                Text(note)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .onAppear(perform: load)
+    }
+
+    @ViewBuilder
+    private func field(_ key: String) -> some View {
+        switch values[key] ?? .null {
+        case .bool:
+            Toggle(key, isOn: Binding(get: { values[key]?.boolValue ?? false }, set: { values[key] = .bool($0) }))
+        case .number:
+            LabeledContent(key) {
+                TextField(key, value: Binding(get: { values[key]?.doubleValue ?? 0 }, set: { values[key] = .number($0) }), format: .number)
+                    .frame(width: 180)
+            }
+        case .string:
+            LabeledContent(key) {
+                TextField(key, text: Binding(get: { values[key]?.stringValue ?? "" }, set: { values[key] = .string($0) }))
+                    .frame(width: 280)
+            }
+        default:
+            LabeledContent(key) {
+                TextField(key, text: Binding(get: { Self.text(values[key]) }, set: { values[key] = Self.parse($0) ?? values[key] }))
+                    .font(.body.monospaced())
+                    .frame(width: 280)
+            }
+        }
+    }
+
+    private var file: URL? {
+        FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroup)?
+            .appendingPathComponent(AppGroupLayout.settings(widget.id))
+    }
+
+    private func load() {
+        var merged = Self.decode(widget.defaults)
+        if let file, let data = try? Data(contentsOf: file), case .object(let saved)? = try? JSONDecoder().decode(JSONValue.self, from: data) {
+            merged.merge(saved) { _, edited in edited }
+        }
+        values = merged
+    }
+
+    private func save() {
+        guard let file, let data = try? JSONValue.object(values).canonicalData() else { return }
+        do {
+            try FileManager.default.createDirectory(at: file.deletingLastPathComponent(), withIntermediateDirectories: true)
+            try data.write(to: file, options: .atomic)
+            note = pick("Saved — the feed uses it on its next run", "Сохранено — feed возьмёт их при следующем запуске")
+        } catch {
+            note = error.localizedDescription
+        }
+    }
+
+    static func decode(_ json: String) -> [String: JSONValue] {
+        guard case .object(let object)? = try? JSONDecoder().decode(JSONValue.self, from: Data(json.utf8)) else { return [:] }
+        return object
+    }
+
+    static func text(_ value: JSONValue?) -> String {
+        guard let value, let data = try? value.canonicalData() else { return "" }
+        return String(bytes: data, encoding: .utf8) ?? ""
+    }
+
+    static func parse(_ text: String) -> JSONValue? {
+        try? JSONDecoder().decode(JSONValue.self, from: Data(text.utf8))
     }
 }
 

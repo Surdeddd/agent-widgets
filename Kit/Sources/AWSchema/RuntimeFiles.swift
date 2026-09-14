@@ -64,6 +64,10 @@ public enum AppGroupLayout {
         "widgets/\(id)/state.json"
     }
 
+    public static func settings(_ id: String) -> String {
+        "widgets/\(id)/settings.json"
+    }
+
     public static func image(_ id: String, _ name: String) -> String {
         "widgets/\(id)/images/\(name)"
     }
