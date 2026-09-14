@@ -23,6 +23,7 @@ public struct ShipOutcome: Codable, Sendable {
         case build
         case install
         case done
+        case unverified
     }
 
     public var widget: String
@@ -41,7 +42,45 @@ public struct ShipOutcome: Codable, Sendable {
         case .build: 4
         case .install: 3
         case .done: 0
+        case .unverified: 5
         }
+    }
+
+    public mutating func requireShot(_ requested: Bool) {
+        guard stage == .done else { return }
+        if !requested {
+            issues.append(Self.unverifiedShot(.warning))
+            return
+        }
+        if shots.contains(where: { $0.settled }) {
+            return
+        }
+        let shotCodes = [
+            IssueCode.widgetNotPlaced,
+            IssueCode.screenRecordingDenied,
+            IssueCode.shotUnchanged
+        ]
+        let hadShotIssue = issues.contains { shotCodes.contains($0.code) }
+        issues = issues.map { shotCodes.contains($0.code) ? $0.upgraded : $0 }
+        if !hadShotIssue {
+            issues.append(Self.unverifiedShot(.error))
+        }
+        stage = .unverified
+    }
+
+    private static func unverifiedShot(_ severity: Issue.Severity) -> Issue {
+        Issue(
+            code: IssueCode.shipUnverified,
+            severity: severity,
+            message: L10n.pick(
+                en: "Shipped without a desktop screenshot, nobody has seen the real widget yet",
+                ru: "Отгружен без снимка со стола — реальный виджет ещё никто не видел"
+            ),
+            hint: L10n.pick(
+                en: "Put the dev slot on the desktop and run `aw shot --dev`",
+                ru: "Поставь dev-слот на стол и запусти `aw shot --dev`"
+            )
+        )
     }
 }
 
@@ -97,15 +136,15 @@ public struct Shipper: Sendable {
         )
         await Reloader(config: workspace.config, runner: runner).reload(kind: RegistryGenerator.devKind)
         outcome.stage = .done
-        guard !windows.isEmpty else {
-            return outcome
+        if !windows.isEmpty {
+            note(L10n.pick(en: "waiting for the desktop to redraw…", ru: "жду перерисовку на столе…"))
+            outcome.shots = await shooter.settle(windows, label: RegistryGenerator.devKind, baselines: baselines, timeout: options.settleTimeout)
+            outcome.seconds["shot"] = watch.lap()
+            if outcome.shots.contains(where: { !$0.settled }) {
+                outcome.issues.append(ShotIssues.unchanged(after: options.settleTimeout))
+            }
         }
-        note(L10n.pick(en: "waiting for the desktop to redraw…", ru: "жду перерисовку на столе…"))
-        outcome.shots = await shooter.settle(windows, label: RegistryGenerator.devKind, baselines: baselines, timeout: options.settleTimeout)
-        outcome.seconds["shot"] = watch.lap()
-        if outcome.shots.contains(where: { !$0.settled }) {
-            outcome.issues.append(ShotIssues.unchanged(after: options.settleTimeout))
-        }
+        outcome.requireShot(options.shots)
         return outcome
     }
 

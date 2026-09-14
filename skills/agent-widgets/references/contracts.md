@@ -76,7 +76,7 @@ Every command accepts `--json`, `--workspace <dir>` and `--lang en|ru` (the lang
 {"ok": true, "issues": [{"code": "OVERFLOW", "severity": "error", "message": "…", "hint": "…", "file": "…", "line": 12}], "artifacts": ["…/sheet.png"], "data": {}}
 ```
 
-Exit codes: `0` ok, `1` checks failed, `2` usage, `3` environment, `4` build failed.
+Exit codes: `0` ok, `1` checks failed, `2` usage, `3` environment, `4` build failed, `5` shipped but not seen on the desktop.
 
 ## Commands
 

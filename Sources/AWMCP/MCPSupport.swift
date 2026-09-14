@@ -121,7 +121,9 @@ enum Reply {
     static func make<Payload: Codable>(_ summary: String, issues: [Issue] = [], payload: Payload, images: [String] = []) -> CallTool.Result {
         let text = ([summary] + issues.deduplicated().map(Printer.format)).filter { !$0.isEmpty }.joined(separator: "\n")
         let content = [Tool.Content.text(text: text, annotations: nil, _meta: nil)] + images.compactMap(image)
-        return (try? CallTool.Result(content: content, structuredContent: payload, isError: false)) ?? CallTool.Result(content: content, isError: false)
+        let isError = issues.contains { $0.severity == .error }
+        return (try? CallTool.Result(content: content, structuredContent: payload, isError: isError))
+            ?? CallTool.Result(content: content, isError: isError)
     }
 
     static func failure(_ issues: [Issue]) -> CallTool.Result {

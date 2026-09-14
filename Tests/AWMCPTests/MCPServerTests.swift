@@ -1,4 +1,5 @@
 import AWCore
+import AWSchema
 import Foundation
 import MCP
 import Testing
@@ -72,6 +73,13 @@ private func texts(_ content: [Tool.Content]) -> String {
     let again = try await client.callTool(name: "aw_new", arguments: ["workspace": .string(root.path), "id": .string("weather")])
     #expect(again.isError == true)
     #expect(texts(again.content).contains("WIDGET_EXISTS"))
+}
+
+@Test func replyMakeSetsIsErrorWhenAnIssueIsAnError() {
+    let failed = Reply.make("x", issues: [Issue(code: "X", severity: .error, message: "boom")], payload: ["a": 1])
+    #expect(failed.isError == true)
+    let warned = Reply.make("x", issues: [Issue(code: "W", severity: .warning, message: "careful")], payload: ["a": 1])
+    #expect(warned.isError != true)
 }
 
 @Test func toolsOutsideAWorkspaceExplainWhatToDo() async throws {

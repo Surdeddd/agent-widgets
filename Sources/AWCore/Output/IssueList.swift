@@ -15,4 +15,10 @@ extension Issue {
         }
         return copy
     }
+
+    public var upgraded: Issue {
+        var copy = self
+        copy.severity = .error
+        return copy
+    }
 }

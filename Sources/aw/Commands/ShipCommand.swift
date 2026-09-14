@@ -56,12 +56,25 @@ struct ShipCommand: AWCommand {
             outcome.seconds[key].map { "\(label) \(String(format: "%.0f", $0)) \(unit)" }
         }
         .joined(separator: " · ")
-        var lines = [outcome.stage == .done
-            ? L10n.pick(en: "✓ \(outcome.widget) shipped: \(timings)", ru: "✓ \(outcome.widget) отгружен: \(timings)")
-            : L10n.pick(
+        let headline: String
+        switch outcome.stage {
+        case .done:
+            headline = L10n.pick(
+                en: "✓ \(outcome.widget) shipped: \(timings)",
+                ru: "✓ \(outcome.widget) отгружен: \(timings)"
+            )
+        case .unverified:
+            headline = L10n.pick(
+                en: "✗ \(outcome.widget) is installed, but nobody has seen it on the desktop: \(timings)",
+                ru: "✗ \(outcome.widget) установлен, но на столе его никто не видел: \(timings)"
+            )
+        case .preview, .build, .install:
+            headline = L10n.pick(
                 en: "✗ \(outcome.widget) stopped at \(outcome.stage.rawValue): \(timings)",
                 ru: "✗ \(outcome.widget) остановился на этапе \(outcome.stage.rawValue): \(timings)"
-            )]
+            )
+        }
+        var lines = [headline]
         if let sheet = outcome.preview?.report?.sheet {
             lines.append(L10n.pick(en: "  sheet: \(sheet)", ru: "  лист: \(sheet)"))
         }

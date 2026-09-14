@@ -268,6 +268,19 @@ private let catalogEntries: [IssueExplanation] = [
         example: nil
     ),
     IssueExplanation(
+        code: IssueCode.shipUnverified,
+        title: text("Nobody has seen the widget on the desktop", "Виджет на столе никто не видел"),
+        cause: text(
+            "Ship installed the widget without a screenshot of the real desktop window, so nobody has checked how it looks.",
+            "Ship установил виджет, но снимка реального окна на столе нет — как он выглядит, никто не проверял."
+        ),
+        fix: text(
+            "Put the dev slot (“<App> · Dev”) on the desktop (right-click → Edit Widgets) and run aw shot --dev. sheet.png is not enough.",
+            "Поставь dev-слот («<App> · Dev») на стол (правый клик → «Изменить виджеты») и запусти aw shot --dev. sheet.png недостаточно."
+        ),
+        example: nil
+    ),
+    IssueExplanation(
         code: IssueCode.widgetExists,
         title: text("The widget id is taken", "id виджета занят"),
         cause: text("widgets/<id> already exists.", "widgets/<id> уже есть."),

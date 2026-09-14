@@ -12,7 +12,7 @@ Use the MCP tools (`aw_new`, `aw_preview`, `aw_ship`, …) when they are connect
 ## Done means
 
 - `aw preview <id>` reports no errors **and** you opened the sheet image and it looks right in every family, light and dark, and desktop-idle (monochrome).
-- `aw ship <id>` succeeded; when the dev slot is on the desktop you looked at the real screenshot.
+- A ship without a desktop screenshot is not done: `aw ship` exits 5 with stage `unverified`. Put the dev slot (“<App> · Dev”: right-click the desktop → Edit Widgets) on the desktop and run `aw shot --dev`. Never report a widget as done from `sheet.png` alone.
 - If the widget has live data, `aw feed run <id>` is green.
 
 ## The loop

@@ -3,6 +3,7 @@
 ## Unreleased
 
 - A free Apple ID is enough for signing: docs and `SIGNING_MISSING` now say so; `aw preview` needs no certificate.
+- `aw ship` without a desktop screenshot no longer reports success: exit 5, stage `unverified` (`SHIP_UNVERIFIED`).
 - `aw geometry [--measure]` reads the real desktop widget sizes of this Mac from the system log; previews, the sheet and window matching use them, and `aw doctor` warns while they are unknown (`GEOMETRY_UNKNOWN`).
 - The dev slot shot is compared with the preview cell of the sample it shows: `aw shot` writes `<id>-<family>-compare.png` (preview, desktop, outlines) and warns with `SHOT_MISMATCH` when the size or the outlines differ.
 
