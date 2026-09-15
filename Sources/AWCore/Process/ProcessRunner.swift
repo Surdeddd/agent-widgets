@@ -104,7 +104,7 @@ public struct SystemProcessRunner: ProcessRunning {
     }
 
     private static func watch(_ process: Process, exit: ExitSignal, timeout: TimeInterval) {
-        let queue = DispatchQueue.global(qos: .utility)
+        let queue = DispatchQueue.global(qos: .userInitiated)
         queue.asyncAfter(deadline: .now() + timeout) {
             guard process.isRunning else { return }
             exit.markTimedOut()
@@ -132,7 +132,7 @@ private final class ProcessStopper: @unchecked Sendable {
     func stop() {
         guard process.isRunning else { return }
         process.interrupt()
-        let queue = DispatchQueue.global(qos: .utility)
+        let queue = DispatchQueue.global(qos: .userInitiated)
         queue.asyncAfter(deadline: .now() + 1) {
             guard self.process.isRunning else { return }
             self.process.terminate()

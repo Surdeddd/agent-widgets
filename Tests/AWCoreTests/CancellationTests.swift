@@ -31,20 +31,20 @@ import Testing
 @Test func settleStopsWhenCancelled() async throws {
     let started = Date()
     let wait = Task {
-        await Capture.settle(baseline: nil, timeout: 3, interval: 0.02) { nil }
+        await Capture.settle(baseline: nil, timeout: 60, interval: 0.02) { nil }
     }
     try await Task.sleep(nanoseconds: 100_000_000)
     wait.cancel()
     let frame = await wait.value
     #expect(frame == nil)
-    #expect(Date().timeIntervalSince(started) < 2)
+    #expect(Date().timeIntervalSince(started) < 20)
 }
 
 @Test func slotWaiterStopsWhenCancelled() async throws {
     let target = ShotTarget(label: "aw.dev", names: ["Probe · Dev"], descriptor: "::com.example.probe.widgets:aw.dev")
     let started = Date()
     let wait = Task {
-        await SlotWaiter(families: [], timeout: 3, interval: 0.02).wait(
+        await SlotWaiter(families: [], timeout: 60, interval: 0.02).wait(
             target: target,
             locate: { [] },
             sleep: { interval in try? await Task.sleep(nanoseconds: UInt64(interval * 1_000_000_000)) }

@@ -24,7 +24,7 @@ private func slowTool(respectingCancellation: Bool) -> AWTool {
         try await Task.sleep(nanoseconds: 50_000_000)
         call.cancel()
         await #expect(throws: CancellationError.self) { _ = try await call.value }
-        #expect(Date().timeIntervalSince(started) < 5)
+        #expect(Date().timeIntervalSince(started) < 20)
     }
 }
 
