@@ -55,6 +55,8 @@ enum SheetComposer {
             Text("\(family.rawValue)  ideal \(Int(rendered.cell.idealHeight))/\(Int(family.size.height))  \(codes)")
                 .font(.system(size: 11, design: .monospaced))
                 .foregroundStyle(failing ? Color.red : Color.white.opacity(0.55))
+                .lineLimit(3)
+                .frame(width: family.size.width, alignment: .leading)
         }
     }
 }

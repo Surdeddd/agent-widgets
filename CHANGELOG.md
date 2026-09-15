@@ -12,6 +12,7 @@
 - A dev slot covered by windows is `WIDGET_HIDDEN` instead of a misleading `SHOT_MISMATCH`: macOS does not draw desktop widgets that are not on screen, so their capture is an empty frame. `aw dev` no longer waits 30 s for a redraw that cannot happen, `aw slot` waits until the slot is visible, `aw ship` without a visible slot ends `unverified`, and `aw doctor` tells a placed but invisible slot from a missing one.
 - `aw ship` and `aw dev` capture and compare only the dev slot sizes the widget supports.
 - `aw_preview` takes `lang` (`en` / `ru`), like `aw preview --lang`.
+- Long issue labels under a preview cell wrap inside the tile instead of pushing the next cell out of the grid.
 - `SAMPLE_NOT_LOCALIZED` fires only when the default sample holds text; a feed of numbers has nothing to translate.
 - The contracts say how `Date` fields of a model decode: ISO 8601 or epoch seconds, as in the timeline envelope. The skill asks for the dev slot in the sizes the widget supports.
 
