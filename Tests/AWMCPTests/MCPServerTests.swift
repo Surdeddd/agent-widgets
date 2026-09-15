@@ -34,7 +34,7 @@ private func texts(_ content: [Tool.Content]) -> String {
     let client = try await connectedClient()
     let names = try await client.listTools().tools.map(\.name)
     #expect(Set(names) == [
-        "aw_templates", "aw_new", "aw_preview", "aw_ship", "aw_shot", "aw_slot", "aw_dev",
+        "aw_templates", "aw_new", "aw_preview", "aw_ship", "aw_shot", "aw_slot", "aw_dev", "aw_wait",
         "aw_doctor", "aw_list", "aw_data_set", "aw_feed_run", "aw_explain"
     ])
 }

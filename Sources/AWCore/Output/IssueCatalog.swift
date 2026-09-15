@@ -340,6 +340,19 @@ private let catalogEntries: [IssueExplanation] = [
         example: "aw new bangkok-weather --template metric"
     ),
     IssueExplanation(
+        code: IssueCode.jobUnknown,
+        title: text("No such job", "Нет такого задания"),
+        cause: text(
+            "aw_wait got a job id the server does not know: the job finished more than 15 minutes ago, was cancelled, or the MCP server restarted.",
+            "aw_wait получил id задания, которого сервер не знает: оно закончилось больше 15 минут назад, отменено или MCP-сервер перезапущен."
+        ),
+        fix: text(
+            "Call the original tool (aw_ship, aw_dev, aw_slot or aw_feed_run) again.",
+            "Вызови исходный инструмент (aw_ship, aw_dev, aw_slot или aw_feed_run) ещё раз."
+        ),
+        example: nil
+    ),
+    IssueExplanation(
         code: IssueCode.templateUnknown,
         title: text("No such template", "Нет такого шаблона"),
         cause: text("The template name is not in the engine's Templates folder.", "Такого шаблона нет в папке Templates движка."),

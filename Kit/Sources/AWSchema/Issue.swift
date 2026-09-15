@@ -75,6 +75,7 @@ public enum IssueCode {
     public static let feedSecretMissing = "FEED_SECRET_MISSING"
     public static let secretsInConfig = "SECRETS_IN_CONFIG"
     public static let sampleNotLocalized = "SAMPLE_NOT_LOCALIZED"
+    public static let jobUnknown = "JOB_UNKNOWN"
 
     public static let all: [String] = [
         keptExisting, previewCrashed,
@@ -85,6 +86,6 @@ public enum IssueCode {
         screenRecordingDenied, widgetNotPlaced, slotTimeout, shotUnchanged, shipUnverified, geometryUnknown,
         widgetExists, widgetNotFound, widgetIdInvalid, templateUnknown, scenarioNotFound,
         feedFailed, feedTimeout, feedInvalidOutput, staleData, daemonMissing,
-        shotMismatch, feedCommandNotFound, feedSecretMissing, secretsInConfig, sampleNotLocalized
+        shotMismatch, feedCommandNotFound, feedSecretMissing, secretsInConfig, sampleNotLocalized, jobUnknown
     ]
 }

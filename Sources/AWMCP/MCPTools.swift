@@ -4,7 +4,7 @@ import Foundation
 import MCP
 
 enum AWTools {
-    static let all: [AWTool] = [templates, create, preview, ship, shot, slot, dev, doctor, list, dataSet, feedRun, explain]
+    static let all: [AWTool] = [templates, create, preview, ship, shot, slot, dev, wait, doctor, list, dataSet, feedRun, explain]
 
     static let templates = AWTool(
         "aw_templates",
@@ -56,6 +56,7 @@ enum AWTools {
     ) { arguments, context in
         let workspace = try context.workspace(arguments)
         let widget = try workspace.widget(try arguments.required("id"))
+        await context.report(L10n.pick(en: "rendering the preview…", ru: "рендерю превью…"))
         let request = PreviewRequest(
             families: arguments.list("families")?.compactMap(Family.init(rawValue:)),
             scenarios: arguments.list("scenarios"),
@@ -69,7 +70,7 @@ enum AWTools {
     static let ship = AWTool(
         "aw_ship",
         "Build, sign and install the widget app, point the dev slot on the desktop at this widget and capture the real window. "
-            + "Call when aw_preview is clean. Takes 20–60 s.",
+            + "Call when aw_preview is clean. Takes 20–90 s; if it answers with a job id, call aw_wait.",
         schema: Schema.object([
             "id": Schema.string("Widget id"),
             "scenario": Schema.string("Sample for the dev slot (default: default)"),
@@ -80,6 +81,7 @@ enum AWTools {
         ], required: ["id"])
     ) { arguments, context in
         let workspace = try context.workspace(arguments)
+        let id = try arguments.required("id")
         let options = ShipOptions(
             scenario: arguments.string("scenario"),
             live: arguments.bool("live", default: false),
@@ -87,13 +89,17 @@ enum AWTools {
             shots: arguments.bool("shot", default: true),
             settleTimeout: arguments.number("timeout") ?? 30
         )
-        let outcome = try await Shipper(workspace: workspace, engine: try context.engine(), runner: context.runner).ship(try arguments.required("id"), options)
-        return Reply.make(
-            Summaries.ship(outcome),
-            issues: outcome.issues,
-            payload: outcome,
-            images: outcome.shots.map(\.path) + outcome.comparisons.map(\.image)
-        )
+        let shipper = Shipper(workspace: workspace, engine: try context.engine(), runner: context.runner)
+        let first = L10n.pick(en: "preview…", ru: "превью…")
+        return try await context.job("aw_ship", key: jobKey("aw_ship", workspace, arguments), stage: first) { stage in
+            let outcome = try await shipper.ship(id, options) { stage.set($0) }
+            return Reply.make(
+                Summaries.ship(outcome),
+                issues: outcome.issues,
+                payload: outcome,
+                images: outcome.shots.map(\.path) + outcome.comparisons.map(\.image)
+            )
+        }
     }
 
     static let shot = AWTool(
@@ -130,7 +136,7 @@ enum AWTools {
     static let slot = AWTool(
         "aw_slot",
         "Call right after asking the person to add the dev slot, when aw_ship or aw_shot reports WIDGET_NOT_PLACED. "
-            + "Waits until the slot is on the desktop, then measures desktop sizes and captures it.",
+            + "Waits until the slot is on the desktop, then measures desktop sizes and captures it; if it answers with a job id, call aw_wait.",
         schema: Schema.object([
             "families": Schema.strings("Families that must appear, for example medium and large"),
             "timeout": Schema.number("Seconds to wait (default 300)")
@@ -142,6 +148,20 @@ enum AWTools {
         let workspace = try context.workspace(arguments)
         let families = Set((arguments.list("families") ?? []).compactMap(Family.init(rawValue:)))
         let timeout = arguments.number("timeout") ?? 300
+        let runner = context.runner
+        let waiting = L10n.pick(en: "waiting for the dev slot on the desktop…", ru: "жду dev-слот на столе…")
+        return try await context.job("aw_slot", key: jobKey("aw_slot", workspace, arguments), stage: waiting) { _ in
+            try await slotResult(workspace: workspace, families: families, timeout: timeout, runner: runner)
+        }
+    }
+
+    struct SlotPayload: Codable {
+        let windows: [WidgetWindow]
+        let shots: [ShotRecord]
+        let comparisons: [ShotComparison]
+    }
+
+    static func slotResult(workspace: Workspace, families: Set<Family>, timeout: TimeInterval, runner: any ProcessRunning) async throws -> CallTool.Result {
         let config = workspace.config
         let windows = await SlotWaiter(families: families, timeout: timeout).wait(
             target: ShotTarget.dev(config),
@@ -152,12 +172,7 @@ enum AWTools {
             }
         )
         guard let windows else {
-            let issue = SlotIssues.timeout(
-                seconds: timeout,
-                slot: config.devSlotName,
-                appName: config.appName,
-                families: families
-            )
+            let issue = SlotIssues.timeout(seconds: timeout, slot: config.devSlotName, appName: config.appName, families: families)
             return Reply.make(
                 L10n.pick(en: "The dev slot did not appear in \(Int(timeout)) s", ru: "Dev-слот не появился за \(Int(timeout)) с"),
                 issues: [issue],
@@ -166,22 +181,18 @@ enum AWTools {
         }
         var issues: [Issue] = []
         if GeometryStore.load() == nil {
-            if let measured = await GeometryProbe.measure(runner: context.runner) {
+            if let measured = await GeometryProbe.measure(runner: runner) {
                 try GeometryStore.save(measured)
             } else {
                 issues.append(GeometryIssues.unknown)
             }
         }
         if AppGroupStore(config: config).devTarget() != nil {
-            await Reloader(config: config, runner: context.runner).reload(kind: RegistryGenerator.devKind)
-            try? await Task.sleep(nanoseconds: 2_000_000_000)
+            await Reloader(config: config, runner: runner).reload(kind: RegistryGenerator.devKind)
+            try await Task.sleep(nanoseconds: 2_000_000_000)
         }
-        let capture = try await ShotService.capture(workspace, kind: nil, dev: true, runner: context.runner)
-        let review = ShotCompare.review(
-            capture.records,
-            workspace: workspace,
-            target: AppGroupStore(config: config).devTarget()
-        )
+        let capture = try await ShotService.capture(workspace, kind: nil, dev: true, runner: runner)
+        let review = ShotCompare.review(capture.records, workspace: workspace, target: AppGroupStore(config: config).devTarget())
         issues += capture.issues + review.issues
         let payload = SlotPayload(windows: windows, shots: capture.records, comparisons: review.comparisons)
         let captured = L10n.pick(en: "\(capture.records.count) window(s) captured", ru: "снято окон: \(capture.records.count)")
@@ -191,12 +202,6 @@ enum AWTools {
             payload: payload,
             images: payload.shots.map(\.path) + payload.comparisons.map(\.image)
         )
-    }
-
-    struct SlotPayload: Codable {
-        let windows: [WidgetWindow]
-        let shots: [ShotRecord]
-        let comparisons: [ShotComparison]
     }
 
     static let dev = AWTool(
@@ -213,20 +218,32 @@ enum AWTools {
         let workspace = try context.workspace(arguments)
         let widget = try workspace.widget(try arguments.required("id"))
         let scenario = arguments.bool("live", default: false) ? nil : (arguments.string("scenario") ?? "default")
-        let outcome = try await DevSlot.show(
-            widget,
-            scenario: scenario,
-            workspace: workspace,
-            runner: context.runner,
-            timeout: arguments.number("timeout") ?? 30
-        )
-        let headline = L10n.pick(en: "✓ dev slot → \(outcome.target.widget)", ru: "✓ dev-слот → \(outcome.target.widget)")
-        return Reply.make(
-            ([headline] + outcome.comparisons.map(\.summary)).joined(separator: "\n"),
-            issues: outcome.issues,
-            payload: outcome,
-            images: outcome.shots.map(\.path) + outcome.comparisons.map(\.image)
-        )
+        let timeout = arguments.number("timeout") ?? 30
+        let runner = context.runner
+        let stage = L10n.pick(en: "switching the dev slot and waiting for the desktop to redraw…", ru: "переключаю dev-слот и жду перерисовку на столе…")
+        return try await context.job("aw_dev", key: jobKey("aw_dev", workspace, arguments), stage: stage) { _ in
+            let outcome = try await DevSlot.show(widget, scenario: scenario, workspace: workspace, runner: runner, timeout: timeout)
+            let headline = L10n.pick(en: "✓ dev slot → \(outcome.target.widget)", ru: "✓ dev-слот → \(outcome.target.widget)")
+            return Reply.make(
+                ([headline] + outcome.comparisons.map(\.summary)).joined(separator: "\n"),
+                issues: outcome.issues,
+                payload: outcome,
+                images: outcome.shots.map(\.path) + outcome.comparisons.map(\.image)
+            )
+        }
+    }
+
+    static let wait = AWTool(
+        "aw_wait",
+        "Keep waiting for a long call (aw_ship, aw_dev, aw_slot, aw_feed_run) that answered with a job id. "
+            + "Returns its final result, or the job again if it is still running.",
+        schema: Schema.object([
+            "job": Schema.string("Job id from the earlier answer"),
+            "timeout": Schema.number("Seconds to wait at most; the server may answer sooner")
+        ], required: ["job"], workspace: false),
+        readOnly: true
+    ) { arguments, context in
+        try await context.follow(try arguments.required("job"), limit: arguments.number("timeout"))
     }
 
     static let doctor = AWTool(
@@ -314,15 +331,19 @@ enum AWTools {
     ) { arguments, context in
         let workspace = try context.workspace(arguments)
         let widget = try workspace.widget(try arguments.required("id"))
-        let store = AppGroupStore(config: workspace.config)
         let validator = arguments.bool("validate", default: true) ? DataValidator(pipeline: try context.pipeline(workspace), widget: widget) : nil
-        let check: (@Sendable (Data) async -> Issue?)? = validator.map { validator in { data in await validator.check(data) } }
-        let feeds = FeedRunner(workspace: workspace, store: store, runner: context.runner, language: workspace.config.locale ?? L10n.language)
-        let run = await feeds.run(widget, validate: check)
-        if run.changed {
-            await Reloader(config: workspace.config, runner: context.runner).reload(afterPublishing: widget, store: store)
+        let runner = context.runner
+        let stage = L10n.pick(en: "running the feed…", ru: "запускаю feed…")
+        return try await context.job("aw_feed_run", key: jobKey("aw_feed_run", workspace, arguments), stage: stage) { _ in
+            let store = AppGroupStore(config: workspace.config)
+            let check: (@Sendable (Data) async -> Issue?)? = validator.map { validator in { @Sendable data in await validator.check(data) } }
+            let feeds = FeedRunner(workspace: workspace, store: store, runner: runner, language: workspace.config.locale ?? L10n.language)
+            let run = await feeds.run(widget, validate: check)
+            if run.changed {
+                await Reloader(config: workspace.config, runner: runner).reload(afterPublishing: widget, store: store)
+            }
+            return Reply.make(Summaries.feed(run), issues: run.issues, payload: run)
         }
-        return Reply.make(Summaries.feed(run), issues: run.issues, payload: run)
     }
 
     static let explain = AWTool(
@@ -344,6 +365,10 @@ enum AWTools {
             )])
         }
         return Reply.make(IssueCatalog.render(entry), payload: entry)
+    }
+
+    static func jobKey(_ tool: String, _ workspace: Workspace, _ arguments: Arguments) -> String {
+        "\(tool)|\(workspace.widgetsDir.path)|\(arguments.fingerprint)"
     }
 }
 

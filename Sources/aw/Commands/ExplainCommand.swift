@@ -57,9 +57,19 @@ struct MCPCommand: AsyncParsableCommand {
     )))
     var workspace: String?
 
+    @Option(help: ArgumentHelp(L10n.pick(
+        en: "Seconds a tool call may block before it answers with a job id for aw_wait; 0 means no limit. "
+            + "Default: no limit for Claude Code, 45 for other clients.",
+        ru: "Сколько секунд вызов может ждать, прежде чем ответить id задания для aw_wait; 0 — без лимита. "
+            + "По умолчанию: без лимита для Claude Code, 45 для остальных."
+    )))
+    var callBudget: Double?
+
     func run() async throws {
-        let directory = workspace.map { URL(fileURLWithPath: ($0 as NSString).expandingTildeInPath, isDirectory: true) }
+        let folder = workspace.flatMap { $0.isEmpty ? nil : $0 }
+        let directory = folder.map { URL(fileURLWithPath: ($0 as NSString).expandingTildeInPath, isDirectory: true) }
             ?? URL(fileURLWithPath: FileManager.default.currentDirectoryPath, isDirectory: true)
-        try await AWMCPServer.run(MCPContext(directory: directory))
+        let budget = callBudget ?? ProcessInfo.processInfo.environment["AW_MCP_CALL_BUDGET"].flatMap(Double.init)
+        try await AWMCPServer.run(MCPContext(directory: directory, callBudget: budget))
     }
 }
