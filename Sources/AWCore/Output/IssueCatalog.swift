@@ -175,6 +175,21 @@ private let catalogEntries: [IssueExplanation] = [
         example: nil
     ),
     IssueExplanation(
+        code: IssueCode.invalidArgument,
+        title: text("A tool argument is wrong", "Неверный аргумент инструмента"),
+        cause: text(
+            "An MCP tool got an argument it does not know, a value of the wrong type, or no value for a required argument.",
+            "MCP-инструмент получил неизвестный аргумент, значение не того типа или не получил обязательный."
+        ),
+        fix: text(
+            "Use the names and types from the tool's input schema — ids, names and samples are strings, flags are booleans, "
+                + "timeouts are numbers, families and scenarios are arrays of strings.",
+            "Бери имена и типы из схемы аргументов инструмента — id, имена и сэмплы это строки, флаги — булевы, "
+                + "таймауты — числа, families и scenarios — массивы строк."
+        ),
+        example: nil
+    ),
+    IssueExplanation(
         code: IssueCode.signingMissing,
         title: text("No signing identity", "Нет подписи"),
         cause: text(
@@ -308,6 +323,21 @@ private let catalogEntries: [IssueExplanation] = [
         cause: text("The workspace has no widget with that id or kind.", "В workspace нет виджета с таким id или kind."),
         fix: text("aw list shows the ids; aw new <id> creates a widget.", "aw list покажет id; aw new <id> создаст виджет."),
         example: nil
+    ),
+    IssueExplanation(
+        code: IssueCode.widgetIdInvalid,
+        title: text("Widget id is not valid", "Недопустимый id виджета"),
+        cause: text(
+            "Ids name folders, widget kinds and generated Swift types, so they are lowercase letters, digits and dashes, "
+                + "start with a letter, at most 40 characters.",
+            "Id даёт имя папке, kind виджета и сгенерированному Swift-типу, поэтому это строчные буквы, цифры и дефис, "
+                + "начинается с буквы, не длиннее 40 символов."
+        ),
+        fix: text(
+            "Pick an id like `bangkok-weather` or `cpu-load`; `aw list` shows the ids that exist.",
+            "Возьми id вроде `bangkok-weather` или `cpu-load`; `aw list` покажет те, что уже есть."
+        ),
+        example: "aw new bangkok-weather --template metric"
     ),
     IssueExplanation(
         code: IssueCode.templateUnknown,

@@ -48,6 +48,22 @@ private func emptyWorkspace() throws -> Workspace {
     }
 }
 
+@Test func instantiateRejectsInvalidId() throws {
+    let workspace = try emptyWorkspace()
+    defer { try? FileManager.default.removeItem(at: workspace.root) }
+    do {
+        _ = try TemplateCatalog(engine: Engine(root: repoRoot)).instantiate("metric", id: "Bad Id", in: workspace)
+        Issue.record("expected widgetIdInvalid")
+    } catch let error as AWError {
+        #expect(error.issue.code == IssueCode.widgetIdInvalid)
+    }
+    let created = (try? FileManager.default.contentsOfDirectory(
+        at: workspace.widgetsDir,
+        includingPropertiesForKeys: nil
+    )) ?? []
+    #expect(created.isEmpty)
+}
+
 @Test func unknownTemplateListsAlternatives() throws {
     let workspace = try emptyWorkspace()
     defer { try? FileManager.default.removeItem(at: workspace.root) }

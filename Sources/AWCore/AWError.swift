@@ -7,6 +7,7 @@ public enum AWError: Error, Equatable, Sendable {
     case engineNotFound
     case invalidJSON(file: String, reason: String)
     case widgetNotFound(String)
+    case widgetIdInvalid(String)
     case widgetExists(String)
     case templateUnknown(String, [String])
     case toolFailed(tool: String, status: Int32, output: String)
@@ -92,6 +93,16 @@ public enum AWError: Error, Equatable, Sendable {
                 hint: L10n.pick(
                     en: "Run `aw list` to see widget ids or `aw new \(id)` to create it",
                     ru: "`aw list` покажет id виджетов, `aw new \(id)` создаст новый"
+                )
+            )
+        case .widgetIdInvalid(let id):
+            Issue(
+                code: IssueCode.widgetIdInvalid,
+                severity: .error,
+                message: L10n.pick(en: "Widget id \"\(id)\" is not valid", ru: "Недопустимый id виджета «\(id)»"),
+                hint: L10n.pick(
+                    en: "Use lowercase letters, digits and dashes, starting with a letter, for example `bangkok-weather`",
+                    ru: "Строчные буквы, цифры и дефис, первой — буква, например `bangkok-weather`"
                 )
             )
         case .toolFailed(let tool, let status, let output):

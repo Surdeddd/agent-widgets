@@ -100,6 +100,7 @@ public struct Workspace: Sendable {
     }
 
     public func widget(_ id: String) throws -> WidgetSource {
+        guard WidgetID.isValid(id) else { throw AWError.widgetIdInvalid(id) }
         let match = try widgets().first { $0.manifest.id == id || $0.directory.lastPathComponent == id }
         guard let match else {
             throw AWError.widgetNotFound(id)

@@ -34,7 +34,7 @@ public enum ManifestValidator {
     public static func validate(_ manifest: WidgetManifest) -> [Issue] {
         let id = manifest.id
         var issues: [Issue] = []
-        if !matches(id, "^[a-z][a-z0-9-]{0,39}$") {
+        if !WidgetID.isValid(id) {
             issues.append(invalid(
                 manifest,
                 en: "Widget id \"\(id)\" is invalid",

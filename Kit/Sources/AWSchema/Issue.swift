@@ -46,6 +46,7 @@ public enum IssueCode {
     public static let workspaceExists = "WORKSPACE_EXISTS"
     public static let engineNotFound = "ENGINE_NOT_FOUND"
     public static let invalidJSON = "INVALID_JSON"
+    public static let invalidArgument = "INVALID_ARGUMENT"
     public static let signingMissing = "SIGNING_MISSING"
     public static let toolMissing = "TOOL_MISSING"
     public static let compileError = "COMPILE_ERROR"
@@ -56,6 +57,7 @@ public enum IssueCode {
     public static let slotTimeout = "SLOT_TIMEOUT"
     public static let widgetExists = "WIDGET_EXISTS"
     public static let widgetNotFound = "WIDGET_NOT_FOUND"
+    public static let widgetIdInvalid = "WIDGET_ID_INVALID"
     public static let templateUnknown = "TEMPLATE_UNKNOWN"
     public static let feedFailed = "FEED_FAILED"
     public static let feedTimeout = "FEED_TIMEOUT"
@@ -78,10 +80,10 @@ public enum IssueCode {
         keptExisting, previewCrashed,
         overflow, truncation, decode, tinyText, emptyScenario, unrenderable,
         manifestInvalid, duplicateKind, budgetRisk, missingDefaultSample,
-        workspaceNotFound, workspaceExists, engineNotFound, invalidJSON,
+        workspaceNotFound, workspaceExists, engineNotFound, invalidJSON, invalidArgument,
         signingMissing, toolMissing, compileError, buildError, installFailed,
         screenRecordingDenied, widgetNotPlaced, slotTimeout, shotUnchanged, shipUnverified, geometryUnknown,
-        widgetExists, widgetNotFound, templateUnknown, scenarioNotFound,
+        widgetExists, widgetNotFound, widgetIdInvalid, templateUnknown, scenarioNotFound,
         feedFailed, feedTimeout, feedInvalidOutput, staleData, daemonMissing,
         shotMismatch, feedCommandNotFound, feedSecretMissing, secretsInConfig, sampleNotLocalized
     ]

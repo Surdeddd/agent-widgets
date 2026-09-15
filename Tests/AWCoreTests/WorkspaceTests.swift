@@ -64,6 +64,25 @@ private func canonical(_ url: URL) -> String {
     #expect(try workspace.widget("weather").manifest.view == "WeatherView")
 }
 
+@Test func widgetLookupRejectsInvalidIds() throws {
+    let root = try makeWorkspace()
+    defer { try? fileManager.removeItem(at: root) }
+    let workspace = try Workspace.load(at: root)
+    do {
+        _ = try workspace.widget("../../etc")
+        Issue.record("expected widgetIdInvalid")
+    } catch let error as AWError {
+        #expect(error.issue.code == IssueCode.widgetIdInvalid)
+    }
+    do {
+        _ = try workspace.widget("Bad Id")
+        Issue.record("expected widgetIdInvalid")
+    } catch let error as AWError {
+        #expect(error.issue.code == IssueCode.widgetIdInvalid)
+    }
+    #expect(throws: AWError.widgetNotFound("nope")) { try workspace.widget("nope") }
+}
+
 @Test func validateReportsMissingDefaultSampleAndIdMismatch() throws {
     let root = try makeWorkspace()
     defer { try? fileManager.removeItem(at: root) }

@@ -31,11 +31,8 @@ public struct TemplateCatalog: Sendable {
         families: [Family]? = nil,
         in workspace: Workspace
     ) throws -> [String] {
-        guard id.range(of: "^[a-z][a-z0-9-]{0,39}$", options: .regularExpression) != nil else {
-            throw AWError.invalidJSON(file: "widgets/\(id)", reason: L10n.pick(
-                en: "widget id must be lowercase letters, digits and dashes",
-                ru: "id виджета — строчные буквы, цифры и дефис"
-            ))
+        guard WidgetID.isValid(id) else {
+            throw AWError.widgetIdInvalid(id)
         }
         let source = root.appendingPathComponent(template, isDirectory: true)
         guard FileManager.default.fileExists(atPath: source.appendingPathComponent("template.json").path) else {
