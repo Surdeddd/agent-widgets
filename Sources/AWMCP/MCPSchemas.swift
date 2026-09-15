@@ -2,11 +2,17 @@ import Foundation
 import MCP
 
 enum OutputSchema {
-    static func object(_ properties: [String: Value], required: [String] = []) -> Value {
-        .object([
+    static func object(_ properties: [String: Value], required: [String] = [], summary: Bool = true) -> Value {
+        var all = properties
+        var needed = required
+        if summary {
+            all["summary"] = string
+            needed.append("summary")
+        }
+        return .object([
             "type": .string("object"),
-            "properties": .object(properties),
-            "required": .array(required.map(Value.string))
+            "properties": .object(all),
+            "required": .array(needed.map(Value.string))
         ])
     }
 
@@ -17,7 +23,7 @@ enum OutputSchema {
     static let anyArray: Value = .object(["type": .string("array")])
     static let strings: Value = .object(["type": .string("array"), "items": .object(["type": .string("string")])])
 
-    static let job = object(["id": string, "tool": string, "stage": string, "elapsed": number], required: ["id", "tool", "stage", "elapsed"])
+    static let job = object(["id": string, "tool": string, "stage": string, "elapsed": number], required: ["id", "tool", "stage", "elapsed"], summary: false)
 
     static let templates = object(["templates": anyArray], required: ["templates"])
     static let created = object(["files": strings], required: ["files"])
@@ -52,7 +58,7 @@ enum OutputSchema {
         "seconds": number,
         "job": job
     ])
-    static let wait = anyObject
+    static let wait = object([:])
     static let doctor = object(["checks": anyArray], required: ["checks"])
     static let list = object(["widgets": anyArray], required: ["widgets"])
     static let data = object(["changed": boolean], required: ["changed"])

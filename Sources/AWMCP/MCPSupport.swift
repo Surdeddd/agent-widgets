@@ -226,7 +226,7 @@ enum Reply {
         let text = ([summary] + lines).filter { !$0.isEmpty }.joined(separator: "\n")
         let content = [Tool.Content.text(text: text, annotations: nil, _meta: nil)] + images.compactMap(image)
         let isError = issues.contains { $0.severity == .error }
-        return CallTool.Result(content: content, structuredContent: structured(payload), isError: isError)
+        return CallTool.Result(content: content, structuredContent: structured(payload, summary: text), isError: isError)
     }
 
     static func failure(_ issues: [Issue]) -> CallTool.Result {
@@ -234,12 +234,35 @@ enum Reply {
         return CallTool.Result(content: [.text(text: text, annotations: nil, _meta: nil)], isError: true)
     }
 
-    /// The payload as a JSON value; NaN and infinities become strings so a stray value never drops the structured content.
-    static func structured<Payload: Encodable>(_ payload: Payload) -> Value? {
+    /// The payload as JSON with the reply text under "summary" and hints that name MCP tools, since some clients show the model only this;
+    /// NaN and infinities become strings so a stray value never drops it.
+    static func structured<Payload: Encodable>(_ payload: Payload, summary: String? = nil) -> Value? {
         let encoder = JSONEncoder()
         encoder.nonConformingFloatEncodingStrategy = .convertToString(positiveInfinity: "Infinity", negativeInfinity: "-Infinity", nan: "NaN")
-        guard let data = try? encoder.encode(payload) else { return nil }
-        return try? JSONDecoder().decode(Value.self, from: data)
+        guard let data = try? encoder.encode(payload), let value = try? JSONDecoder().decode(Value.self, from: data) else { return nil }
+        let rewritten = rewritingHints(value)
+        guard case .object(var object) = rewritten, let summary else { return rewritten }
+        object["summary"] = .string(summary)
+        return .object(object)
+    }
+
+    private static func rewritingHints(_ value: Value) -> Value {
+        switch value {
+        case .object(let object):
+            var result: [String: Value] = [:]
+            for (key, member) in object {
+                if key == "hint", case .string(let hint) = member {
+                    result[key] = .string(MCPHints.rewrite(hint))
+                } else {
+                    result[key] = rewritingHints(member)
+                }
+            }
+            return .object(result)
+        case .array(let items):
+            return .array(items.map(rewritingHints))
+        default:
+            return value
+        }
     }
 
     static func image(_ path: String) -> Tool.Content? {

@@ -69,8 +69,22 @@ private func outputSchema(_ name: String) throws -> Value {
 @Test func schemaValidatorCatchesWrongTypesAndMissingFields() {
     #expect(!SchemaValidator.errors(.object(["files": .string("x")]), OutputSchema.created).isEmpty)
     #expect(!SchemaValidator.errors(.object([:]), OutputSchema.created).isEmpty)
-    #expect(SchemaValidator.errors(.object(["files": .array([.string("a")])]), OutputSchema.created).isEmpty)
+    #expect(SchemaValidator.errors(.object(["files": .array([.string("a")]), "summary": .string("done")]), OutputSchema.created).isEmpty)
     #expect(!SchemaValidator.errors(.object(["code": .string("X")]), OutputSchema.explain).isEmpty)
+}
+
+@Test func structuredContentCarriesTheSummaryAndToolHints() throws {
+    let issue = AWSchema.Issue(code: "X", severity: .warning, message: "careful", hint: "Run `aw list` first")
+    let result = L10n.$language.withValue(.en) { Reply.make("done", issues: [issue], payload: ["issues": [issue]]) }
+    guard case .object(let object)? = result.structuredContent,
+          case .array(let issues)? = object["issues"],
+          case .object(let first)? = issues.first else {
+        Testing.Issue.record("no structured issues")
+        return
+    }
+    #expect(object["summary"]?.stringValue?.hasPrefix("done") == true)
+    #expect(object["summary"]?.stringValue?.contains("`aw_list`") == true)
+    #expect(first["hint"]?.stringValue == "Run `aw_list` first")
 }
 
 @Test func structuredContentSurvivesNonFiniteNumbers() throws {
