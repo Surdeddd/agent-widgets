@@ -26,7 +26,7 @@ public enum AWMCPServer {
             guard let tool = tools.first(where: { $0.tool.name == params.name }) else {
                 return .init(content: [.text(text: "Unknown tool \(params.name)", annotations: nil, _meta: nil)], isError: true)
             }
-            return await tool.call(Arguments(params.arguments ?? [:]), context)
+            return try await tool.call(Arguments(params.arguments ?? [:]), context)
         }
         return server
     }

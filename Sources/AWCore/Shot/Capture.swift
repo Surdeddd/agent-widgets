@@ -86,6 +86,9 @@ public struct Capture: Sendable {
         let deadline = Date().addingTimeInterval(timeout)
         var previous: Data?
         while true {
+            if Task.isCancelled {
+                return nil
+            }
             if let current = await frame(), current != baseline {
                 if current == previous {
                     return current

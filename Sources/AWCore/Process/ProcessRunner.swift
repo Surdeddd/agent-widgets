@@ -43,6 +43,7 @@ extension ProcessRunning {
 public struct SystemProcessRunner: ProcessRunning {
     public init() {}
 
+    /// Runs the process to completion; cancelling the calling task interrupts it, then terminates and kills it, and throws `CancellationError`.
     public func run(
         _ executable: String,
         _ arguments: [String],
@@ -50,6 +51,7 @@ public struct SystemProcessRunner: ProcessRunning {
         environment: [String: String]?,
         timeout: TimeInterval?
     ) async throws -> ProcessResult {
+        try Task.checkCancellation()
         let process = Self.makeProcess(executable, arguments, cwd: cwd, environment: environment)
         let output = Pipe()
         let errors = Pipe()
@@ -67,7 +69,13 @@ public struct SystemProcessRunner: ProcessRunning {
         if let timeout {
             Self.watch(process, exit: exit, timeout: timeout)
         }
-        let (status, timedOut) = await exit.wait()
+        let stopper = ProcessStopper(process)
+        let (status, timedOut) = await withTaskCancellationHandler {
+            await exit.wait()
+        } onCancel: {
+            stopper.stop()
+        }
+        try Task.checkCancellation()
         return ProcessResult(
             status: status,
             stdout: stdout.text(),
@@ -110,6 +118,29 @@ public struct SystemProcessRunner: ProcessRunning {
         queue.asyncAfter(deadline: .now() + timeout + 10) {
             exit.markTimedOut()
             exit.finish(process.isRunning ? -1 : process.terminationStatus)
+        }
+    }
+}
+
+private final class ProcessStopper: @unchecked Sendable {
+    private let process: Process
+
+    init(_ process: Process) {
+        self.process = process
+    }
+
+    func stop() {
+        guard process.isRunning else { return }
+        process.interrupt()
+        let queue = DispatchQueue.global(qos: .utility)
+        queue.asyncAfter(deadline: .now() + 1) {
+            guard self.process.isRunning else { return }
+            self.process.terminate()
+            queue.asyncAfter(deadline: .now() + 1.5) {
+                if self.process.isRunning {
+                    kill(self.process.processIdentifier, SIGKILL)
+                }
+            }
         }
     }
 }

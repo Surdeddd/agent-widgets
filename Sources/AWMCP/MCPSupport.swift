@@ -106,12 +106,18 @@ struct AWTool: Sendable {
         self.run = run
     }
 
-    func call(_ arguments: Arguments, _ context: MCPContext) async -> CallTool.Result {
+    func call(_ arguments: Arguments, _ context: MCPContext) async throws -> CallTool.Result {
         do {
-            return try await run(arguments, context)
+            let result = try await run(arguments, context)
+            try Task.checkCancellation()
+            return result
+        } catch is CancellationError {
+            throw CancellationError()
         } catch let error as AWError {
+            try Task.checkCancellation()
             return Reply.failure([error.issue])
         } catch {
+            try Task.checkCancellation()
             return Reply.failure([Issue(code: "UNEXPECTED", severity: .error, message: String(describing: error))])
         }
     }

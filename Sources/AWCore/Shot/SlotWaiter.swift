@@ -20,7 +20,7 @@ public struct SlotWaiter: Sendable {
         now: @Sendable () -> Date = { Date() }
     ) async -> [WidgetWindow]? {
         let deadline = now().addingTimeInterval(timeout)
-        while true {
+        while !Task.isCancelled {
             let found = WindowLocator.find(locate(), names: target.names, descriptor: target.descriptor)
             if covers(found) {
                 return found
@@ -30,6 +30,7 @@ public struct SlotWaiter: Sendable {
             }
             await sleep(interval)
         }
+        return nil
     }
 
     private func covers(_ windows: [WidgetWindow]) -> Bool {

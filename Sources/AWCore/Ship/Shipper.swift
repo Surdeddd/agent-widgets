@@ -108,6 +108,7 @@ public struct Shipper: Sendable {
             return outcome
         }
         outcome.seconds["preview"] = watch.lap()
+        try Task.checkCancellation()
         outcome.stage = .build
         note(L10n.pick(en: "build…", ru: "сборка…"))
         let build = try await Builder(workspace: workspace, engine: engine, runner: runner).build()
@@ -117,14 +118,15 @@ public struct Shipper: Sendable {
         guard let app = build.app else {
             return outcome
         }
+        try Task.checkCancellation()
         let shooter = Shooter(directory: workspace.shotsDir, capture: Capture(runner: runner))
         let windows = options.shots ? devWindows(into: &outcome) : []
         let baselines = await shooter.baselines(windows)
         outcome.stage = .install
         note(L10n.pick(en: "install…", ru: "установка…"))
-        let installed = try await Installer(config: workspace.config, runner: runner, paths: .standard(for: workspace.config))
-            .install(URL(fileURLWithPath: app))
+        let installed = try await install(app)
         outcome.seconds["install"] = watch.lap()
+        try Task.checkCancellation()
         outcome.install = installed
         outcome.issues += installed.issues
         guard !installed.hasErrors else {
@@ -145,6 +147,11 @@ public struct Shipper: Sendable {
         }
         outcome.requireShot(options.shots)
         return outcome
+    }
+
+    private func install(_ app: String) async throws -> InstallOutcome {
+        let installer = Installer(config: workspace.config, runner: runner, paths: .standard(for: workspace.config))
+        return try await Task.detached { try await installer.install(URL(fileURLWithPath: app)) }.value
     }
 
     private func review(_ outcome: inout ShipOutcome, settleTimeout: TimeInterval) {
