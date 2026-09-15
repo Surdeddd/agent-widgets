@@ -10,7 +10,9 @@ enum AWTools {
         "aw_templates",
         "List widget templates to start from (metric, list, ring, chart, card, image, timer, blank). Call before aw_new when unsure which one fits.",
         schema: Schema.object([:]),
-        readOnly: true
+        title: L10n.pick(en: "List widget templates", ru: "Шаблоны виджетов"),
+        hints: .reading,
+        output: OutputSchema.templates
     ) { _, context in
         let list = TemplateCatalog(engine: try context.engine()).list()
         let lines = list.map { "\($0.id) — \($0.summary.localized) [\($0.families.map(\.rawValue).joined(separator: ","))]" }
@@ -27,7 +29,9 @@ enum AWTools {
             "name": Schema.string("Display name in English"),
             "name_ru": Schema.string("Display name in Russian"),
             "families": Schema.strings("Families to support: small, medium, large, extraLarge")
-        ], required: ["id"])
+        ], required: ["id"]),
+        title: L10n.pick(en: "Create a widget", ru: "Создать виджет"),
+        output: OutputSchema.created
     ) { arguments, context in
         let workspace = try context.workspace(arguments)
         let id = try arguments.required("id")
@@ -52,7 +56,9 @@ enum AWTools {
             "scenarios": Schema.strings("Only these samples (file names in samples/ without .json)"),
             "full": Schema.boolean("Render every theme and mode for every sample")
         ], required: ["id"]),
-        readOnly: true
+        title: L10n.pick(en: "Preview a widget", ru: "Превью виджета"),
+        hints: .reading,
+        output: OutputSchema.preview
     ) { arguments, context in
         let workspace = try context.workspace(arguments)
         let widget = try workspace.widget(try arguments.required("id"))
@@ -78,7 +84,10 @@ enum AWTools {
             "force": Schema.boolean("Ship even if the preview has errors"),
             "shot": Schema.boolean("Capture the desktop window (default true)"),
             "timeout": Schema.number("Seconds to wait for the desktop to redraw (default 30)")
-        ], required: ["id"])
+        ], required: ["id"]),
+        title: L10n.pick(en: "Ship to the desktop", ru: "Выкатить на стол"),
+        hints: ToolHints(destructive: true, idempotent: true),
+        output: OutputSchema.ship
     ) { arguments, context in
         let workspace = try context.workspace(arguments)
         let id = try arguments.required("id")
@@ -109,7 +118,9 @@ enum AWTools {
             "kind": Schema.string("Only this widget (id or kind)"),
             "dev": Schema.boolean("Only the dev slot")
         ]),
-        readOnly: true
+        title: L10n.pick(en: "Capture desktop widgets", ru: "Снять виджеты со стола"),
+        hints: .reading,
+        output: OutputSchema.shot
     ) { arguments, context in
         let workspace = try context.workspace(arguments)
         let capture = try await ShotService.capture(
@@ -140,7 +151,10 @@ enum AWTools {
         schema: Schema.object([
             "families": Schema.strings("Families that must appear, for example medium and large"),
             "timeout": Schema.number("Seconds to wait (default 300)")
-        ])
+        ]),
+        title: L10n.pick(en: "Wait for the dev slot", ru: "Дождаться dev-слота"),
+        hints: ToolHints(idempotent: true),
+        output: OutputSchema.slot
     ) { arguments, context in
         guard WindowLocator.screenRecordingAllowed else {
             return Reply.failure([ShotIssues.screenRecording(.error)])
@@ -213,7 +227,10 @@ enum AWTools {
             "scenario": Schema.string("Sample name (default: default)"),
             "live": Schema.boolean("Show the live feed data"),
             "timeout": Schema.number("Seconds to wait for the desktop to redraw (default 30)")
-        ], required: ["id"])
+        ], required: ["id"]),
+        title: L10n.pick(en: "Show in the dev slot", ru: "Показать в dev-слоте"),
+        hints: ToolHints(idempotent: true),
+        output: OutputSchema.dev
     ) { arguments, context in
         let workspace = try context.workspace(arguments)
         let widget = try workspace.widget(try arguments.required("id"))
@@ -241,7 +258,9 @@ enum AWTools {
             "job": Schema.string("Job id from the earlier answer"),
             "timeout": Schema.number("Seconds to wait at most; the server may answer sooner")
         ], required: ["job"], workspace: false),
-        readOnly: true
+        title: L10n.pick(en: "Wait for a job", ru: "Дождаться задания"),
+        hints: .reading,
+        output: OutputSchema.wait
     ) { arguments, context in
         try await context.follow(try arguments.required("job"), limit: arguments.number("timeout"))
     }
@@ -251,7 +270,9 @@ enum AWTools {
         "Check Xcode, XcodeGen, signing, Screen Recording, the installed app, the dev slot and the feed daemon. "
             + "Call first when anything environment-related fails.",
         schema: Schema.object([:]),
-        readOnly: true
+        title: L10n.pick(en: "Check the setup", ru: "Проверить окружение"),
+        hints: .reading,
+        output: OutputSchema.doctor
     ) { arguments, context in
         let doctor = Doctor(runner: context.runner)
         var checks = await doctor.run()
@@ -272,7 +293,9 @@ enum AWTools {
         "aw_list",
         "List the widgets in the workspace with their families and feeds, plus manifest problems.",
         schema: Schema.object([:]),
-        readOnly: true
+        title: L10n.pick(en: "List widgets", ru: "Список виджетов"),
+        hints: .reading,
+        output: OutputSchema.list
     ) { arguments, context in
         let workspace = try context.workspace(arguments)
         let manifests = try workspace.widgets().map(\.manifest)
@@ -291,7 +314,10 @@ enum AWTools {
             "id": Schema.string("Widget id"),
             "json": .object(["description": .string("The model as a JSON object (or a string holding it)")]),
             "validate": Schema.boolean("Check the data against the model first (default true)")
-        ], required: ["id", "json"])
+        ], required: ["id", "json"]),
+        title: L10n.pick(en: "Publish widget data", ru: "Опубликовать данные виджета"),
+        hints: ToolHints(destructive: true, idempotent: true),
+        output: OutputSchema.data
     ) { arguments, context in
         let workspace = try context.workspace(arguments)
         let widget = try workspace.widget(try arguments.required("id"))
@@ -327,7 +353,10 @@ enum AWTools {
         schema: Schema.object([
             "id": Schema.string("Widget id"),
             "validate": Schema.boolean("Check the output against the model (default true)")
-        ], required: ["id"])
+        ], required: ["id"]),
+        title: L10n.pick(en: "Run a feed", ru: "Запустить feed"),
+        hints: ToolHints(idempotent: true, openWorld: true),
+        output: OutputSchema.feed
     ) { arguments, context in
         let workspace = try context.workspace(arguments)
         let widget = try workspace.widget(try arguments.required("id"))
@@ -350,7 +379,9 @@ enum AWTools {
         "aw_explain",
         "Explain an issue code from a report: what it means, why it happens and how to fix it. Without a code, lists every code.",
         schema: Schema.object(["code": Schema.string("Issue code, for example OVERFLOW")]),
-        readOnly: true
+        title: L10n.pick(en: "Explain an issue code", ru: "Объяснить код проблемы"),
+        hints: .reading,
+        output: OutputSchema.explain
     ) { arguments, _ in
         guard let code = arguments.string("code") else {
             let lines = IssueCatalog.entries.map { "\($0.code) — \($0.title.localized)" }

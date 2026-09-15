@@ -154,6 +154,15 @@ enum Schema {
     }
 }
 
+struct ToolHints: Sendable {
+    var readOnly = false
+    var destructive = false
+    var idempotent = false
+    var openWorld = false
+
+    static let reading = ToolHints(readOnly: true, idempotent: true)
+}
+
 struct AWTool: Sendable {
     let tool: Tool
     let run: @Sendable (Arguments, CallEnvironment) async throws -> CallTool.Result
@@ -162,10 +171,25 @@ struct AWTool: Sendable {
         _ name: String,
         _ description: String,
         schema: Value,
-        readOnly: Bool = false,
+        title: String? = nil,
+        hints: ToolHints = ToolHints(),
+        output: Value? = nil,
         run: @escaping @Sendable (Arguments, CallEnvironment) async throws -> CallTool.Result
     ) {
-        tool = Tool(name: name, description: description, inputSchema: schema, annotations: .init(readOnlyHint: readOnly))
+        tool = Tool(
+            name: name,
+            title: title,
+            description: description,
+            inputSchema: schema,
+            annotations: .init(
+                title: title,
+                readOnlyHint: hints.readOnly,
+                destructiveHint: hints.readOnly ? nil : hints.destructive,
+                idempotentHint: hints.idempotent,
+                openWorldHint: hints.openWorld
+            ),
+            outputSchema: output
+        )
         self.run = run
     }
 
@@ -175,6 +199,10 @@ struct AWTool: Sendable {
         progress: ProgressReporter = .silent,
         budget: TimeInterval? = nil
     ) async throws -> CallTool.Result {
+        let problems = ArgumentCheck.problems(arguments.values, schema: tool.inputSchema)
+        guard problems.isEmpty else {
+            return Reply.failure(problems.map(ArgumentCheck.issue))
+        }
         let environment = CallEnvironment(context: context, progress: progress, budget: budget)
         do {
             let result = try await run(arguments, environment)
@@ -193,16 +221,25 @@ struct AWTool: Sendable {
 }
 
 enum Reply {
-    static func make<Payload: Codable>(_ summary: String, issues: [Issue] = [], payload: Payload, images: [String] = []) -> CallTool.Result {
-        let text = ([summary] + issues.deduplicated().map(Printer.format)).filter { !$0.isEmpty }.joined(separator: "\n")
+    static func make<Payload: Encodable>(_ summary: String, issues: [Issue] = [], payload: Payload, images: [String] = []) -> CallTool.Result {
+        let lines = issues.deduplicated().map { MCPHints.rewrite(Printer.format($0)) }
+        let text = ([summary] + lines).filter { !$0.isEmpty }.joined(separator: "\n")
         let content = [Tool.Content.text(text: text, annotations: nil, _meta: nil)] + images.compactMap(image)
         let isError = issues.contains { $0.severity == .error }
-        return (try? CallTool.Result(content: content, structuredContent: payload, isError: isError))
-            ?? CallTool.Result(content: content, isError: isError)
+        return CallTool.Result(content: content, structuredContent: structured(payload), isError: isError)
     }
 
     static func failure(_ issues: [Issue]) -> CallTool.Result {
-        CallTool.Result(content: [.text(text: issues.map(Printer.format).joined(separator: "\n"), annotations: nil, _meta: nil)], isError: true)
+        let text = issues.map { MCPHints.rewrite(Printer.format($0)) }.joined(separator: "\n")
+        return CallTool.Result(content: [.text(text: text, annotations: nil, _meta: nil)], isError: true)
+    }
+
+    /// The payload as a JSON value; NaN and infinities become strings so a stray value never drops the structured content.
+    static func structured<Payload: Encodable>(_ payload: Payload) -> Value? {
+        let encoder = JSONEncoder()
+        encoder.nonConformingFloatEncodingStrategy = .convertToString(positiveInfinity: "Infinity", negativeInfinity: "-Infinity", nan: "NaN")
+        guard let data = try? encoder.encode(payload) else { return nil }
+        return try? JSONDecoder().decode(Value.self, from: data)
     }
 
     static func image(_ path: String) -> Tool.Content? {
