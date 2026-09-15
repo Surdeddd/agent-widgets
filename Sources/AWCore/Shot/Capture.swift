@@ -189,6 +189,22 @@ public enum ShotIssues {
         )
     }
 
+    public static func hidden(_ name: String, families: [Family]) -> Issue {
+        let sizes = families.isEmpty ? "" : " (\(families.map(\.rawValue).joined(separator: ", ")))"
+        return Issue(
+            code: IssueCode.widgetHidden,
+            severity: .warning,
+            message: L10n.pick(
+                en: "“\(name)”\(sizes) is covered by windows, so macOS does not draw it and a screenshot would be empty",
+                ru: "«\(name)»\(sizes) закрыт окнами — macOS его не рисует, снимок был бы пустым"
+            ),
+            hint: L10n.pick(
+                en: "Ask the person to show the desktop for a few seconds (Mission Control → Show Desktop, or F11), then run `aw shot --dev`",
+                ru: "Попроси человека на несколько секунд показать рабочий стол (Mission Control → «Показать рабочий стол» или F11), затем `aw shot --dev`"
+            )
+        )
+    }
+
     public static func unchanged(after seconds: TimeInterval) -> Issue {
         Issue(
             code: IssueCode.shotUnchanged,

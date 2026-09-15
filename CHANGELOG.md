@@ -9,6 +9,7 @@
 - Every MCP tool has a title, read-only, destructive, idempotent and open-world hints, and an output schema. The structured content carries the reply text under `summary`, because Claude Code shows the model that JSON instead of the text block.
 - MCP arguments are checked against the input schema: unknown names, wrong types and missing values are `INVALID_ARGUMENT`. Invalid widget ids are `WIDGET_ID_INVALID` everywhere, unknown jobs `JOB_UNKNOWN`.
 - Hints in MCP replies name the tool to call (`aw_explain {"code": "…"}`) and mark commands that only exist in a shell.
+- A dev slot covered by windows is `WIDGET_HIDDEN` instead of a misleading `SHOT_MISMATCH`: macOS does not draw desktop widgets that are not on screen, so their capture is an empty frame. `aw dev` no longer waits 30 s for a redraw that cannot happen, `aw slot` waits until the slot is visible, and `aw ship` without a visible slot ends `unverified`.
 
 ## 0.2.0 — 2026-09-14
 

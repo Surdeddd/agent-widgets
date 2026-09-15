@@ -353,6 +353,23 @@ private let catalogEntries: [IssueExplanation] = [
         example: nil
     ),
     IssueExplanation(
+        code: IssueCode.widgetHidden,
+        title: text("The widget is covered by windows", "Виджет закрыт окнами"),
+        cause: text(
+            "macOS draws a desktop widget only while it is on screen. Behind windows, on another Space or under a full-screen app the dev slot is an empty frame, "
+                + "so a screenshot would show nothing and the comparison would be meaningless.",
+            "macOS рисует виджет на столе, только пока он виден. За окнами, на другом Space или под полноэкранным приложением dev-слот — пустая рамка, "
+                + "поэтому снимок ничего не покажет, а сравнение будет бессмысленным."
+        ),
+        fix: text(
+            "The widget is installed; only the check is missing. Ask the person to show the desktop for a few seconds — Mission Control → Show Desktop or F11 — "
+                + "then run aw shot --dev (aw_shot with dev: true). aw slot waits until the slot is visible.",
+            "Виджет установлен, не хватает только проверки. Попроси человека на несколько секунд показать рабочий стол — Mission Control → «Показать рабочий стол» "
+                + "или F11 — и запусти aw shot --dev (aw_shot с dev: true). aw slot ждёт, пока слот станет виден."
+        ),
+        example: nil
+    ),
+    IssueExplanation(
         code: IssueCode.templateUnknown,
         title: text("No such template", "Нет такого шаблона"),
         cause: text("The template name is not in the engine's Templates folder.", "Такого шаблона нет в папке Templates движка."),

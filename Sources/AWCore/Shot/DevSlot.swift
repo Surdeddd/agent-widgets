@@ -24,7 +24,8 @@ public enum DevSlot {
         let config = workspace.config
         let store = store ?? AppGroupStore(config: config)
         let slot = ShotTarget.dev(config)
-        let windows = screenRecording ? WindowLocator.find(locate(), names: slot.names, descriptor: slot.descriptor) : []
+        let placed = screenRecording ? WindowLocator.find(locate(), names: slot.names, descriptor: slot.descriptor) : []
+        let windows = placed.filter { !$0.hidden }
         let shooter = Shooter(directory: workspace.shotsDir, capture: Capture(runner: runner))
         let previous = store.devTarget()
         let baselines = await shooter.baselines(windows)
@@ -38,8 +39,14 @@ public enum DevSlot {
             outcome.issues.append(ShotIssues.screenRecording(.warning))
             return outcome
         }
-        guard !windows.isEmpty else {
+        guard !placed.isEmpty else {
             outcome.issues.append(ShotIssues.notPlaced(config.devSlotName, appName: config.appName))
+            return outcome
+        }
+        if windows.count < placed.count {
+            outcome.issues.append(ShotIssues.hidden(config.devSlotName, families: placed.filter(\.hidden).compactMap(\.family)))
+        }
+        guard !windows.isEmpty else {
             return outcome
         }
         if previous == target {

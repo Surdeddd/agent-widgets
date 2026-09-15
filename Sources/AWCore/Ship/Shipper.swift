@@ -189,7 +189,11 @@ public struct Shipper: Sendable {
         if windows.isEmpty {
             outcome.issues.append(ShotIssues.notPlaced(workspace.config.devSlotName, appName: workspace.config.appName))
         }
-        return windows
+        let shown = windows.filter { !$0.hidden }
+        if shown.count < windows.count {
+            outcome.issues.append(ShotIssues.hidden(workspace.config.devSlotName, families: windows.filter(\.hidden).compactMap(\.family)))
+        }
+        return shown
     }
 }
 

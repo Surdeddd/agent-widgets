@@ -34,10 +34,11 @@ public struct SlotWaiter: Sendable {
     }
 
     private func covers(_ windows: [WidgetWindow]) -> Bool {
+        let shown = windows.filter { !$0.hidden }
         if families.isEmpty {
-            return !windows.isEmpty
+            return !shown.isEmpty
         }
-        return families.isSubset(of: Set(windows.compactMap(\.family)))
+        return families.isSubset(of: Set(shown.compactMap(\.family)))
     }
 }
 

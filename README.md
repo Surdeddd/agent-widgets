@@ -192,6 +192,7 @@ Every command accepts `--json` and `--lang en|ru`.
 - Widgets are snapshots: no networking, timers or free animation in the view. Feeds fetch; the timeline moves; `Text(date, style:)` ticks.
 - macOS gives a widget roughly 40–70 reloads a day; keep feeds at 15 minutes or slower. Button taps do not count.
 - Only a person can place a widget on the desktop, so the dev slot is added by hand once.
+- macOS draws a desktop widget only while it is on screen. Behind windows the dev slot is an empty frame, so `aw` reports `WIDGET_HIDDEN` and asks you to show the desktop instead of comparing a blank shot.
 - Previews draw a neutral glass background; the real desktop tints widgets with your wallpaper.
 
 ## Development

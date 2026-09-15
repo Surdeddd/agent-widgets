@@ -9,6 +9,12 @@ public struct WidgetWindow: Codable, Equatable, Sendable {
     public var width: Int
     public var height: Int
     public var family: Family?
+    public var visible: Bool?
+
+    /// macOS does not draw a desktop widget that is not on screen, so a capture of it is an empty frame.
+    public var hidden: Bool {
+        visible == false
+    }
 }
 
 public enum WindowLocator {
@@ -40,7 +46,8 @@ public enum WindowLocator {
                 name: window[kCGWindowName as String] as? String ?? "",
                 width: width,
                 height: height,
-                family: Family.nearest(windowSize: CGSize(width: width, height: height), in: geometry)
+                family: Family.nearest(windowSize: CGSize(width: width, height: height), in: geometry),
+                visible: (window[kCGWindowIsOnscreen as String] as? Bool) == true
             )
         }
         .sorted { $0.id < $1.id }

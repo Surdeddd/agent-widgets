@@ -23,7 +23,11 @@ public enum ShotService {
             if found.isEmpty && single {
                 issues.append(ShotIssues.notPlaced(target.names.first ?? target.label, appName: workspace.config.appName))
             }
-            records += await shooter.take(found, label: target.label)
+            let shown = found.filter { !$0.hidden }
+            if shown.count < found.count {
+                issues.append(ShotIssues.hidden(target.names.first ?? target.label, families: found.filter(\.hidden).compactMap(\.family)))
+            }
+            records += await shooter.take(shown, label: target.label)
         }
         if records.isEmpty && issues.isEmpty {
             issues.append(ShotIssues.notPlaced(workspace.config.appName, appName: workspace.config.appName))
