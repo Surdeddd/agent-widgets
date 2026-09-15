@@ -57,6 +57,13 @@ public enum WindowLocator {
         windows.filter { names.contains($0.name) || $0.name.hasSuffix(descriptor) }
     }
 
+    /// The visible windows worth capturing: those in the widget's families, or every visible one when none of them is.
+    public static func capturable(_ windows: [WidgetWindow], families: [Family]) -> [WidgetWindow] {
+        let visible = windows.filter { !$0.hidden }
+        let supported = visible.filter { $0.family.map(families.contains) ?? true }
+        return supported.isEmpty ? visible : supported
+    }
+
     public static func namesHidden(_ windows: [WidgetWindow]) -> Bool {
         !windows.isEmpty && windows.allSatisfy { $0.name.isEmpty }
     }

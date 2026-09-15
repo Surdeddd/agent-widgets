@@ -54,7 +54,8 @@ enum AWTools {
             "id": Schema.string("Widget id"),
             "families": Schema.strings("Only these families"),
             "scenarios": Schema.strings("Only these samples (file names in samples/ without .json)"),
-            "full": Schema.boolean("Render every theme and mode for every sample")
+            "full": Schema.boolean("Render every theme and mode for every sample"),
+            "lang": Schema.string("Language of the widget texts: en or ru (default: the workspace locale, else the system language)")
         ], required: ["id"]),
         title: L10n.pick(en: "Preview a widget", ru: "Превью виджета"),
         hints: .reading,
@@ -67,6 +68,7 @@ enum AWTools {
             families: arguments.list("families")?.compactMap(Family.init(rawValue:)),
             scenarios: arguments.list("scenarios"),
             full: arguments.bool("full", default: false),
+            language: arguments.string("lang").flatMap(Language.init(rawValue:)) ?? workspace.config.locale ?? L10n.language,
             geometry: GeometryStore.load()
         )
         let outcome = try await context.pipeline(workspace).run(widget, request)

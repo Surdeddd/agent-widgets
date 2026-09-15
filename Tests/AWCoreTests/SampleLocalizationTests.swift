@@ -14,6 +14,7 @@ import Testing
         feed: FeedSpec(command: "./feed.py", every: Interval(seconds: 900))
     )
     try JSONEncoder().encode(manifest).write(to: root.appendingPathComponent("widgets/probe/widget.json"))
+    try Data(#"{"value": 8, "label": "Disk"}"#.utf8).write(to: root.appendingPathComponent("widgets/probe/samples/default.json"))
     let widget = try Workspace.load(at: root).widget("probe")
     let issues = PreviewPipeline.localizationIssues(widget, PreviewRequest(language: .ru))
     #expect(issues.map(\.code) == [IssueCode.sampleNotLocalized])
@@ -21,6 +22,22 @@ import Testing
     #expect(PreviewPipeline.localizationIssues(widget, PreviewRequest(language: .en)).isEmpty)
     try Data(#"{"value": 8}"#.utf8).write(to: root.appendingPathComponent("widgets/probe/samples/default.ru.json"))
     #expect(PreviewPipeline.localizationIssues(try Workspace.load(at: root).widget("probe"), PreviewRequest(language: .ru)).isEmpty)
+}
+
+@Test func aFeedOfNumbersNeedsNoRussianSample() throws {
+    let root = try ProbeWorkspace.make()
+    defer { try? FileManager.default.removeItem(at: root) }
+    let manifest = WidgetManifest(
+        id: "probe",
+        name: LocalizedText(en: "Probe"),
+        families: [.small],
+        view: "ProbeView",
+        feed: FeedSpec(command: "./feed.py", every: Interval(seconds: 900))
+    )
+    try JSONEncoder().encode(manifest).write(to: root.appendingPathComponent("widgets/probe/widget.json"))
+    try Data(#"{"value": 8, "history": [1.5, 2.0], "ok": true}"#.utf8).write(to: root.appendingPathComponent("widgets/probe/samples/default.json"))
+    let widget = try Workspace.load(at: root).widget("probe")
+    #expect(PreviewPipeline.localizationIssues(widget, PreviewRequest(language: .ru)).isEmpty)
 }
 
 @Test func widgetsWithoutAFeedNeedNoRussianSample() throws {

@@ -120,7 +120,7 @@ public struct Shipper: Sendable {
         }
         try Task.checkCancellation()
         let shooter = Shooter(directory: workspace.shotsDir, capture: Capture(runner: runner))
-        let windows = options.shots ? devWindows(into: &outcome) : []
+        let windows = options.shots ? devWindows(for: widget, into: &outcome) : []
         let baselines = await shooter.baselines(windows)
         outcome.stage = .install
         note(L10n.pick(en: "install…", ru: "установка…"))
@@ -179,7 +179,7 @@ public struct Shipper: Sendable {
         return true
     }
 
-    private func devWindows(into outcome: inout ShipOutcome) -> [WidgetWindow] {
+    private func devWindows(for widget: WidgetSource, into outcome: inout ShipOutcome) -> [WidgetWindow] {
         guard WindowLocator.screenRecordingAllowed else {
             outcome.issues.append(ShotIssues.screenRecording(.warning))
             return []
@@ -189,11 +189,10 @@ public struct Shipper: Sendable {
         if windows.isEmpty {
             outcome.issues.append(ShotIssues.notPlaced(workspace.config.devSlotName, appName: workspace.config.appName))
         }
-        let shown = windows.filter { !$0.hidden }
-        if shown.count < windows.count {
+        if windows.contains(where: \.hidden) {
             outcome.issues.append(ShotIssues.hidden(workspace.config.devSlotName, families: windows.filter(\.hidden).compactMap(\.family)))
         }
-        return shown
+        return WindowLocator.capturable(windows, families: widget.manifest.families)
     }
 }
 

@@ -77,6 +77,28 @@ private func windowInfo(_ id: Int, onscreen: Bool?) -> [String: Any] {
     #expect(Date().timeIntervalSince(started) < 5)
 }
 
+@Test func captureSkipsHiddenWindowsAndSizesTheWidgetLacks() {
+    let small = WidgetWindow(id: 1, name: "x", width: 164, height: 164, family: .small, visible: true)
+    let large = WidgetWindow(id: 2, name: "x", width: 344, height: 344, family: .large, visible: true)
+    let hiddenMedium = WidgetWindow(id: 3, name: "x", width: 344, height: 164, family: .medium, visible: false)
+    #expect(WindowLocator.capturable([small, large, hiddenMedium], families: [.small, .medium]).map(\.id) == [1])
+    #expect(WindowLocator.capturable([large], families: [.small]).map(\.id) == [2])
+    #expect(WindowLocator.capturable([hiddenMedium], families: [.medium]).isEmpty)
+}
+
+@Test func doctorSaysWhenThePlacedSlotIsNotVisible() throws {
+    let root = try ProbeWorkspace.make()
+    defer { try? FileManager.default.removeItem(at: root) }
+    let workspace = try Workspace.load(at: root)
+    let hidden = WidgetWindow(id: 9, name: workspace.config.devSlotName, width: 344, height: 170, family: .medium, visible: false)
+    let shown = WidgetWindow(id: 9, name: workspace.config.devSlotName, width: 344, height: 170, family: .medium, visible: true)
+    let doctor = Doctor(runner: FakeProcessRunner())
+    let check = doctor.devSlotCheck(workspace.config, screenRecording: true, windows: [hidden])
+    #expect(check.status == .warn)
+    #expect(check.issue?.code == IssueCode.widgetHidden)
+    #expect(doctor.devSlotCheck(workspace.config, screenRecording: true, windows: [shown]).status == .pass)
+}
+
 @Test func hiddenIssueNamesTheSizesAndTheFix() {
     let issue = L10n.$language.withValue(.en) { ShotIssues.hidden("Probe · Dev", families: [.medium, .large]) }
     #expect(issue.code == IssueCode.widgetHidden)

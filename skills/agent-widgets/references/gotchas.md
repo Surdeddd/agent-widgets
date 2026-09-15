@@ -27,7 +27,7 @@ Things that look fine in code and break on the desktop. The preview catches many
 ## Install and desktop
 
 - **Signing is mandatory:** the App Group (`<TeamID>.<bundle>`) needs an Apple Development certificate — a free Apple ID with its Personal Team is enough. `aw doctor` checks it.
-- **Placing widgets is a human action.** Ask once for the dev slot “<App> · Dev” in medium and large; `aw dev` / `aw ship` switch it afterwards.
+- **Placing widgets is a human action.** Ask once for the dev slot “<App> · Dev” in the sizes your widgets support; `aw dev` / `aw ship` switch it afterwards and capture only those sizes.
 - **Changing `id` or `kind` is a new widget** to macOS; the old one disappears from the desktop.
 - **Screenshots need Screen Recording** for the app that runs `aw`.
 - **A covered widget is not drawn.** macOS draws desktop widgets only while they are on screen; behind windows, on another Space or under a full-screen app the dev slot is an empty frame. `aw` then reports `WIDGET_HIDDEN` instead of comparing a blank shot: ask the person to show the desktop for a few seconds, then run `aw shot --dev`.

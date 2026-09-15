@@ -148,6 +148,15 @@ extension Doctor {
             )
         }
         let families = placed.map { $0.family?.rawValue ?? "\($0.width)×\($0.height)" }.joined(separator: ", ")
+        guard placed.contains(where: { !$0.hidden }) else {
+            return DoctorCheck(
+                id: "dev-slot",
+                title: title,
+                status: .warn,
+                detail: L10n.pick(en: "\(families), not visible right now", ru: "\(families), сейчас не виден"),
+                issue: ShotIssues.hidden(config.devSlotName, families: placed.compactMap(\.family))
+            )
+        }
         return DoctorCheck(id: "dev-slot", title: title, status: .pass, detail: families)
     }
 }

@@ -190,7 +190,8 @@ public struct PreviewPipeline: Sendable {
 
     /// A feed widget previewed in Russian without samples/default.ru.json never checks the feed's Russian text.
     static func localizationIssues(_ widget: WidgetSource, _ request: PreviewRequest) -> [Issue] {
-        guard request.language == .ru, let feed = widget.manifest.feed, widget.samples["default.ru"] == nil else { return [] }
+        guard request.language == .ru, let feed = widget.manifest.feed, widget.samples["default.ru"] == nil,
+              hasText(widget.samples["default"]) else { return [] }
         return [Issue(
             code: IssueCode.sampleNotLocalized,
             severity: .warning,
@@ -204,6 +205,23 @@ public struct PreviewPipeline: Sendable {
             ),
             file: "widgets/\(widget.id)/samples"
         )]
+    }
+
+    /// True when the sample holds any string value, which a Russian feed would word differently; a sample that cannot be read counts as text.
+    static func hasText(_ sample: URL?) -> Bool {
+        guard let sample, let data = try? Data(contentsOf: sample),
+              let json = try? JSONSerialization.jsonObject(with: data, options: [.fragmentsAllowed]) else {
+            return true
+        }
+        func text(in value: Any) -> Bool {
+            switch value {
+            case is String: true
+            case let array as [Any]: array.contains(where: text)
+            case let object as [String: Any]: object.values.contains(where: text)
+            default: false
+            }
+        }
+        return text(in: json)
     }
 
     func scenarios(of widget: WidgetSource, request: PreviewRequest) -> [(String, URL)] {

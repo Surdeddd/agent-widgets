@@ -64,7 +64,7 @@ Intervals: `"30s"`, `"15m"`, `"1h"`, `"1d"` or a number of seconds.
 - Exit 127 / 126 → `FEED_COMMAND_NOT_FOUND` names the missing or non-executable program and the PATH feeds get. The status keeps the exit code and the last stderr lines.
 - `aw doctor` reports every feed: ok N min ago, the last failure, or `STALE_DATA` once the last good data is older than three runs.
 - Output is published only when it changed, so an unchanged feed costs no reload.
-- Dates: ISO 8601 (`2026-09-14T09:00:00Z`, fractions allowed) or epoch seconds.
+- Dates — in the timeline envelope and in `Date` fields of your model alike: ISO 8601 (`2026-09-14T09:00:00Z`, fractions allowed) or epoch seconds.
 
 ## State and actions
 

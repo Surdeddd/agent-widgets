@@ -22,7 +22,7 @@ Use the MCP tools (`aw_new`, `aw_preview`, `aw_ship`, …) when they are connect
 3. Edit `widgets/<id>/<Type>View.swift` (model + view) and `widgets/<id>/samples/*.json`: `default.json` is required, add `long.json` with the longest real strings and `empty.json` containing `null`.
 4. `aw preview <id> --json` → fix every error in `issues`, then open `sheet.png` and fix what looks wrong. Repeat until clean. Unknown code → `aw explain <CODE>`.
 5. Live data: write `feed.py` that prints one JSON object shaped like the model, add `"feed"` to `widget.json`, run `aw feed run <id>`. Quick test data without a feed: `aw data set <id> '{…}'`.
-6. `aw ship <id>` — build, install, dev slot, real screenshot. On `WIDGET_NOT_PLACED`, ask the person once to add “<App name> · Dev” to the desktop in medium and large; you cannot place widgets yourself. Run `aw slot` right after asking — it waits until the slot is on the desktop, measures the desktop sizes and captures the slot.
+6. `aw ship <id>` — build, install, dev slot, real screenshot. On `WIDGET_NOT_PLACED`, ask the person once to add “<App name> · Dev” to the desktop in the sizes your widget supports; you cannot place widgets yourself. Run `aw slot` right after asking — it waits until the slot is on the desktop, measures the desktop sizes and captures the slot.
 7. `aw daemon install` keeps feeds running every minute (each feed still runs only at its own `every`).
 
 ## The code you write
