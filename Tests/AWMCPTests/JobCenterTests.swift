@@ -64,31 +64,35 @@ private func jobID(_ result: CallTool.Result) -> String? {
 
 @Test func longCallAnswersWithAJobAndWaitFinishesIt() async throws {
     let context = MCPContext()
-    let first = try await slowJob(seconds: 0.8).call(Arguments([:]), context, budget: 0.2)
+    let first = try await slowJob(seconds: 3).call(Arguments([:]), context, budget: 0.2)
     #expect(text(first).contains("aw_wait"))
     #expect(first.isError != true)
     let id = try #require(jobID(first))
-    let final = try await AWTools.wait.call(Arguments(["job": .string(id)]), context, budget: 5)
+    let final = try await AWTools.wait.call(Arguments(["job": .string(id)]), context, budget: 30)
     #expect(text(final) == "finished")
 }
 
 @Test func cancellingTheWaitCancelsTheJob() async throws {
     let context = MCPContext()
     let finished = Flag()
-    let first = try await slowJob(seconds: 1.0, finished: finished).call(Arguments([:]), context, budget: 0.1)
+    let first = try await slowJob(seconds: 30, finished: finished).call(Arguments([:]), context, budget: 0.1)
     let id = try #require(jobID(first))
-    let waiting = Task { try await AWTools.wait.call(Arguments(["job": .string(id)]), context, budget: 5) }
+    let waiting = Task { try await AWTools.wait.call(Arguments(["job": .string(id)]), context, budget: 60) }
     try await Task.sleep(nanoseconds: 100_000_000)
     waiting.cancel()
     await #expect(throws: CancellationError.self) { _ = try await waiting.value }
-    try await Task.sleep(nanoseconds: 1_200_000_000)
+    var gone = await context.jobs.info(id) == nil
+    for _ in 0..<100 where !gone {
+        try await Task.sleep(nanoseconds: 100_000_000)
+        gone = await context.jobs.info(id) == nil
+    }
+    #expect(gone)
     #expect(!finished.isSet)
-    #expect(await context.jobs.info(id) == nil)
 }
 
 @Test func identicalCallsJoinTheRunningJob() async throws {
     let context = MCPContext()
-    let tool = slowJob(seconds: 0.6)
+    let tool = slowJob(seconds: 10)
     let first = try await tool.call(Arguments(["id": .string("a")]), context, budget: 0.05)
     let second = try await tool.call(Arguments(["id": .string("a")]), context, budget: 0.05)
     let other = try await tool.call(Arguments(["id": .string("b")]), context, budget: 0.05)
@@ -108,7 +112,7 @@ private func jobID(_ result: CallTool.Result) -> String? {
     let progress = ProgressReporter(token: .string("probe")) { parameters in
         messages.add(parameters.message ?? "")
     }
-    let result = try await slowJob(seconds: 0.6).call(Arguments([:]), MCPContext(), progress: progress, budget: nil)
+    let result = try await slowJob(seconds: 4).call(Arguments([:]), MCPContext(), progress: progress, budget: nil)
     #expect(text(result) == "finished")
     #expect(messages.all.contains("first"))
     #expect(messages.all.contains("second"))

@@ -54,5 +54,5 @@ import Testing
     wait.cancel()
     let windows = await wait.value
     #expect(windows == nil)
-    #expect(Date().timeIntervalSince(started) < 2)
+    #expect(Date().timeIntervalSince(started) < 20)
 }

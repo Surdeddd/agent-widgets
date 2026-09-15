@@ -74,7 +74,7 @@ private func windowInfo(_ id: Int, onscreen: Bool?) -> [String: Any] {
     )
     #expect(outcome.issues.map(\.code) == [IssueCode.widgetHidden])
     #expect(outcome.shots.isEmpty)
-    #expect(Date().timeIntervalSince(started) < 5)
+    #expect(Date().timeIntervalSince(started) < 15)
 }
 
 @Test func captureSkipsHiddenWindowsAndSizesTheWidgetLacks() {

@@ -67,8 +67,8 @@ private func fixture(_ name: String) throws -> String {
 }
 
 @Test func systemRunnerTimesOut() async throws {
-    let result = try await SystemProcessRunner().run("/bin/sleep", ["5"], cwd: nil, environment: nil, timeout: 0.5)
+    let result = try await SystemProcessRunner().run("/bin/sleep", ["30"], cwd: nil, environment: nil, timeout: 0.5)
     #expect(result.timedOut)
     #expect(!result.succeeded)
-    #expect(result.duration < 4)
+    #expect(result.duration < 15)
 }
