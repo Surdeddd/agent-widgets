@@ -7,6 +7,7 @@
 <p align="center"><b>Нативные виджеты рабочего стола macOS, которые делают AI-агенты.</b></p>
 
 <p align="center">
+  <a href="https://github.com/Surdeddd/agent-widgets/releases"><img src="https://img.shields.io/github/v/release/Surdeddd/agent-widgets" alt="Release"></a>
   <a href="https://github.com/Surdeddd/agent-widgets/actions/workflows/ci.yml"><img src="https://github.com/Surdeddd/agent-widgets/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <img src="https://img.shields.io/badge/macOS-14%2B-black" alt="macOS 14+">
   <img src="https://img.shields.io/badge/Swift-6-orange" alt="Swift 6">
@@ -27,16 +28,25 @@
 - **Настоящий WidgetKit, а не макет.** `aw ship` собирает подписанное приложение, подменяет его в `/Applications` с бэкапом, направляет dev-слот на виджет и снимает реальное окно.
 - **Живые данные.** Feed на любом языке печатает JSON; `aw` сверяет его с моделью, публикует только настоящие изменения и запускает по расписанию через LaunchAgent.
 - **Интерактивные виджеты.** Кнопки с состоянием — вперёд, назад, переключатели, счётчики, перемешанные колоды — не тратят бюджет перезагрузок.
-- **Сделано для агентов.** MCP-сервер, у которого превью возвращает лист картинкой, скилл с компонентами, рецептами и граблями, `--json` у каждой команды.
+- **Сделано для агентов.** MCP-сервер, у которого превью возвращает лист картинкой, а длинные вызовы отдают id задания, а не обрываются по таймауту, скилл с компонентами, рецептами и граблями, и плагин Claude Code, который ставит и то и другое сразу.
 - **Двуязычно.** Каждое сообщение и каждый документ — на английском и русском.
 
 ## Что нужно
 
 - macOS 14 или новее, Xcode 16.3 или новее
-- `brew install xcodegen`
+- `brew install xcodegen` (Homebrew ставит его сам)
 - Сертификат Apple Development, и бесплатного Apple ID достаточно — платная подписка разработчика не нужна: Xcode → Settings → Accounts → + → Apple ID, выбери его «(Personal Team)» → Manage Certificates → + → Apple Development; в уже существующем workspace затем запусти `aw init --refresh-signing`. Сертификат нужен виджетам для App Group. `aw preview` работает без сертификата. Проверено: все виджеты в этом репозитории собраны, подписаны и установлены с бесплатной Personal Team.
 
 ## Установка
+
+**Homebrew** — собирает из исходников твоим Xcode:
+
+```sh
+brew install surdeddd/tap/agent-widgets
+aw doctor
+```
+
+**Из исходников:**
 
 ```sh
 git clone https://github.com/Surdeddd/agent-widgets
@@ -58,12 +68,14 @@ aw ship weather           # сборка, установка, dev-слот, на
 
 ## Подключить к агенту
 
-**Claude Code**
+**Claude Code** — плагин ставит скилл и MCP-сервер:
 
-```sh
-aw skill install
-claude mcp add -s user agent-widgets -- aw mcp --workspace ~/Widgets
+```text
+/plugin marketplace add Surdeddd/agent-widgets
+/plugin install agent-widgets@agent-widgets
 ```
+
+Спросит папку с виджетами (`~/Widgets` по умолчанию). Без плагина: `aw skill install` и `claude mcp add -s user agent-widgets -- aw mcp --workspace ~/Widgets`.
 
 И попроси: «сделай виджет погоды в Бангкоке на рабочий стол».
 
@@ -75,7 +87,7 @@ command = "/Users/you/.local/bin/aw"
 args = ["mcp", "--workspace", "/Users/you/Widgets"]
 ```
 
-**Cursor** (`~/.cursor/mcp.json`) и **Gemini CLI** (`~/.gemini/settings.json`)
+**Cursor** (`~/.cursor/mcp.json`), **Claude Desktop** (`~/Library/Application Support/Claude/claude_desktop_config.json`) и **Gemini CLI** (`~/.gemini/settings.json`)
 
 ```json
 {
@@ -87,6 +99,8 @@ args = ["mcp", "--workspace", "/Users/you/Widgets"]
   }
 }
 ```
+
+Сборка и установка длятся дольше, чем многие клиенты ждут один вызов: Codex и Claude Desktop обрывают вызов через 60 с. Поэтому `aw_ship`, `aw_dev`, `aw_slot` и `aw_feed_run` за 45 с отвечают id задания, если ещё не закончили, а `aw_wait` подхватывает с того места. Claude Code ждёт весь вызов. `aw mcp --call-budget <seconds>` меняет лимит, `0` снимает его.
 
 Агенты без MCP проходят тот же цикл из терминала; `aw skill install` ещё и линкует скилл в `~/.codex/skills` и `~/.agents/skills`, если такие папки есть.
 
@@ -169,7 +183,7 @@ flowchart LR
 | `aw feed run <id>` · `aw data set <id>` · `aw data get <id>` | прогнать feed, пушнуть данные, прочитать данные |
 | `aw tick` · `aw daemon install` · `aw logs <id>` | держать feed'ы свежими и читать их логи |
 | `aw doctor` · `aw list` · `aw explain [CODE]` | здоровье, виджеты, коды проблем |
-| `aw mcp` · `aw skill install` | отдать агентам по MCP, поставить скилл |
+| `aw mcp [--call-budget s]` · `aw skill install` | отдать агентам по MCP, поставить скилл |
 
 Каждая команда понимает `--json` и `--lang en|ru`.
 
