@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- Long MCP calls fit every client. `aw_ship`, `aw_dev`, `aw_slot` and `aw_feed_run` run as jobs: a call answers within its budget (none for Claude Code, 45 s for other clients, `aw mcp --call-budget`) with a job id and stage, and the new `aw_wait` returns the final result. Codex and Claude Desktop, which stop a tool call after 60 s, now get through a ship.
+- Progress notifications for every stage of a long call, and a pulse every 10 s.
+- Cancelling an MCP call stops its work and sends no reply: a build is interrupted, waits end, an install swap already under way still finishes.
+- Claude Code plugin: `/plugin marketplace add Surdeddd/agent-widgets`, then `/plugin install agent-widgets@agent-widgets` installs the skill and the MCP server and asks for the widgets folder. A SessionStart hook explains how to install `aw` when it is missing.
+- Every MCP tool has a title, read-only, destructive, idempotent and open-world hints, and an output schema. The structured content carries the reply text under `summary`, because Claude Code shows the model that JSON instead of the text block.
+- MCP arguments are checked against the input schema: unknown names, wrong types and missing values are `INVALID_ARGUMENT`. Invalid widget ids are `WIDGET_ID_INVALID` everywhere, unknown jobs `JOB_UNKNOWN`.
+- Hints in MCP replies name the tool to call (`aw_explain {"code": "…"}`) and mark commands that only exist in a shell.
+
 ## 0.2.0 — 2026-09-14
 
 - `aw slot` waits until the person puts the dev slot on the desktop, then measures sizes and captures it (`SLOT_TIMEOUT`).

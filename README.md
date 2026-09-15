@@ -7,6 +7,7 @@
 <p align="center"><b>Native macOS desktop widgets, built by AI agents.</b></p>
 
 <p align="center">
+  <a href="https://github.com/Surdeddd/agent-widgets/releases"><img src="https://img.shields.io/github/v/release/Surdeddd/agent-widgets" alt="Release"></a>
   <a href="https://github.com/Surdeddd/agent-widgets/actions/workflows/ci.yml"><img src="https://github.com/Surdeddd/agent-widgets/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <img src="https://img.shields.io/badge/macOS-14%2B-black" alt="macOS 14+">
   <img src="https://img.shields.io/badge/Swift-6-orange" alt="Swift 6">
@@ -27,16 +28,25 @@ Coding agents write good SwiftUI, but they cannot see WidgetKit. **agent-widgets
 - **Real WidgetKit, not a mockup.** `aw ship` builds a signed app, swaps it into `/Applications` with a backup, points the dev slot at the widget and screenshots the real window.
 - **Live data.** Feeds in any language print JSON; `aw` checks it against the model, publishes only real changes and schedules feeds with a LaunchAgent.
 - **Interactive widgets.** Buttons with state — next, previous, toggles, counters, shuffled decks — that do not spend the reload budget.
-- **Made for agents.** An MCP server whose preview tool returns the sheet as an image, a skill with components, recipes and gotchas, `--json` on every command.
+- **Made for agents.** An MCP server whose preview tool returns the sheet as an image and whose long calls hand back a job id instead of timing out, a skill with components, recipes and gotchas, and a Claude Code plugin that installs both at once.
 - **Bilingual.** Every message and every doc in English and Russian.
 
 ## Requirements
 
 - macOS 14 or newer, Xcode 16.3 or newer
-- `brew install xcodegen`
+- `brew install xcodegen` (Homebrew installs it for you)
 - An Apple Development certificate, and a free Apple ID is enough — no paid developer membership: Xcode → Settings → Accounts → + → Apple ID, select its "(Personal Team)" → Manage Certificates → + → Apple Development; in an existing workspace then run `aw init --refresh-signing`. Widgets need the certificate for their App Group. `aw preview` works without any certificate. Verified: every widget in this repository was built, signed and installed with a free Personal Team.
 
 ## Install
+
+**Homebrew** — builds from source with your Xcode:
+
+```sh
+brew install surdeddd/tap/agent-widgets
+aw doctor
+```
+
+**From source:**
 
 ```sh
 git clone https://github.com/Surdeddd/agent-widgets
@@ -58,12 +68,14 @@ The first time, add “<App name> · Dev” to your desktop: right-click the des
 
 ## Use it from an agent
 
-**Claude Code**
+**Claude Code** — the plugin brings the skill and the MCP server:
 
-```sh
-aw skill install
-claude mcp add -s user agent-widgets -- aw mcp --workspace ~/Widgets
+```text
+/plugin marketplace add Surdeddd/agent-widgets
+/plugin install agent-widgets@agent-widgets
 ```
+
+It asks for your widgets folder (`~/Widgets` by default). Without the plugin: `aw skill install` and `claude mcp add -s user agent-widgets -- aw mcp --workspace ~/Widgets`.
 
 Then ask: “make me a desktop widget with the weather in Bangkok”.
 
@@ -75,7 +87,7 @@ command = "/Users/you/.local/bin/aw"
 args = ["mcp", "--workspace", "/Users/you/Widgets"]
 ```
 
-**Cursor** (`~/.cursor/mcp.json`) and **Gemini CLI** (`~/.gemini/settings.json`)
+**Cursor** (`~/.cursor/mcp.json`), **Claude Desktop** (`~/Library/Application Support/Claude/claude_desktop_config.json`) and **Gemini CLI** (`~/.gemini/settings.json`)
 
 ```json
 {
@@ -87,6 +99,8 @@ args = ["mcp", "--workspace", "/Users/you/Widgets"]
   }
 }
 ```
+
+Building and installing takes longer than many clients wait for one tool call: Codex and Claude Desktop stop after 60 s. So `aw_ship`, `aw_dev`, `aw_slot` and `aw_feed_run` answer within 45 s with a job id when they are not done yet, and `aw_wait` picks up where they stopped. Claude Code waits for the whole call. `aw mcp --call-budget <seconds>` changes the limit, `0` removes it.
 
 Agents without MCP can use the same loop from a shell; `aw skill install` also links the skill into `~/.codex/skills` and `~/.agents/skills` when those folders exist.
 
@@ -169,7 +183,7 @@ flowchart LR
 | `aw feed run <id>` · `aw data set <id>` · `aw data get <id>` | run a feed, push data, read data |
 | `aw tick` · `aw daemon install` · `aw logs <id>` | keep feeds running and read their logs |
 | `aw doctor` · `aw list` · `aw explain [CODE]` | health, widgets, issue codes |
-| `aw mcp` · `aw skill install` | serve agents over MCP, install the skill |
+| `aw mcp [--call-budget s]` · `aw skill install` | serve agents over MCP, install the skill |
 
 Every command accepts `--json` and `--lang en|ru`.
 

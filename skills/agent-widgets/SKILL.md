@@ -7,7 +7,7 @@ description: Build, preview, install and screenshot native macOS desktop widgets
 
 You write only the unique part of a widget: a Codable model, a SwiftUI view and, when it needs live data, a feed script. `aw` does everything else — WidgetKit plumbing, previews with layout checks, signing, installing, pointing a dev slot on the desktop at your widget and capturing the real window.
 
-Use the MCP tools (`aw_new`, `aw_preview`, `aw_ship`, …) when they are connected; otherwise run the same commands in a shell with `--json`.
+Use the MCP tools (`aw_new`, `aw_preview`, `aw_ship`, …) when they are connected; otherwise run the same commands in a shell with `--json`. A long MCP call (`aw_ship`, `aw_dev`, `aw_slot`, `aw_feed_run`) may answer with a job id before it finishes: call `aw_wait` with that id until the final result arrives.
 
 ## Done means
 
