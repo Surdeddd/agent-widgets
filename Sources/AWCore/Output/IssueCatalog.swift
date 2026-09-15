@@ -354,18 +354,18 @@ private let catalogEntries: [IssueExplanation] = [
     ),
     IssueExplanation(
         code: IssueCode.widgetHidden,
-        title: text("The widget is covered by windows", "Виджет закрыт окнами"),
+        title: text("The dev slot is not visible", "Dev-слот не виден"),
         cause: text(
-            "macOS draws a desktop widget only while it is on screen. Behind windows, on another Space or under a full-screen app the dev slot is an empty frame, "
-                + "so a screenshot would show nothing and the comparison would be meaningless.",
-            "macOS рисует виджет на столе, только пока он виден. За окнами, на другом Space или под полноэкранным приложением dev-слот — пустая рамка, "
-                + "поэтому снимок ничего не покажет, а сравнение будет бессмысленным."
+            "macOS draws a desktop widget only while it is on screen. Behind windows, on another Space, under a full-screen app or after it was removed "
+                + "from the desktop (macOS keeps its window for a while) the dev slot is an empty frame, so a screenshot would show nothing.",
+            "macOS рисует виджет на столе, только пока он виден. За окнами, на другом Space, под полноэкранным приложением или после того, как его убрали "
+                + "со стола (окно macOS держит ещё какое-то время), dev-слот — пустая рамка, и снимок ничего не покажет."
         ),
         fix: text(
-            "The widget is installed; only the check is missing. Ask the person to show the desktop for a few seconds — Mission Control → Show Desktop or F11 — "
-                + "then run aw shot --dev (aw_shot with dev: true). aw slot waits until the slot is visible.",
-            "Виджет установлен, не хватает только проверки. Попроси человека на несколько секунд показать рабочий стол — Mission Control → «Показать рабочий стол» "
-                + "или F11 — и запусти aw shot --dev (aw_shot с dev: true). aw slot ждёт, пока слот станет виден."
+            "The widget is installed; only the check is missing. Ask the person to show the desktop and, if the slot is gone, add it again "
+                + "(right-click the desktop → Edit Widgets), then run aw slot (aw_slot): it waits until the slot is visible and captures it.",
+            "Виджет установлен, не хватает только проверки. Попроси человека показать рабочий стол и, если слота нет, добавить его снова "
+                + "(правый клик по столу → «Изменить виджеты»), затем запусти aw slot (aw_slot): он дождётся, пока слот станет виден, и снимет его."
         ),
         example: nil
     ),

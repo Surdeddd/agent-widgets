@@ -195,12 +195,16 @@ public enum ShotIssues {
             code: IssueCode.widgetHidden,
             severity: .warning,
             message: L10n.pick(
-                en: "“\(name)”\(sizes) is covered by windows, so macOS does not draw it and a screenshot would be empty",
-                ru: "«\(name)»\(sizes) закрыт окнами — macOS его не рисует, снимок был бы пустым"
+                en: "“\(name)”\(sizes) is not visible — covered by windows, on another Space or no longer on the desktop — "
+                    + "so macOS does not draw it and a screenshot would be empty",
+                ru: "«\(name)»\(sizes) не виден — закрыт окнами, на другом Space или уже не на столе — "
+                    + "macOS его не рисует, снимок был бы пустым"
             ),
             hint: L10n.pick(
-                en: "Ask the person to show the desktop for a few seconds (Mission Control → Show Desktop, or F11), then run `aw shot --dev`",
-                ru: "Попроси человека на несколько секунд показать рабочий стол (Mission Control → «Показать рабочий стол» или F11), затем `aw shot --dev`"
+                en: "Ask the person to show the desktop and, if the slot is gone, add it again (right-click the desktop → Edit Widgets); "
+                    + "then run `aw slot` — it waits until the slot is visible and captures it",
+                ru: "Попроси человека показать рабочий стол и, если слота нет, добавить его снова (правый клик по столу → «Изменить виджеты»); "
+                    + "затем `aw slot` — он дождётся, пока слот станет виден, и снимет его"
             )
         )
     }

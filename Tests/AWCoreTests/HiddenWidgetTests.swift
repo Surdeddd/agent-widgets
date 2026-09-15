@@ -103,5 +103,6 @@ private func windowInfo(_ id: Int, onscreen: Bool?) -> [String: Any] {
     let issue = L10n.$language.withValue(.en) { ShotIssues.hidden("Probe · Dev", families: [.medium, .large]) }
     #expect(issue.code == IssueCode.widgetHidden)
     #expect(issue.message.contains("(medium, large)"))
-    #expect(issue.hint?.contains("aw shot --dev") == true)
+    #expect(issue.hint?.contains("aw slot") == true)
+    #expect(issue.message.contains("no longer on the desktop"))
 }
