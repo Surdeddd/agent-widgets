@@ -58,4 +58,8 @@ private func text(_ result: CallTool.Result) -> String {
         try await AWTools.preview.call(Arguments(["id": .int(1)]), MCPContext())
     }
     #expect(text(invalid).contains("`aw_explain {\"code\": \"INVALID_ARGUMENT\"}`"))
+    let warned = L10n.$language.withValue(.en) {
+        Reply.make("done", issues: [AWSchema.Issue(code: "X", severity: .warning, message: "careful", hint: "Run `aw list` first")], payload: ["ok": true])
+    }
+    #expect(text(warned).contains("Run `aw_list` first"))
 }
