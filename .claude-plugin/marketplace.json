@@ -1,0 +1,16 @@
+{
+  "name": "agent-widgets",
+  "description": "Agent Widgets: native macOS desktop widgets made by coding agents.",
+  "owner": {
+    "name": "Surdeddd",
+    "url": "https://github.com/Surdeddd"
+  },
+  "plugins": [
+    {
+      "name": "agent-widgets",
+      "source": "./",
+      "description": "Native macOS desktop widgets built by your agent: the agent-widgets skill and the aw MCP server.",
+      "version": "0.2.0"
+    }
+  ]
+}

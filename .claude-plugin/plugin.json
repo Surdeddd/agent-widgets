@@ -1,0 +1,28 @@
+{
+  "name": "agent-widgets",
+  "displayName": "Agent Widgets",
+  "version": "0.2.0",
+  "description": "Native macOS desktop widgets built by your agent: the agent-widgets skill and the aw MCP server — previews with layout checks, signed builds, and shots of the real desktop.",
+  "author": {
+    "name": "Surdeddd",
+    "url": "https://github.com/Surdeddd"
+  },
+  "homepage": "https://github.com/Surdeddd/agent-widgets",
+  "repository": "https://github.com/Surdeddd/agent-widgets",
+  "license": "MIT",
+  "keywords": ["macos", "widgets", "widgetkit", "swiftui", "mcp", "desktop"],
+  "mcpServers": {
+    "agent-widgets": {
+      "command": "aw",
+      "args": ["mcp", "--workspace", "${user_config.workspace}"]
+    }
+  },
+  "userConfig": {
+    "workspace": {
+      "type": "string",
+      "title": "Widgets workspace",
+      "description": "Folder with aw.json. `aw init ~/Widgets` creates one.",
+      "default": "~/Widgets"
+    }
+  }
+}
