@@ -104,6 +104,8 @@ func everyTemplateRendersWithoutErrors() async throws {
         let outcome = try await pipeline.run(try Workspace.load(at: workspace.root).widget(id), PreviewRequest(language: .en))
         let errors = outcome.allIssues.filter { $0.severity == .error }
         #expect(errors.isEmpty, "\(template.id): \(errors.map { "\($0.code) \($0.message) \($0.file ?? "")" })")
+        let hollow = outcome.allIssues.filter { $0.code == IssueCode.underfilled }
+        #expect(template.id == "blank" || hollow.isEmpty, "\(template.id): \(hollow.map(\.message))")
         if let artifacts = ProcessInfo.processInfo.environment["AW_TEST_ARTIFACTS"], let sheet = outcome.report?.sheet {
             let destination = URL(fileURLWithPath: artifacts).appendingPathComponent("template-\(template.id).png")
             try? FileManager.default.removeItem(at: destination)

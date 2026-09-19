@@ -39,12 +39,22 @@ struct __TYPE__View: AWView {
                                 .frame(maxHeight: .infinity)
                         }
                     }
-                } else {
+                } else if context.isSmall {
                     summary(data)
                     Spacer(minLength: 0)
                     if data.history.count > 1 {
                         AWSparkline(data.history)
-                            .frame(height: context.isSmall ? 26 : 110)
+                            .frame(height: 26)
+                    }
+                } else {
+                    HStack(alignment: .top, spacing: AWSpace.m) {
+                        summary(data)
+                        Spacer(minLength: 0)
+                        range(data)
+                    }
+                    if data.history.count > 1 {
+                        AWSparkline(data.history)
+                            .frame(maxHeight: .infinity)
                     }
                 }
             }
@@ -58,6 +68,25 @@ struct __TYPE__View: AWView {
                 AWText(caption, .caption, lines: context.family == .extraLarge ? 3 : 1)
                     .foregroundStyle(.secondary)
             }
+        }
+    }
+
+    @ViewBuilder
+    private func range(_ data: __TYPE__Data) -> some View {
+        if let high = data.history.max(), let low = data.history.min(), high > low {
+            VStack(alignment: .trailing, spacing: AWSpace.xs) {
+                fact(context.pick(en: "high", ru: "максимум"), "\(format(high)) \(data.unit)")
+                fact(context.pick(en: "low", ru: "минимум"), "\(format(low)) \(data.unit)")
+            }
+        }
+    }
+
+    private func fact(_ label: String, _ value: String) -> some View {
+        VStack(alignment: .trailing, spacing: 0) {
+            AWText(label, .label)
+                .foregroundStyle(.secondary)
+            AWText(value, .headline)
+                .monospacedDigit()
         }
     }
 

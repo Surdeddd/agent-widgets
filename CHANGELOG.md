@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- A gallery of ready-made widgets ships with the engine. `aw gallery` lists them, `aw gallery add <id>` copies one into the workspace with its feed and samples; the MCP server has `aw_gallery` and `aw_gallery_add`. An unknown id is `GALLERY_UNKNOWN` with the list of what exists.
+- Seven gallery widgets on live data replace the old examples: **AI limits** (what is left of the Claude and Codex windows, the pace against an even spend, a forecast and a week of history), **Agents** (coding sessions that wait for you, went silent or are working, with live timers and sessions by hour), **GitHub** (contribution calendar, streaks, the review queue, the last 14 days), **AI spend** (tokens of the day at API prices, by model), **2048** (played with widget buttons), and redrawn **System pulse** and **Focus**.
+- The preview checks how a widget uses its space. It measures the largest empty rectangle of the `default` sample in every family and warns with `UNDERFILLED` once it takes 40 % of a small, 30 % of a medium, 25 % of a large or extra large widget; the sheet outlines the hole, every cell shows `empty N%`, and `report.json` carries `emptyShare` and `emptyArea`. Gaps between a label and its value do not count; empty states and side samples are not judged.
+- Templates fill the sizes they declare: the list has two columns in medium and eight default targets, metric and chart put derived facts next to the hero and let the chart take the rest, the timer has its ring in medium. `card` is drawn for small and medium, `list` for small to large; `aw templates` shows the sizes. A test renders every template and fails on `UNDERFILLED`.
+- The skill is rewritten around what agents get wrong: a family ladder (each size answers a bigger question), where the extra information comes from, feeds that print the same bytes while nothing changed, red flags with the right move. Its example is compiled and rendered by the tests.
+- Sample dates can be offsets from now — `"+90m"`, `"-4m"`, `"+2h30m"` — so countdowns and “waiting for” labels stay alive in every preview instead of expiring with the day the sample was written.
+- Feed scripts of the gallery are covered by `Tests/Feeds` (python unittest) and run in CI; the 2048 logic and the limits pace by a Swift test target.
+
 ## 0.3.1 — 2026-09-19
 
 - `aw new` works when the engine sits behind a symlink — a Homebrew install always does. It used to fail with `UNEXPECTED … couldn’t be copied`: the created paths were cut at the wrong place once the symlink was resolved.

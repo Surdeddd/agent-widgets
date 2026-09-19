@@ -14,7 +14,8 @@ Things that look fine in code and break on the desktop. The preview catches many
 
 ## Data
 
-- **Reload budget:** roughly 40–70 reloads a day per widget. `every` under 15 minutes gets throttled. Buttons and the app in the foreground do not count.
+- **Reload budget:** roughly 40–70 reloads a day per widget. Only a publish that changed the data spends one, so a feed may run every minute as long as its output stays the same while nothing happened. Buttons and the app in the foreground do not count.
+- **A feed that stamps its output reloads forever.** `"fetchedAt": now`, a forecast computed from the clock, a history point on every run, dropping old points on every run — each makes the bytes differ and burns the budget in a quiet night. Print only what was measured; compute time-dependent things in the view from `entry.date` (the timeline re-renders the same data every 15 minutes for free); add history points only when the value moved. Check it: run `aw feed run <id>` twice — the second run must say `unchanged`.
 - **Models change, stored data does not.** After changing the model, run `aw feed run <id>` or `aw data set` so old JSON in the App Group does not fail to decode.
 - **The feed runs without your shell profile.** It gets a fixed PATH; call interpreters by name (`python3 feed.py`) or make scripts executable (`chmod +x feed.sh`). Prefer the Python standard library — no pip installs.
 - **stdout is the data channel.** Any `print` besides the final JSON breaks the feed; log to stderr.
@@ -22,6 +23,7 @@ Things that look fine in code and break on the desktop. The preview catches many
 - **Send a User-Agent.** APIs behind Cloudflare (Frankfurter, many others) answer Python's default agent with HTTP 403; use `urllib.request.Request(url, headers={"User-Agent": "agent-widgets/0.1"})`.
 - **Images** reach widgets only through the App Group: download into `$AW_IMAGES_DIR` and pass the file name in the model.
 - **Per-day state needs date keys.** Store `"habit@\(AWState.dayKey(day))"`, not “column 3”: a relative key silently moves to another day at midnight and no preview can show it.
+- **Sample dates expire.** `"resetsAt": "2026-09-19T12:00:00Z"` is a dead countdown tomorrow. Write offsets from now — `"+90m"`, `"-4m"`, `"+2h30m"` — in samples; feeds keep printing absolute dates.
 - **Timeline samples show their future.** When a sample is `{"timeline": [...]}`, `aw preview` also renders the next two entries as rows like `default+1h` — check them.
 
 ## Install and desktop

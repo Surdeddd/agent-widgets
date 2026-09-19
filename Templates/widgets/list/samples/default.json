@@ -4,6 +4,10 @@
     { "name": "GitHub", "value": "118 ms", "detail": "HTTP 200", "status": "ok" },
     { "name": "Apple", "value": "92 ms", "detail": "HTTP 200", "status": "ok" },
     { "name": "API gateway", "value": "1.2 s", "detail": "slow response", "status": "warning" },
-    { "name": "Status page", "value": "—", "detail": "timeout", "status": "critical" }
+    { "name": "Status page", "value": "—", "detail": "timeout", "status": "critical" },
+    { "name": "Anthropic", "value": "140 ms", "detail": "HTTP 200", "status": "ok" },
+    { "name": "Cloudflare", "value": "38 ms", "detail": "HTTP 200", "status": "ok" },
+    { "name": "npm", "value": "210 ms", "detail": "HTTP 200", "status": "ok" },
+    { "name": "PyPI", "value": "176 ms", "detail": "HTTP 200", "status": "ok" }
   ]
 }

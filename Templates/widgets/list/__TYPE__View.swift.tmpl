@@ -26,24 +26,37 @@ struct __TYPE__View: AWView {
         AWPhaseView(entry) { data in
             VStack(alignment: .leading, spacing: AWMetrics.spacing(for: context.family)) {
                 AWHeader(data.title, symbol: "waveform.path.ecg", entry: entry)
-                if context.isSmall {
+                switch context.family {
+                case .small:
                     summary(data)
-                } else if context.family == .extraLarge {
-                    HStack(alignment: .top, spacing: AWSpace.xl) {
-                        summary(data)
-                            .frame(width: 150, alignment: .leading)
-                        AWList(data.items, maxRows: 6) { item in
-                            AWRow(item.name, value: item.value, detail: item.detail, status: item.status)
-                        }
-                    }
-                } else {
-                    AWList(data.items) { item in
-                        AWRow(item.name, value: item.value, detail: context.family == .medium ? nil : item.detail, status: item.status)
-                    }
+                case .medium:
+                    columns(data.items, rows: 3, detailed: false)
+                case .large, .extraLarge:
+                    rows(data.items, limit: 7, detailed: true)
                 }
                 Spacer(minLength: 0)
             }
         }
+    }
+
+    @ViewBuilder
+    private func columns(_ items: [__TYPE__Item], rows limit: Int, detailed: Bool) -> some View {
+        if items.count <= limit {
+            rows(items, limit: limit, detailed: detailed)
+        } else {
+            let half = min(limit, (items.count + 1) / 2)
+            HStack(alignment: .top, spacing: AWSpace.l) {
+                rows(Array(items.prefix(half)), limit: limit, detailed: detailed)
+                rows(Array(items.dropFirst(half)), limit: limit, detailed: detailed)
+            }
+        }
+    }
+
+    private func rows(_ items: [__TYPE__Item], limit: Int, detailed: Bool) -> some View {
+        AWList(items, maxRows: limit) { item in
+            AWRow(item.name, value: item.value, detail: detailed ? item.detail : nil, status: item.status)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func summary(_ data: __TYPE__Data) -> some View {

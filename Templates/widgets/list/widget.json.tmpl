@@ -5,7 +5,7 @@
     "en": "Checks a few endpoints and shows which ones are healthy.",
     "ru": "Проверяет несколько адресов и показывает, какие живы."
   },
-  "families": ["small", "medium", "large", "extraLarge"],
+  "families": ["small", "medium", "large"],
   "view": "__TYPE__View",
   "refresh": "15m",
   "feed": { "command": "python3 feed.py", "every": "15m", "timeout": "30s" },
@@ -13,7 +13,12 @@
     "targets": [
       { "name": "GitHub", "url": "https://github.com" },
       { "name": "Apple", "url": "https://www.apple.com" },
-      { "name": "Anthropic", "url": "https://www.anthropic.com" }
+      { "name": "Anthropic", "url": "https://www.anthropic.com" },
+      { "name": "Hugging Face", "url": "https://huggingface.co" },
+      { "name": "Cloudflare", "url": "https://www.cloudflare.com" },
+      { "name": "npm", "url": "https://registry.npmjs.org" },
+      { "name": "PyPI", "url": "https://pypi.org" },
+      { "name": "Docker Hub", "url": "https://hub.docker.com" }
     ]
   }
 }

@@ -45,6 +45,7 @@ Intervals: `"30s"`, `"15m"`, `"1h"`, `"1d"` or a number of seconds.
 - By default: `default` in light, dark, desktop-idle and Tahoe clear (dark glass, no color) for every family, every other sample in dark, plus the next two entries of timeline samples.
 - `--full`: every sample in light, dark, light-idle, dark-idle and clear.
 - Each cell is a PNG next to `sheet.png` (`<family>-<appearance>-<mode>-<sample>.png`); `report.json` lists the issues per cell.
+- Cells of the `default` sample also carry `emptyShare` (0…1, the largest empty rectangle as a share of the content area) and `emptyArea` (`[x, y, width, height]` as fractions of the widget). `UNDERFILLED` fires at 0.4 for small, 0.3 for medium, 0.25 for large and extraLarge; a cell without `emptyShare` was not judged (side sample, empty state or overflow).
 
 ## Feed
 
@@ -86,7 +87,8 @@ Exit codes: `0` ok, `1` checks failed, `2` usage, `3` environment, `4` build fai
 | command | does |
 |---|---|
 | `aw init [dir]` | new workspace with signing detected |
-| `aw templates` / `aw new <id> --template t` | scaffold a widget |
+| `aw gallery` / `aw gallery add <id>` | list the ready-made widgets that ship with the engine / copy one into `widgets/` with its feed and samples |
+| `aw templates` / `aw new <id> --template t [--families small,medium]` | scaffold a widget; `aw templates` shows the sizes each template is drawn for |
 | `aw preview <id> [--family f] [--scenario s] [--full] [--open] [--lang ru]` | render the matrix, check the layout, write `sheet.png` + `report.json`; `--open` opens the sheet |
 | `aw ship <id> [--scenario s] [--live] [--force] [--no-shot]` | preview → build → install → dev slot → real screenshot |
 | `aw build [--no-sign]` / `aw install [--hard]` / `aw rollback` | build and install the app with backups |
@@ -101,7 +103,7 @@ Exit codes: `0` ok, `1` checks failed, `2` usage, `3` environment, `4` build fai
 
 ## MCP tools
 
-`aw_templates`, `aw_new`, `aw_preview` (sheet image + report), `aw_ship` (desktop screenshots), `aw_shot`, `aw_slot`, `aw_dev`, `aw_wait`, `aw_doctor`, `aw_list`, `aw_data_set`, `aw_feed_run`, `aw_explain`. Each takes an optional `workspace` path.
+`aw_gallery`, `aw_gallery_add`, `aw_templates`, `aw_new`, `aw_preview` (sheet image + report), `aw_ship` (desktop screenshots), `aw_shot`, `aw_slot`, `aw_dev`, `aw_wait`, `aw_doctor`, `aw_list`, `aw_data_set`, `aw_feed_run`, `aw_explain`. Each takes an optional `workspace` path.
 
 - **Long calls.** `aw_ship`, `aw_dev`, `aw_slot` and `aw_feed_run` run as jobs. When a call would outlast the client, it answers with `{"job": {"id", "tool", "stage", "elapsed"}}`; call `aw_wait {"job": "<id>"}` until the final result arrives — the same text, images and data the tool itself returns. The budget is none for Claude Code and 45 s for other clients (Codex and Claude Desktop stop a tool call after 60 s); `aw mcp --call-budget <s>` or `AW_MCP_CALL_BUDGET` override it, `0` means no limit. Identical calls join the running job; `JOB_UNKNOWN` means it ended more than 15 minutes ago, was cancelled or the server restarted.
 - **Progress and cancel.** A call with a progress token gets a notification for every stage (preview, build, install, redraw) and a pulse every 10 s. Cancelling a call stops its work: a build is interrupted, waits end, an install swap already under way still finishes.

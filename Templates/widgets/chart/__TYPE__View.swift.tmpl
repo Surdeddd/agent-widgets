@@ -32,14 +32,46 @@ struct __TYPE__View: AWView {
                             .frame(width: context.family == .medium ? 104 : 240, alignment: .leading)
                         chart(data)
                     }
-                } else {
+                } else if context.isSmall {
                     AWMetric(data.total, label: data.caption)
                     Spacer(minLength: 0)
                     chart(data)
-                        .frame(height: context.isSmall ? 38 : 150)
+                        .frame(height: 38)
+                } else {
+                    HStack(alignment: .top, spacing: AWSpace.m) {
+                        AWMetric(data.total, label: data.caption)
+                        Spacer(minLength: 0)
+                        facts(data)
+                    }
+                    chart(data)
+                        .frame(maxHeight: .infinity)
                 }
             }
         }
+    }
+
+    @ViewBuilder
+    private func facts(_ data: __TYPE__Data) -> some View {
+        if let best = data.bars.max(by: { $0.value < $1.value }) {
+            let average = data.bars.map(\.value).reduce(0, +) / Double(data.bars.count)
+            VStack(alignment: .trailing, spacing: AWSpace.xs) {
+                fact(context.pick(en: "best", ru: "максимум"), "\(best.label) · \(Self.short(best.value))")
+                fact(context.pick(en: "average", ru: "в среднем"), Self.short(average))
+            }
+        }
+    }
+
+    private func fact(_ label: String, _ value: String) -> some View {
+        VStack(alignment: .trailing, spacing: 0) {
+            AWText(label, .label)
+                .foregroundStyle(.secondary)
+            AWText(value, .headline)
+                .monospacedDigit()
+        }
+    }
+
+    static func short(_ value: Double) -> String {
+        value == value.rounded() ? String(format: "%.0f", value) : String(format: "%.1f", value)
     }
 
     private func chart(_ data: __TYPE__Data) -> some View {

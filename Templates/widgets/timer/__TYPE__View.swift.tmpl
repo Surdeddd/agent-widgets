@@ -29,19 +29,17 @@ struct __TYPE__View: AWView {
                     countdown(data)
                     Spacer(minLength: 0)
                 case .medium:
-                    HStack(alignment: .bottom, spacing: AWSpace.m) {
+                    HStack(alignment: .center, spacing: AWSpace.m) {
                         VStack(alignment: .leading, spacing: 2) {
                             AWText(data.event, .headline)
                             countdown(data)
+                            AWText(Self.format(data.date, language: context.language), .caption)
+                                .foregroundStyle(.secondary)
                         }
-                        Spacer(minLength: AWSpace.s)
-                        AWText(Self.format(data.date, language: context.language), .caption)
-                            .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        elapsed(data, size: 100)
                     }
-                    Spacer(minLength: 0)
-                    if let since = data.since {
-                        AWBar(progress: Self.fraction(since: since, until: data.date, now: entry.date), tint: .orange)
-                    }
+                    .frame(maxHeight: .infinity)
                 case .large, .extraLarge:
                     Spacer(minLength: 0)
                     HStack(alignment: .center, spacing: context.family == .large ? AWSpace.m : AWSpace.xl) {

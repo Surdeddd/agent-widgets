@@ -21,23 +21,10 @@ struct __TYPE__View: AWView {
         AWPhaseView(entry) { data in
             VStack(alignment: .leading, spacing: spacing) {
                 AWHeader(data.kicker, symbol: "text.book.closed", entry: entry)
-                if context.family == .extraLarge {
-                    title(data)
-                    Spacer(minLength: 0)
-                    HStack(alignment: .bottom, spacing: AWSpace.xl) {
-                        AWText(data.body, .body, lines: 4)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        if let footnote = data.footnote {
-                            quote(footnote)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                    }
-                } else {
-                    text(data)
-                    Spacer(minLength: 0)
-                    if let footnote = data.footnote, !context.isSmall {
-                        quote(footnote)
-                    }
+                text(data)
+                Spacer(minLength: 0)
+                if let footnote = data.footnote, !context.isSmall {
+                    quote(footnote)
                 }
             }
         }
@@ -56,7 +43,7 @@ struct __TYPE__View: AWView {
 
     private func title(_ data: __TYPE__Data) -> some View {
         VStack(alignment: .leading, spacing: 1) {
-            AWText(data.headline, context.family == .extraLarge ? .display : .title, lines: context.isSmall || context.family == .extraLarge ? 2 : 1)
+            AWText(data.headline, .title, lines: context.isSmall ? 2 : 1)
             if let subtitle = data.subtitle {
                 AWText(subtitle, .caption)
                     .foregroundStyle(.secondary)
@@ -84,10 +71,6 @@ struct __TYPE__View: AWView {
     }
 
     private var quoteLines: Int {
-        switch context.family {
-        case .medium: 1
-        case .extraLarge: 4
-        default: 3
-        }
+        context.family == .medium ? 1 : 3
     }
 }
