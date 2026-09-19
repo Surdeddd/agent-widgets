@@ -65,6 +65,7 @@ Intervals: `"30s"`, `"15m"`, `"1h"`, `"1d"` or a number of seconds.
 - `aw doctor` reports every feed: ok N min ago, the last failure, or `STALE_DATA` once the last good data is older than three runs.
 - Output is published only when it changed, so an unchanged feed costs no reload.
 - Dates — in the timeline envelope and in `Date` fields of your model alike: ISO 8601 (`2026-09-14T09:00:00Z`, fractions allowed) or epoch seconds.
+- In samples, write dates as an offset from now — `"+90m"`, `"-4m"`, `"+2h30m"`, `"+6d"` (units `s`, `m`, `h`, `d`, `w`) — so a countdown or “waiting for 4 min” stays alive in every preview instead of expiring with the day you wrote the sample. Feeds print absolute dates: an offset is read again on every redraw.
 
 ## State and actions
 

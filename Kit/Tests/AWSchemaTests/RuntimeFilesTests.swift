@@ -9,6 +9,21 @@ import Testing
     #expect(AWJSON.parseDate("yesterday") == nil)
 }
 
+@Test func parseDateAcceptsOffsetsFromNow() throws {
+    let now = Date(timeIntervalSince1970: 1_800_000_000)
+    #expect(AWJSON.parseDate("+90m", now: now) == now.addingTimeInterval(5400))
+    #expect(AWJSON.parseDate("-4m", now: now) == now.addingTimeInterval(-240))
+    #expect(AWJSON.parseDate("+2h30m", now: now) == now.addingTimeInterval(9000))
+    #expect(AWJSON.parseDate("+1w2d", now: now) == now.addingTimeInterval(777_600))
+    #expect(AWJSON.parseDate("+45s", now: now) == now.addingTimeInterval(45))
+    #expect(AWJSON.parseDate("90m", now: now) == nil)
+    #expect(AWJSON.parseDate("+", now: now) == nil)
+    #expect(AWJSON.parseDate("+5x", now: now) == nil)
+    let before = Date()
+    let decoded = try AWJSON.decoder().decode(FeedStatus.self, from: Data(#"{"ok":true,"checkedAt":"+1h"}"#.utf8))
+    #expect(abs(decoded.checkedAt.timeIntervalSince(before) - 3600) < 5)
+}
+
 @Test func feedStatusDecodesEpochAndISO() throws {
     let epoch = try AWJSON.decoder().decode(FeedStatus.self, from: Data(#"{"ok":true,"checkedAt":1800000000}"#.utf8))
     let iso = try AWJSON.decoder().decode(FeedStatus.self, from: Data(#"{"ok":true,"checkedAt":"2027-01-15T08:00:00Z"}"#.utf8))

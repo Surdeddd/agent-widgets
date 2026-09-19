@@ -97,7 +97,8 @@ public enum AWJSON {
             guard let date = parseDate(text) else {
                 throw DecodingError.dataCorruptedError(
                     in: container,
-                    debugDescription: "Unrecognized date \"\(text)\"; use ISO 8601 like 2026-09-14T09:00:00Z or epoch seconds"
+                    debugDescription: "Unrecognized date \"\(text)\"; use ISO 8601 like 2026-09-14T09:00:00Z, "
+                        + "epoch seconds, or an offset from now like +90m"
                 )
             }
             return date
@@ -112,11 +113,34 @@ public enum AWJSON {
         return encoder
     }
 
-    public static func parseDate(_ text: String) -> Date? {
+    /// ISO 8601, or an offset from `now` such as `+90m`, `-4m` or `+2h30m` (units s, m, h, d, w) so samples keep live countdowns.
+    public static func parseDate(_ text: String, now: Date = Date()) -> Date? {
+        if let seconds = offset(text) {
+            return now.addingTimeInterval(seconds)
+        }
         if let date = fractional.date(from: text) ?? plain.date(from: text) {
             return date
         }
         let trimmed = text.replacingOccurrences(of: #"\.\d+"#, with: "", options: .regularExpression)
         return plain.date(from: trimmed)
+    }
+
+    private static let units: [Character: Double] = ["s": 1, "m": 60, "h": 3600, "d": 86400, "w": 604_800]
+
+    static func offset(_ text: String) -> TimeInterval? {
+        guard text.range(of: #"^[+-](\d+[smhdw])+$"#, options: .regularExpression) != nil, let sign = text.first else {
+            return nil
+        }
+        var total = 0.0
+        var digits = ""
+        for character in text.dropFirst() {
+            if character.isNumber {
+                digits.append(character)
+            } else {
+                total += (Double(digits) ?? 0) * (units[character] ?? 0)
+                digits = ""
+            }
+        }
+        return sign == "-" ? -total : total
     }
 }
