@@ -65,23 +65,13 @@ public struct Capture: Sendable {
         return result?.succeeded == true && FileManager.default.fileExists(atPath: url.path)
     }
 
+    /// The captured window as an encoded image; `FrameDiff` compares such frames by picture.
     public func frame(_ window: WidgetWindow, to url: URL) async -> Data? {
         guard await shot(window, to: url) else { return nil }
-        return Self.pixels(at: url)
+        return try? Data(contentsOf: url)
     }
 
-    public static func pixels(at url: URL) -> Data? {
-        guard let data = try? Data(contentsOf: url),
-              let source = CGImageSourceCreateWithData(data as CFData, nil),
-              let image = CGImageSourceCreateImageAtIndex(source, 0, nil),
-              let pixels = image.dataProvider?.data
-        else {
-            return nil
-        }
-        return pixels as Data
-    }
-
-    /// Waits until frames differ from `baseline` and two consecutive frames match; nil on timeout.
+    /// Waits until two consecutive frames show the same picture and it differs from `baseline`; a running timer counts as neither. Nil on timeout.
     public static func settle(baseline: Data?, timeout: TimeInterval, interval: TimeInterval, frame: () async -> Data?) async -> Data? {
         let deadline = Date().addingTimeInterval(timeout)
         var previous: Data?
@@ -89,8 +79,8 @@ public struct Capture: Sendable {
             if Task.isCancelled {
                 return nil
             }
-            if let current = await frame(), current != baseline {
-                if current == previous {
+            if let current = await frame() {
+                if let previous, FrameDiff.alike(previous, current), FrameDiff.differs(current, from: baseline, steadiedBy: previous) {
                     return current
                 }
                 previous = current
