@@ -1,0 +1,43 @@
+{
+  "name": "agent-widgets",
+  "version": "__VERSION__",
+  "description": "Native macOS desktop widgets built by your AI agent: the aw CLI, a SwiftUI kit, previews with layout checks, ready-made widgets and an MCP server.",
+  "keywords": [
+    "macos",
+    "widgets",
+    "widgetkit",
+    "swiftui",
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "claude",
+    "codex",
+    "ai-agents",
+    "desktop"
+  ],
+  "homepage": "https://github.com/Surdeddd/agent-widgets#readme",
+  "bugs": "https://github.com/Surdeddd/agent-widgets/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Surdeddd/agent-widgets.git"
+  },
+  "license": "MIT",
+  "author": "Surdeddd (https://github.com/Surdeddd)",
+  "mcpName": "io.github.Surdeddd/agent-widgets",
+  "os": [
+    "darwin"
+  ],
+  "bin": {
+    "aw": "bin/aw",
+    "agent-widgets": "bin/aw"
+  },
+  "files": [
+    "bin",
+    "Templates",
+    "Kit",
+    "skills",
+    "gallery",
+    "README.md",
+    "LICENSE"
+  ]
+}

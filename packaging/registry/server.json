@@ -1,0 +1,42 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.Surdeddd/agent-widgets",
+  "title": "Agent Widgets",
+  "description": "Native macOS desktop widgets built by your agent: gallery, layout-checked previews, real shots.",
+  "repository": {
+    "url": "https://github.com/Surdeddd/agent-widgets",
+    "source": "github"
+  },
+  "version": "__VERSION__",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "agent-widgets",
+      "version": "__VERSION__",
+      "transport": {
+        "type": "stdio"
+      },
+      "packageArguments": [
+        {
+          "type": "positional",
+          "value": "mcp"
+        },
+        {
+          "type": "named",
+          "name": "--workspace",
+          "description": "Folder for your widgets; an empty one is fine, the aw_init tool sets it up",
+          "isRequired": false,
+          "format": "filepath"
+        }
+      ]
+    },
+    {
+      "registryType": "mcpb",
+      "identifier": "https://github.com/Surdeddd/agent-widgets/releases/download/v__VERSION__/agent-widgets-__VERSION__.mcpb",
+      "fileSha256": "__SHA256__",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}

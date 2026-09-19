@@ -1,0 +1,61 @@
+{
+  "manifest_version": "0.3",
+  "name": "agent-widgets",
+  "display_name": "Agent Widgets",
+  "version": "__VERSION__",
+  "description": "Native macOS desktop widgets built by Claude: ready-made widgets, previews with layout checks, signed builds and shots of the real desktop.",
+  "long_description": "Ask for a widget and get a real one on the macOS desktop. The gallery has AI limits for Claude and Codex, running agent sessions, GitHub contributions, AI spend, 2048, a system monitor and a focus timer; anything else is written as a small SwiftUI view and a feed script. The server renders every size in light, dark, idle and clear glass, checks overflow, truncation and empty space, then builds, signs, installs and captures the widget on the desktop.\n\nNeeds macOS 14+, Xcode 16+ with a free Apple ID (Personal Team) and `brew install xcodegen`. Pick any folder for your widgets — an empty one is fine, the aw_init tool sets it up.",
+  "author": {
+    "name": "Surdeddd",
+    "url": "https://github.com/Surdeddd"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Surdeddd/agent-widgets"
+  },
+  "homepage": "https://github.com/Surdeddd/agent-widgets",
+  "documentation": "https://github.com/Surdeddd/agent-widgets#readme",
+  "support": "https://github.com/Surdeddd/agent-widgets/issues",
+  "icon": "icon.png",
+  "server": {
+    "type": "binary",
+    "entry_point": "engine/bin/aw",
+    "mcp_config": {
+      "command": "${__dirname}/engine/bin/aw",
+      "args": ["mcp", "--workspace", "${user_config.workspace}"],
+      "env": {}
+    }
+  },
+  "tools": [
+    { "name": "aw_init", "description": "Create the widgets workspace in the chosen folder" },
+    { "name": "aw_gallery", "description": "List ready-made widgets" },
+    { "name": "aw_gallery_add", "description": "Install a ready-made widget" },
+    { "name": "aw_templates", "description": "List widget templates" },
+    { "name": "aw_new", "description": "Create a widget from a template" },
+    { "name": "aw_preview", "description": "Render every size and check the layout" },
+    { "name": "aw_ship", "description": "Build, install and capture the widget on the desktop" },
+    { "name": "aw_dev", "description": "Point the dev slot at a widget and capture it" },
+    { "name": "aw_slot", "description": "Wait until the dev slot is placed on the desktop" },
+    { "name": "aw_shot", "description": "Capture the real widget windows" },
+    { "name": "aw_wait", "description": "Wait for a long call to finish" },
+    { "name": "aw_feed_run", "description": "Run the live-data feed of a widget" },
+    { "name": "aw_data_set", "description": "Push data into a widget" },
+    { "name": "aw_list", "description": "List the widgets of the workspace" },
+    { "name": "aw_doctor", "description": "Check the toolchain, signing and the workspace" },
+    { "name": "aw_explain", "description": "Explain an issue code and its fix" }
+  ],
+  "user_config": {
+    "workspace": {
+      "type": "directory",
+      "title": "Widgets folder",
+      "description": "Where your widgets live. An empty folder is fine: the aw_init tool sets it up.",
+      "required": true,
+      "default": "${HOME}/Widgets"
+    }
+  },
+  "compatibility": {
+    "platforms": ["darwin"]
+  },
+  "keywords": ["macos", "widgets", "widgetkit", "swiftui", "desktop", "claude", "codex", "github"],
+  "license": "MIT"
+}
