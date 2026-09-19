@@ -1,9 +1,10 @@
 # Changelog
 
-## Unreleased
+## 0.4.0 — 2026-09-19
 
 - A gallery of ready-made widgets ships with the engine. `aw gallery` lists them, `aw gallery add <id>` copies one into the workspace with its feed and samples; the MCP server has `aw_gallery` and `aw_gallery_add`. An unknown id is `GALLERY_UNKNOWN` with the list of what exists.
 - `aw_init` creates the workspace from an MCP client, so Claude Desktop and other clients without a shell can start from nothing; `WORKSPACE_NOT_FOUND` points at it.
+- Three more ways to install. **npm**: `npm install -g agent-widgets` ships a prebuilt universal binary with the kit, templates, skill and gallery, so `npx -y agent-widgets mcp --workspace ~/Widgets` is a complete MCP server config. **Claude Desktop**: `agent-widgets-<version>.mcpb` on the release page installs with a folder picker. **MCP registry**: listed as `io.github.Surdeddd/agent-widgets`. `scripts/package.sh` builds both packages; the release workflow attaches them and publishes.
 - Seven gallery widgets on live data replace the old examples: **AI limits** (what is left of the Claude and Codex windows, the pace against an even spend, a forecast and a week of history), **Agents** (coding sessions that wait for you, went silent or are working, with live timers and sessions by hour), **GitHub** (contribution calendar, streaks, the review queue, the last 14 days), **AI spend** (tokens of the day at API prices, by model), **2048** (played with widget buttons), and redrawn **System pulse** and **Focus**.
 - The preview checks how a widget uses its space. It measures the largest empty rectangle of the `default` sample in every family and warns with `UNDERFILLED` once it takes 40 % of a small, 30 % of a medium, 25 % of a large or extra large widget; the sheet outlines the hole, every cell shows `empty N%`, and `report.json` carries `emptyShare` and `emptyArea`. Gaps between a label and its value do not count; empty states and side samples are not judged.
 - Templates fill the sizes they declare: the list has two columns in medium and eight default targets, metric and chart put derived facts next to the hero and let the chart take the rest, the timer has its ring in medium. `card` is drawn for small and medium, `list` for small to large; `aw templates` shows the sizes. A test renders every template and fails on `UNDERFILLED`.

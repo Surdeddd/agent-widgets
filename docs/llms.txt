@@ -5,6 +5,7 @@
 ## Start here
 
 - [Skill](../skills/agent-widgets/SKILL.md): the loop, the view contract, widget.json and the design rules
+- [Gallery](../examples/widgets): seven ready-made widgets — AI limits, agent sessions, GitHub, AI spend, 2048, system pulse, focus — each with a feed, samples and tests; `aw gallery add <id>` installs one
 - [Components](../skills/agent-widgets/references/components.md): every kit component with its signature
 - [Cookbook](../skills/agent-widgets/references/cookbook.md): weather, lists, rings, countdowns, charts, buttons, images
 - [Contracts](../skills/agent-widgets/references/contracts.md): widget.json, samples, feeds, state, JSON output, exit codes, MCP tools

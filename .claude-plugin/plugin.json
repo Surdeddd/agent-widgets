@@ -1,8 +1,8 @@
 {
   "name": "agent-widgets",
   "displayName": "Agent Widgets",
-  "version": "0.3.1",
-  "description": "Native macOS desktop widgets built by your agent: the agent-widgets skill and the aw MCP server — previews with layout checks, signed builds, and shots of the real desktop.",
+  "version": "0.4.0",
+  "description": "Native macOS desktop widgets built by your agent: the agent-widgets skill and the aw MCP server — ready-made widgets, previews with layout checks, signed builds, and shots of the real desktop.",
   "author": {
     "name": "Surdeddd",
     "url": "https://github.com/Surdeddd"
