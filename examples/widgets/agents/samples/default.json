@@ -1,0 +1,112 @@
+{
+ "working": 3,
+ "waiting": 2,
+ "silent": 1,
+ "sessions": [
+  {
+   "id": "claude-1",
+   "agent": "claude",
+   "project": "checkout-api",
+   "branch": "fix/retry",
+   "title": "Retry failed webhooks",
+   "state": "waiting",
+   "since": "-4m12s"
+  },
+  {
+   "id": "codex-1",
+   "agent": "codex",
+   "project": "landing",
+   "branch": "main",
+   "title": null,
+   "state": "waiting",
+   "since": "-19m"
+  },
+  {
+   "id": "claude-2",
+   "agent": "claude",
+   "project": "infra",
+   "branch": "main",
+   "title": "Rotate the staging certificates",
+   "state": "silent",
+   "since": "-26m"
+  },
+  {
+   "id": "claude-3",
+   "agent": "claude",
+   "project": "agent-widgets",
+   "branch": "feat/gallery",
+   "title": "Build the gallery widgets",
+   "state": "working",
+   "since": "-2m40s"
+  },
+  {
+   "id": "codex-2",
+   "agent": "codex",
+   "project": "billing",
+   "branch": "refactor/ledger",
+   "title": null,
+   "state": "working",
+   "since": "-11m"
+  },
+  {
+   "id": "claude-4",
+   "agent": "claude",
+   "project": "docs",
+   "branch": null,
+   "title": "Rewrite the install guide",
+   "state": "working",
+   "since": "-48s"
+  }
+ ],
+ "today": 14,
+ "activity": [
+  {
+   "hour": "-11h",
+   "sessions": 0
+  },
+  {
+   "hour": "-10h",
+   "sessions": 1
+  },
+  {
+   "hour": "-9h",
+   "sessions": 1
+  },
+  {
+   "hour": "-8h",
+   "sessions": 3
+  },
+  {
+   "hour": "-7h",
+   "sessions": 4
+  },
+  {
+   "hour": "-6h",
+   "sessions": 2
+  },
+  {
+   "hour": "-5h",
+   "sessions": 0
+  },
+  {
+   "hour": "-4h",
+   "sessions": 1
+  },
+  {
+   "hour": "-3h",
+   "sessions": 5
+  },
+  {
+   "hour": "-2h",
+   "sessions": 6
+  },
+  {
+   "hour": "-1h",
+   "sessions": 4
+  },
+  {
+   "hour": "-1m",
+   "sessions": 5
+  }
+ ]
+}

@@ -1,0 +1,84 @@
+{
+ "todayUsd": 0.0,
+ "weekUsd": 0.0,
+ "monthUsd": 0.0,
+ "monthTokens": 0,
+ "days": [
+  {
+   "date": "2026-09-06",
+   "usd": 0.0,
+   "tokens": 0
+  },
+  {
+   "date": "2026-09-07",
+   "usd": 0.0,
+   "tokens": 0
+  },
+  {
+   "date": "2026-09-08",
+   "usd": 0.0,
+   "tokens": 0
+  },
+  {
+   "date": "2026-09-09",
+   "usd": 0.0,
+   "tokens": 0
+  },
+  {
+   "date": "2026-09-10",
+   "usd": 0.0,
+   "tokens": 0
+  },
+  {
+   "date": "2026-09-11",
+   "usd": 0.0,
+   "tokens": 0
+  },
+  {
+   "date": "2026-09-12",
+   "usd": 0.0,
+   "tokens": 0
+  },
+  {
+   "date": "2026-09-13",
+   "usd": 0.0,
+   "tokens": 0
+  },
+  {
+   "date": "2026-09-14",
+   "usd": 0.0,
+   "tokens": 0
+  },
+  {
+   "date": "2026-09-15",
+   "usd": 0.0,
+   "tokens": 0
+  },
+  {
+   "date": "2026-09-16",
+   "usd": 0.0,
+   "tokens": 0
+  },
+  {
+   "date": "2026-09-17",
+   "usd": 0.0,
+   "tokens": 0
+  },
+  {
+   "date": "2026-09-18",
+   "usd": 0.0,
+   "tokens": 0
+  },
+  {
+   "date": "2026-09-19",
+   "usd": 0.0,
+   "tokens": 0
+  }
+ ],
+ "byModel": [],
+ "planUsd": null,
+ "leverage": null,
+ "unpricedTokens": 0,
+ "pricesAsOf": "2026-09-19",
+ "codexTokens": 0
+}

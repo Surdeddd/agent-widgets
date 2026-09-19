@@ -1,0 +1,18 @@
+{
+  "id": "tiles",
+  "name": {
+    "en": "2048",
+    "ru": "2048"
+  },
+  "description": {
+    "en": "The 2048 puzzle, played right on the desktop: every arrow is a full move.",
+    "ru": "Головоломка 2048 прямо на рабочем столе: каждая стрелка — полный ход."
+  },
+  "families": [
+    "small",
+    "medium",
+    "large"
+  ],
+  "view": "TilesView",
+  "refresh": "6h"
+}

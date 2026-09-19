@@ -1,8 +1,0 @@
-{
-  "cities": [
-    {"id": "port-au-prince", "name": "Port-au-Prince", "timeZoneId": "America/Port-au-Prince"},
-    {"id": "kuala-lumpur", "name": "Kuala Lumpur", "timeZoneId": "Asia/Kuala_Lumpur"},
-    {"id": "port-moresby", "name": "Port Moresby", "timeZoneId": "Pacific/Port_Moresby"},
-    {"id": "addis-ababa", "name": "Addis Ababa", "timeZoneId": "Africa/Addis_Ababa"}
-  ]
-}

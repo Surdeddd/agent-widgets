@@ -1,0 +1,26 @@
+{
+  "id": "ai-spend",
+  "name": {
+    "en": "AI spend",
+    "ru": "Расход AI"
+  },
+  "description": {
+    "en": "What your Claude Code usage would cost at API prices: today, this week and by model.",
+    "ru": "Сколько стоила бы твоя работа в Claude Code по ценам API: сегодня, за неделю и по моделям."
+  },
+  "families": [
+    "small",
+    "medium",
+    "large"
+  ],
+  "view": "AiSpendView",
+  "refresh": "30m",
+  "feed": {
+    "command": "python3 feed.py",
+    "every": "30m",
+    "timeout": "2m"
+  },
+  "settings": {
+    "planUsd": 200
+  }
+}

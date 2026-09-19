@@ -21,6 +21,7 @@ swift build                        # the CLI
 swift test                         # AWCore + MCP tests, including integration (swiftc, xcodebuild)
 AW_SKIP_INTEGRATION=1 swift test   # fast unit run
 (cd Kit && swift test)             # kit and preview tests
+python3 -B -m unittest discover -s Tests/Feeds   # feed scripts of the gallery widgets
 swiftlint --strict                 # must be clean
 make install                       # ~/.local/lib/agent-widgets + ~/.local/bin/aw
 ```

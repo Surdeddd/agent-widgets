@@ -1,17 +1,24 @@
 {
-  "description": {
-    "en": "Stars, forks and open issues at a glance",
-    "ru": "Звёзды, форки и открытые проблемы одним взглядом"
+  "id": "github",
+  "name": {
+    "en": "GitHub",
+    "ru": "GitHub"
   },
-  "families": ["small", "medium"],
+  "description": {
+    "en": "Your contribution year, the current streak and the pull requests waiting for your review.",
+    "ru": "Год вкладов, текущая серия и пул-реквесты, которые ждут твоего ревью."
+  },
+  "families": [
+    "small",
+    "medium",
+    "large",
+    "extraLarge"
+  ],
+  "view": "GithubView",
+  "refresh": "30m",
   "feed": {
     "command": "python3 feed.py",
     "every": "30m",
-    "timeout": "20s"
-  },
-  "id": "github",
-  "name": {"en": "GitHub", "ru": "GitHub"},
-  "refresh": "30m",
-  "settings": {"owner": "apple", "repo": "swift"},
-  "view": "GithubView"
+    "timeout": "40s"
+  }
 }

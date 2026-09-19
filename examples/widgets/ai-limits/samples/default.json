@@ -1,0 +1,1734 @@
+{
+ "services": [
+  {
+   "id": "claude",
+   "name": "Claude",
+   "plan": "Max",
+   "state": "ok",
+   "session": {
+    "percent": 72.0,
+    "resetsAt": "+1h52m",
+    "windowHours": 5
+   },
+   "week": {
+    "percent": 34.0,
+    "resetsAt": "+4d6h",
+    "windowHours": 168
+   },
+   "models": [
+    {
+     "label": "Fable",
+     "percent": 41.0
+    }
+   ],
+   "history": [
+    {
+     "at": "-167h",
+     "session": 6.3,
+     "week": 35.9
+    },
+    {
+     "at": "-166h",
+     "session": 8.4,
+     "week": 36.3
+    },
+    {
+     "at": "-165h",
+     "session": 10.5,
+     "week": 36.8
+    },
+    {
+     "at": "-164h",
+     "session": 2.1,
+     "week": 37.3
+    },
+    {
+     "at": "-163h",
+     "session": 4.2,
+     "week": 37.8
+    },
+    {
+     "at": "-162h",
+     "session": 6.3,
+     "week": 38.3
+    },
+    {
+     "at": "-161h",
+     "session": 8.4,
+     "week": 38.7
+    },
+    {
+     "at": "-160h",
+     "session": 10.5,
+     "week": 39.2
+    },
+    {
+     "at": "-159h",
+     "session": 14.0,
+     "week": 39.7
+    },
+    {
+     "at": "-158h",
+     "session": 28.0,
+     "week": 40.2
+    },
+    {
+     "at": "-157h",
+     "session": 42.0,
+     "week": 40.6
+    },
+    {
+     "at": "-156h",
+     "session": 56.0,
+     "week": 41.1
+    },
+    {
+     "at": "-155h",
+     "session": 70.0,
+     "week": 41.6
+    },
+    {
+     "at": "-154h",
+     "session": 14.0,
+     "week": 42.1
+    },
+    {
+     "at": "-153h",
+     "session": 28.0,
+     "week": 42.5
+    },
+    {
+     "at": "-152h",
+     "session": 42.0,
+     "week": 43.0
+    },
+    {
+     "at": "-151h",
+     "session": 56.0,
+     "week": 43.5
+    },
+    {
+     "at": "-150h",
+     "session": 70.0,
+     "week": 43.9
+    },
+    {
+     "at": "-149h",
+     "session": 14.0,
+     "week": 44.4
+    },
+    {
+     "at": "-148h",
+     "session": 28.0,
+     "week": 44.9
+    },
+    {
+     "at": "-147h",
+     "session": 42.0,
+     "week": 45.4
+    },
+    {
+     "at": "-146h",
+     "session": 56.0,
+     "week": 45.8
+    },
+    {
+     "at": "-145h",
+     "session": 10.5,
+     "week": 46.3
+    },
+    {
+     "at": "-144h",
+     "session": 2.1,
+     "week": 46.8
+    },
+    {
+     "at": "-143h",
+     "session": 4.2,
+     "week": 47.2
+    },
+    {
+     "at": "-142h",
+     "session": 6.3,
+     "week": 47.7
+    },
+    {
+     "at": "-141h",
+     "session": 8.4,
+     "week": 48.2
+    },
+    {
+     "at": "-140h",
+     "session": 10.5,
+     "week": 48.6
+    },
+    {
+     "at": "-139h",
+     "session": 2.1,
+     "week": 49.1
+    },
+    {
+     "at": "-138h",
+     "session": 4.2,
+     "week": 49.6
+    },
+    {
+     "at": "-137h",
+     "session": 6.3,
+     "week": 50.0
+    },
+    {
+     "at": "-136h",
+     "session": 8.4,
+     "week": 50.5
+    },
+    {
+     "at": "-135h",
+     "session": 70.0,
+     "week": 50.9
+    },
+    {
+     "at": "-134h",
+     "session": 14.0,
+     "week": 51.4
+    },
+    {
+     "at": "-133h",
+     "session": 28.0,
+     "week": 51.9
+    },
+    {
+     "at": "-132h",
+     "session": 42.0,
+     "week": 52.3
+    },
+    {
+     "at": "-131h",
+     "session": 56.0,
+     "week": 52.8
+    },
+    {
+     "at": "-130h",
+     "session": 70.0,
+     "week": 53.3
+    },
+    {
+     "at": "-129h",
+     "session": 14.0,
+     "week": 53.7
+    },
+    {
+     "at": "-128h",
+     "session": 28.0,
+     "week": 54.2
+    },
+    {
+     "at": "-127h",
+     "session": 42.0,
+     "week": 54.6
+    },
+    {
+     "at": "-126h",
+     "session": 56.0,
+     "week": 55.1
+    },
+    {
+     "at": "-125h",
+     "session": 70.0,
+     "week": 55.6
+    },
+    {
+     "at": "-124h",
+     "session": 14.0,
+     "week": 56.0
+    },
+    {
+     "at": "-123h",
+     "session": 28.0,
+     "week": 56.5
+    },
+    {
+     "at": "-122h",
+     "session": 42.0,
+     "week": 56.9
+    },
+    {
+     "at": "-121h",
+     "session": 8.4,
+     "week": 57.4
+    },
+    {
+     "at": "-120h",
+     "session": 10.5,
+     "week": 57.8
+    },
+    {
+     "at": "-119h",
+     "session": 2.1,
+     "week": 58.3
+    },
+    {
+     "at": "-118h",
+     "session": 4.2,
+     "week": 58.8
+    },
+    {
+     "at": "-117h",
+     "session": 6.3,
+     "week": 59.2
+    },
+    {
+     "at": "-116h",
+     "session": 8.4,
+     "week": 59.7
+    },
+    {
+     "at": "-115h",
+     "session": 10.5,
+     "week": 60.1
+    },
+    {
+     "at": "-114h",
+     "session": 2.1,
+     "week": 60.6
+    },
+    {
+     "at": "-113h",
+     "session": 4.2,
+     "week": 61.0
+    },
+    {
+     "at": "-112h",
+     "session": 6.3,
+     "week": 61.5
+    },
+    {
+     "at": "-111h",
+     "session": 56.0,
+     "week": 61.9
+    },
+    {
+     "at": "-110h",
+     "session": 70.0,
+     "week": 62.4
+    },
+    {
+     "at": "-109h",
+     "session": 14.0,
+     "week": 62.8
+    },
+    {
+     "at": "-108h",
+     "session": 28.0,
+     "week": 63.3
+    },
+    {
+     "at": "-107h",
+     "session": 42.0,
+     "week": 63.7
+    },
+    {
+     "at": "-106h",
+     "session": 56.0,
+     "week": 64.2
+    },
+    {
+     "at": "-105h",
+     "session": 70.0,
+     "week": 64.6
+    },
+    {
+     "at": "-104h",
+     "session": 14.0,
+     "week": 65.1
+    },
+    {
+     "at": "-103h",
+     "session": 28.0,
+     "week": 65.6
+    },
+    {
+     "at": "-102h",
+     "session": 42.0,
+     "week": 66.0
+    },
+    {
+     "at": "-101h",
+     "session": 56.0,
+     "week": 66.5
+    },
+    {
+     "at": "-100h",
+     "session": 70.0,
+     "week": 66.9
+    },
+    {
+     "at": "-99h",
+     "session": 14.0,
+     "week": 67.3
+    },
+    {
+     "at": "-98h",
+     "session": 28.0,
+     "week": 67.8
+    },
+    {
+     "at": "-97h",
+     "session": 6.3,
+     "week": 68.2
+    },
+    {
+     "at": "-96h",
+     "session": 8.4,
+     "week": 68.7
+    },
+    {
+     "at": "-95h",
+     "session": 10.5,
+     "week": 69.1
+    },
+    {
+     "at": "-94h",
+     "session": 2.1,
+     "week": 69.6
+    },
+    {
+     "at": "-93h",
+     "session": 4.2,
+     "week": 70.0
+    },
+    {
+     "at": "-92h",
+     "session": 6.3,
+     "week": 70.5
+    },
+    {
+     "at": "-91h",
+     "session": 8.4,
+     "week": 70.9
+    },
+    {
+     "at": "-90h",
+     "session": 10.5,
+     "week": 71.4
+    },
+    {
+     "at": "-89h",
+     "session": 2.1,
+     "week": 71.8
+    },
+    {
+     "at": "-88h",
+     "session": 4.2,
+     "week": 72.3
+    },
+    {
+     "at": "-87h",
+     "session": 42.0,
+     "week": 72.7
+    },
+    {
+     "at": "-86h",
+     "session": 56.0,
+     "week": 73.2
+    },
+    {
+     "at": "-85h",
+     "session": 70.0,
+     "week": 73.6
+    },
+    {
+     "at": "-84h",
+     "session": 14.0,
+     "week": 74.0
+    },
+    {
+     "at": "-83h",
+     "session": 28.0,
+     "week": 74.5
+    },
+    {
+     "at": "-82h",
+     "session": 42.0,
+     "week": 74.9
+    },
+    {
+     "at": "-81h",
+     "session": 56.0,
+     "week": 75.4
+    },
+    {
+     "at": "-80h",
+     "session": 70.0,
+     "week": 75.8
+    },
+    {
+     "at": "-79h",
+     "session": 14.0,
+     "week": 76.3
+    },
+    {
+     "at": "-78h",
+     "session": 28.0,
+     "week": 76.7
+    },
+    {
+     "at": "-77h",
+     "session": 42.0,
+     "week": 77.2
+    },
+    {
+     "at": "-76h",
+     "session": 56.0,
+     "week": 77.6
+    },
+    {
+     "at": "-75h",
+     "session": 70.0,
+     "week": 78.0
+    },
+    {
+     "at": "-74h",
+     "session": 14.0,
+     "week": 78.5
+    },
+    {
+     "at": "-73h",
+     "session": 4.2,
+     "week": 78.9
+    },
+    {
+     "at": "-72h",
+     "session": 6.3,
+     "week": 79.4
+    },
+    {
+     "at": "-71h",
+     "session": 8.4,
+     "week": 79.8
+    },
+    {
+     "at": "-70h",
+     "session": 10.5,
+     "week": 80.2
+    },
+    {
+     "at": "-69h",
+     "session": 2.1,
+     "week": 80.7
+    },
+    {
+     "at": "-68h",
+     "session": 4.2,
+     "week": 81.1
+    },
+    {
+     "at": "-67h",
+     "session": 6.3,
+     "week": 81.6
+    },
+    {
+     "at": "-66h",
+     "session": 8.4,
+     "week": 0.0
+    },
+    {
+     "at": "-65h",
+     "session": 10.5,
+     "week": 0.8
+    },
+    {
+     "at": "-64h",
+     "session": 2.1,
+     "week": 1.5
+    },
+    {
+     "at": "-63h",
+     "session": 28.0,
+     "week": 2.1
+    },
+    {
+     "at": "-62h",
+     "session": 42.0,
+     "week": 2.7
+    },
+    {
+     "at": "-61h",
+     "session": 56.0,
+     "week": 3.3
+    },
+    {
+     "at": "-60h",
+     "session": 70.0,
+     "week": 3.9
+    },
+    {
+     "at": "-59h",
+     "session": 14.0,
+     "week": 4.5
+    },
+    {
+     "at": "-58h",
+     "session": 28.0,
+     "week": 5.1
+    },
+    {
+     "at": "-57h",
+     "session": 42.0,
+     "week": 5.7
+    },
+    {
+     "at": "-56h",
+     "session": 56.0,
+     "week": 6.2
+    },
+    {
+     "at": "-55h",
+     "session": 70.0,
+     "week": 6.8
+    },
+    {
+     "at": "-54h",
+     "session": 14.0,
+     "week": 7.3
+    },
+    {
+     "at": "-53h",
+     "session": 28.0,
+     "week": 7.9
+    },
+    {
+     "at": "-52h",
+     "session": 42.0,
+     "week": 8.4
+    },
+    {
+     "at": "-51h",
+     "session": 56.0,
+     "week": 9.0
+    },
+    {
+     "at": "-50h",
+     "session": 70.0,
+     "week": 9.5
+    },
+    {
+     "at": "-49h",
+     "session": 2.1,
+     "week": 10.0
+    },
+    {
+     "at": "-48h",
+     "session": 4.2,
+     "week": 10.6
+    },
+    {
+     "at": "-47h",
+     "session": 6.3,
+     "week": 11.1
+    },
+    {
+     "at": "-46h",
+     "session": 8.4,
+     "week": 11.6
+    },
+    {
+     "at": "-45h",
+     "session": 10.5,
+     "week": 12.1
+    },
+    {
+     "at": "-44h",
+     "session": 2.1,
+     "week": 12.6
+    },
+    {
+     "at": "-43h",
+     "session": 4.2,
+     "week": 13.2
+    },
+    {
+     "at": "-42h",
+     "session": 6.3,
+     "week": 13.7
+    },
+    {
+     "at": "-41h",
+     "session": 8.4,
+     "week": 14.2
+    },
+    {
+     "at": "-40h",
+     "session": 10.5,
+     "week": 14.7
+    },
+    {
+     "at": "-39h",
+     "session": 14.0,
+     "week": 15.2
+    },
+    {
+     "at": "-38h",
+     "session": 28.0,
+     "week": 15.7
+    },
+    {
+     "at": "-37h",
+     "session": 42.0,
+     "week": 16.2
+    },
+    {
+     "at": "-36h",
+     "session": 56.0,
+     "week": 16.7
+    },
+    {
+     "at": "-35h",
+     "session": 70.0,
+     "week": 17.2
+    },
+    {
+     "at": "-34h",
+     "session": 14.0,
+     "week": 17.7
+    },
+    {
+     "at": "-33h",
+     "session": 28.0,
+     "week": 18.2
+    },
+    {
+     "at": "-32h",
+     "session": 42.0,
+     "week": 18.7
+    },
+    {
+     "at": "-31h",
+     "session": 56.0,
+     "week": 19.2
+    },
+    {
+     "at": "-30h",
+     "session": 70.0,
+     "week": 19.7
+    },
+    {
+     "at": "-29h",
+     "session": 14.0,
+     "week": 20.2
+    },
+    {
+     "at": "-28h",
+     "session": 28.0,
+     "week": 20.7
+    },
+    {
+     "at": "-27h",
+     "session": 42.0,
+     "week": 21.2
+    },
+    {
+     "at": "-26h",
+     "session": 56.0,
+     "week": 21.7
+    },
+    {
+     "at": "-25h",
+     "session": 10.5,
+     "week": 22.2
+    },
+    {
+     "at": "-24h",
+     "session": 2.1,
+     "week": 22.6
+    },
+    {
+     "at": "-23h",
+     "session": 4.2,
+     "week": 23.1
+    },
+    {
+     "at": "-22h",
+     "session": 6.3,
+     "week": 23.6
+    },
+    {
+     "at": "-21h",
+     "session": 8.4,
+     "week": 24.1
+    },
+    {
+     "at": "-20h",
+     "session": 10.5,
+     "week": 24.6
+    },
+    {
+     "at": "-19h",
+     "session": 2.1,
+     "week": 25.0
+    },
+    {
+     "at": "-18h",
+     "session": 4.2,
+     "week": 25.5
+    },
+    {
+     "at": "-17h",
+     "session": 6.3,
+     "week": 26.0
+    },
+    {
+     "at": "-16h",
+     "session": 8.4,
+     "week": 26.5
+    },
+    {
+     "at": "-15h",
+     "session": 70.0,
+     "week": 27.0
+    },
+    {
+     "at": "-14h",
+     "session": 14.0,
+     "week": 27.4
+    },
+    {
+     "at": "-13h",
+     "session": 28.0,
+     "week": 27.9
+    },
+    {
+     "at": "-12h",
+     "session": 42.0,
+     "week": 28.4
+    },
+    {
+     "at": "-11h",
+     "session": 56.0,
+     "week": 28.9
+    },
+    {
+     "at": "-10h",
+     "session": 70.0,
+     "week": 29.3
+    },
+    {
+     "at": "-9h",
+     "session": 14.0,
+     "week": 29.8
+    },
+    {
+     "at": "-8h",
+     "session": 28.0,
+     "week": 30.3
+    },
+    {
+     "at": "-7h",
+     "session": 42.0,
+     "week": 30.7
+    },
+    {
+     "at": "-6h",
+     "session": 56.0,
+     "week": 31.2
+    },
+    {
+     "at": "-5h",
+     "session": 70.0,
+     "week": 31.7
+    },
+    {
+     "at": "-4h",
+     "session": 14.0,
+     "week": 32.1
+    },
+    {
+     "at": "-3h",
+     "session": 28.0,
+     "week": 32.6
+    },
+    {
+     "at": "-2h",
+     "session": 42.0,
+     "week": 33.1
+    },
+    {
+     "at": "-1h",
+     "session": 8.4,
+     "week": 33.5
+    },
+    {
+     "at": "-0h",
+     "session": 72.0,
+     "week": 34.0
+    }
+   ]
+  },
+  {
+   "id": "codex",
+   "name": "Codex",
+   "plan": "Pro",
+   "state": "ok",
+   "session": {
+    "percent": 18.0,
+    "resetsAt": "+3h20m",
+    "windowHours": 5
+   },
+   "week": {
+    "percent": 27.0,
+    "resetsAt": "+2d9h",
+    "windowHours": 168
+   },
+   "asOf": "-2h",
+   "history": [
+    {
+     "at": "-167h",
+     "session": 3.1,
+     "week": 56.9
+    },
+    {
+     "at": "-166h",
+     "session": 4.2,
+     "week": 57.4
+    },
+    {
+     "at": "-165h",
+     "session": 5.2,
+     "week": 57.8
+    },
+    {
+     "at": "-164h",
+     "session": 1.0,
+     "week": 58.3
+    },
+    {
+     "at": "-163h",
+     "session": 2.1,
+     "week": 58.8
+    },
+    {
+     "at": "-162h",
+     "session": 3.1,
+     "week": 59.2
+    },
+    {
+     "at": "-161h",
+     "session": 4.2,
+     "week": 59.7
+    },
+    {
+     "at": "-160h",
+     "session": 5.2,
+     "week": 60.1
+    },
+    {
+     "at": "-159h",
+     "session": 7.0,
+     "week": 60.6
+    },
+    {
+     "at": "-158h",
+     "session": 14.0,
+     "week": 61.0
+    },
+    {
+     "at": "-157h",
+     "session": 21.0,
+     "week": 61.5
+    },
+    {
+     "at": "-156h",
+     "session": 28.0,
+     "week": 61.9
+    },
+    {
+     "at": "-155h",
+     "session": 35.0,
+     "week": 62.4
+    },
+    {
+     "at": "-154h",
+     "session": 7.0,
+     "week": 62.8
+    },
+    {
+     "at": "-153h",
+     "session": 14.0,
+     "week": 63.3
+    },
+    {
+     "at": "-152h",
+     "session": 21.0,
+     "week": 63.7
+    },
+    {
+     "at": "-151h",
+     "session": 28.0,
+     "week": 64.2
+    },
+    {
+     "at": "-150h",
+     "session": 35.0,
+     "week": 64.6
+    },
+    {
+     "at": "-149h",
+     "session": 7.0,
+     "week": 65.1
+    },
+    {
+     "at": "-148h",
+     "session": 14.0,
+     "week": 65.6
+    },
+    {
+     "at": "-147h",
+     "session": 21.0,
+     "week": 66.0
+    },
+    {
+     "at": "-146h",
+     "session": 28.0,
+     "week": 66.5
+    },
+    {
+     "at": "-145h",
+     "session": 5.2,
+     "week": 66.9
+    },
+    {
+     "at": "-144h",
+     "session": 1.0,
+     "week": 67.3
+    },
+    {
+     "at": "-143h",
+     "session": 2.1,
+     "week": 67.8
+    },
+    {
+     "at": "-142h",
+     "session": 3.1,
+     "week": 68.2
+    },
+    {
+     "at": "-141h",
+     "session": 4.2,
+     "week": 68.7
+    },
+    {
+     "at": "-140h",
+     "session": 5.2,
+     "week": 69.1
+    },
+    {
+     "at": "-139h",
+     "session": 1.0,
+     "week": 69.6
+    },
+    {
+     "at": "-138h",
+     "session": 2.1,
+     "week": 70.0
+    },
+    {
+     "at": "-137h",
+     "session": 3.1,
+     "week": 70.5
+    },
+    {
+     "at": "-136h",
+     "session": 4.2,
+     "week": 70.9
+    },
+    {
+     "at": "-135h",
+     "session": 35.0,
+     "week": 71.4
+    },
+    {
+     "at": "-134h",
+     "session": 7.0,
+     "week": 71.8
+    },
+    {
+     "at": "-133h",
+     "session": 14.0,
+     "week": 72.3
+    },
+    {
+     "at": "-132h",
+     "session": 21.0,
+     "week": 72.7
+    },
+    {
+     "at": "-131h",
+     "session": 28.0,
+     "week": 73.2
+    },
+    {
+     "at": "-130h",
+     "session": 35.0,
+     "week": 73.6
+    },
+    {
+     "at": "-129h",
+     "session": 7.0,
+     "week": 74.0
+    },
+    {
+     "at": "-128h",
+     "session": 14.0,
+     "week": 74.5
+    },
+    {
+     "at": "-127h",
+     "session": 21.0,
+     "week": 74.9
+    },
+    {
+     "at": "-126h",
+     "session": 28.0,
+     "week": 75.4
+    },
+    {
+     "at": "-125h",
+     "session": 35.0,
+     "week": 75.8
+    },
+    {
+     "at": "-124h",
+     "session": 7.0,
+     "week": 76.3
+    },
+    {
+     "at": "-123h",
+     "session": 14.0,
+     "week": 76.7
+    },
+    {
+     "at": "-122h",
+     "session": 21.0,
+     "week": 77.2
+    },
+    {
+     "at": "-121h",
+     "session": 4.2,
+     "week": 77.6
+    },
+    {
+     "at": "-120h",
+     "session": 5.2,
+     "week": 78.0
+    },
+    {
+     "at": "-119h",
+     "session": 1.0,
+     "week": 78.5
+    },
+    {
+     "at": "-118h",
+     "session": 2.1,
+     "week": 78.9
+    },
+    {
+     "at": "-117h",
+     "session": 3.1,
+     "week": 79.4
+    },
+    {
+     "at": "-116h",
+     "session": 4.2,
+     "week": 79.8
+    },
+    {
+     "at": "-115h",
+     "session": 5.2,
+     "week": 80.2
+    },
+    {
+     "at": "-114h",
+     "session": 1.0,
+     "week": 80.7
+    },
+    {
+     "at": "-113h",
+     "session": 2.1,
+     "week": 81.1
+    },
+    {
+     "at": "-112h",
+     "session": 3.1,
+     "week": 81.6
+    },
+    {
+     "at": "-111h",
+     "session": 28.0,
+     "week": 0.0
+    },
+    {
+     "at": "-110h",
+     "session": 35.0,
+     "week": 0.4
+    },
+    {
+     "at": "-109h",
+     "session": 7.0,
+     "week": 0.7
+    },
+    {
+     "at": "-108h",
+     "session": 14.0,
+     "week": 1.0
+    },
+    {
+     "at": "-107h",
+     "session": 21.0,
+     "week": 1.4
+    },
+    {
+     "at": "-106h",
+     "session": 28.0,
+     "week": 1.7
+    },
+    {
+     "at": "-105h",
+     "session": 35.0,
+     "week": 2.0
+    },
+    {
+     "at": "-104h",
+     "session": 7.0,
+     "week": 2.2
+    },
+    {
+     "at": "-103h",
+     "session": 14.0,
+     "week": 2.5
+    },
+    {
+     "at": "-102h",
+     "session": 21.0,
+     "week": 2.8
+    },
+    {
+     "at": "-101h",
+     "session": 28.0,
+     "week": 3.1
+    },
+    {
+     "at": "-100h",
+     "session": 35.0,
+     "week": 3.4
+    },
+    {
+     "at": "-99h",
+     "session": 7.0,
+     "week": 3.6
+    },
+    {
+     "at": "-98h",
+     "session": 14.0,
+     "week": 3.9
+    },
+    {
+     "at": "-97h",
+     "session": 3.1,
+     "week": 4.2
+    },
+    {
+     "at": "-96h",
+     "session": 4.2,
+     "week": 4.5
+    },
+    {
+     "at": "-95h",
+     "session": 5.2,
+     "week": 4.7
+    },
+    {
+     "at": "-94h",
+     "session": 1.0,
+     "week": 5.0
+    },
+    {
+     "at": "-93h",
+     "session": 2.1,
+     "week": 5.3
+    },
+    {
+     "at": "-92h",
+     "session": 3.1,
+     "week": 5.5
+    },
+    {
+     "at": "-91h",
+     "session": 4.2,
+     "week": 5.8
+    },
+    {
+     "at": "-90h",
+     "session": 5.2,
+     "week": 6.0
+    },
+    {
+     "at": "-89h",
+     "session": 1.0,
+     "week": 6.3
+    },
+    {
+     "at": "-88h",
+     "session": 2.1,
+     "week": 6.5
+    },
+    {
+     "at": "-87h",
+     "session": 21.0,
+     "week": 6.8
+    },
+    {
+     "at": "-86h",
+     "session": 28.0,
+     "week": 7.1
+    },
+    {
+     "at": "-85h",
+     "session": 35.0,
+     "week": 7.3
+    },
+    {
+     "at": "-84h",
+     "session": 7.0,
+     "week": 7.6
+    },
+    {
+     "at": "-83h",
+     "session": 14.0,
+     "week": 7.8
+    },
+    {
+     "at": "-82h",
+     "session": 21.0,
+     "week": 8.1
+    },
+    {
+     "at": "-81h",
+     "session": 28.0,
+     "week": 8.3
+    },
+    {
+     "at": "-80h",
+     "session": 35.0,
+     "week": 8.6
+    },
+    {
+     "at": "-79h",
+     "session": 7.0,
+     "week": 8.8
+    },
+    {
+     "at": "-78h",
+     "session": 14.0,
+     "week": 9.1
+    },
+    {
+     "at": "-77h",
+     "session": 21.0,
+     "week": 9.3
+    },
+    {
+     "at": "-76h",
+     "session": 28.0,
+     "week": 9.6
+    },
+    {
+     "at": "-75h",
+     "session": 35.0,
+     "week": 9.8
+    },
+    {
+     "at": "-74h",
+     "session": 7.0,
+     "week": 10.0
+    },
+    {
+     "at": "-73h",
+     "session": 2.1,
+     "week": 10.3
+    },
+    {
+     "at": "-72h",
+     "session": 3.1,
+     "week": 10.5
+    },
+    {
+     "at": "-71h",
+     "session": 4.2,
+     "week": 10.8
+    },
+    {
+     "at": "-70h",
+     "session": 5.2,
+     "week": 11.0
+    },
+    {
+     "at": "-69h",
+     "session": 1.0,
+     "week": 11.3
+    },
+    {
+     "at": "-68h",
+     "session": 2.1,
+     "week": 11.5
+    },
+    {
+     "at": "-67h",
+     "session": 3.1,
+     "week": 11.7
+    },
+    {
+     "at": "-66h",
+     "session": 4.2,
+     "week": 12.0
+    },
+    {
+     "at": "-65h",
+     "session": 5.2,
+     "week": 12.2
+    },
+    {
+     "at": "-64h",
+     "session": 1.0,
+     "week": 12.5
+    },
+    {
+     "at": "-63h",
+     "session": 14.0,
+     "week": 12.7
+    },
+    {
+     "at": "-62h",
+     "session": 21.0,
+     "week": 12.9
+    },
+    {
+     "at": "-61h",
+     "session": 28.0,
+     "week": 13.2
+    },
+    {
+     "at": "-60h",
+     "session": 35.0,
+     "week": 13.4
+    },
+    {
+     "at": "-59h",
+     "session": 7.0,
+     "week": 13.6
+    },
+    {
+     "at": "-58h",
+     "session": 14.0,
+     "week": 13.9
+    },
+    {
+     "at": "-57h",
+     "session": 21.0,
+     "week": 14.1
+    },
+    {
+     "at": "-56h",
+     "session": 28.0,
+     "week": 14.4
+    },
+    {
+     "at": "-55h",
+     "session": 35.0,
+     "week": 14.6
+    },
+    {
+     "at": "-54h",
+     "session": 7.0,
+     "week": 14.8
+    },
+    {
+     "at": "-53h",
+     "session": 14.0,
+     "week": 15.1
+    },
+    {
+     "at": "-52h",
+     "session": 21.0,
+     "week": 15.3
+    },
+    {
+     "at": "-51h",
+     "session": 28.0,
+     "week": 15.5
+    },
+    {
+     "at": "-50h",
+     "session": 35.0,
+     "week": 15.8
+    },
+    {
+     "at": "-49h",
+     "session": 1.0,
+     "week": 16.0
+    },
+    {
+     "at": "-48h",
+     "session": 2.1,
+     "week": 16.2
+    },
+    {
+     "at": "-47h",
+     "session": 3.1,
+     "week": 16.4
+    },
+    {
+     "at": "-46h",
+     "session": 4.2,
+     "week": 16.7
+    },
+    {
+     "at": "-45h",
+     "session": 5.2,
+     "week": 16.9
+    },
+    {
+     "at": "-44h",
+     "session": 1.0,
+     "week": 17.1
+    },
+    {
+     "at": "-43h",
+     "session": 2.1,
+     "week": 17.4
+    },
+    {
+     "at": "-42h",
+     "session": 3.1,
+     "week": 17.6
+    },
+    {
+     "at": "-41h",
+     "session": 4.2,
+     "week": 17.8
+    },
+    {
+     "at": "-40h",
+     "session": 5.2,
+     "week": 18.1
+    },
+    {
+     "at": "-39h",
+     "session": 7.0,
+     "week": 18.3
+    },
+    {
+     "at": "-38h",
+     "session": 14.0,
+     "week": 18.5
+    },
+    {
+     "at": "-37h",
+     "session": 21.0,
+     "week": 18.7
+    },
+    {
+     "at": "-36h",
+     "session": 28.0,
+     "week": 19.0
+    },
+    {
+     "at": "-35h",
+     "session": 35.0,
+     "week": 19.2
+    },
+    {
+     "at": "-34h",
+     "session": 7.0,
+     "week": 19.4
+    },
+    {
+     "at": "-33h",
+     "session": 14.0,
+     "week": 19.7
+    },
+    {
+     "at": "-32h",
+     "session": 21.0,
+     "week": 19.9
+    },
+    {
+     "at": "-31h",
+     "session": 28.0,
+     "week": 20.1
+    },
+    {
+     "at": "-30h",
+     "session": 35.0,
+     "week": 20.3
+    },
+    {
+     "at": "-29h",
+     "session": 7.0,
+     "week": 20.6
+    },
+    {
+     "at": "-28h",
+     "session": 14.0,
+     "week": 20.8
+    },
+    {
+     "at": "-27h",
+     "session": 21.0,
+     "week": 21.0
+    },
+    {
+     "at": "-26h",
+     "session": 28.0,
+     "week": 21.2
+    },
+    {
+     "at": "-25h",
+     "session": 5.2,
+     "week": 21.5
+    },
+    {
+     "at": "-24h",
+     "session": 1.0,
+     "week": 21.7
+    },
+    {
+     "at": "-23h",
+     "session": 2.1,
+     "week": 21.9
+    },
+    {
+     "at": "-22h",
+     "session": 3.1,
+     "week": 22.1
+    },
+    {
+     "at": "-21h",
+     "session": 4.2,
+     "week": 22.4
+    },
+    {
+     "at": "-20h",
+     "session": 5.2,
+     "week": 22.6
+    },
+    {
+     "at": "-19h",
+     "session": 1.0,
+     "week": 22.8
+    },
+    {
+     "at": "-18h",
+     "session": 2.1,
+     "week": 23.0
+    },
+    {
+     "at": "-17h",
+     "session": 3.1,
+     "week": 23.2
+    },
+    {
+     "at": "-16h",
+     "session": 4.2,
+     "week": 23.5
+    },
+    {
+     "at": "-15h",
+     "session": 35.0,
+     "week": 23.7
+    },
+    {
+     "at": "-14h",
+     "session": 7.0,
+     "week": 23.9
+    },
+    {
+     "at": "-13h",
+     "session": 14.0,
+     "week": 24.1
+    },
+    {
+     "at": "-12h",
+     "session": 21.0,
+     "week": 24.4
+    },
+    {
+     "at": "-11h",
+     "session": 28.0,
+     "week": 24.6
+    },
+    {
+     "at": "-10h",
+     "session": 35.0,
+     "week": 24.8
+    },
+    {
+     "at": "-9h",
+     "session": 7.0,
+     "week": 25.0
+    },
+    {
+     "at": "-8h",
+     "session": 14.0,
+     "week": 25.2
+    },
+    {
+     "at": "-7h",
+     "session": 21.0,
+     "week": 25.5
+    },
+    {
+     "at": "-6h",
+     "session": 28.0,
+     "week": 25.7
+    },
+    {
+     "at": "-5h",
+     "session": 35.0,
+     "week": 25.9
+    },
+    {
+     "at": "-4h",
+     "session": 7.0,
+     "week": 26.1
+    },
+    {
+     "at": "-3h",
+     "session": 14.0,
+     "week": 26.3
+    },
+    {
+     "at": "-2h",
+     "session": 21.0,
+     "week": 26.6
+    },
+    {
+     "at": "-1h",
+     "session": 4.2,
+     "week": 26.8
+    },
+    {
+     "at": "-0h",
+     "session": 18.0,
+     "week": 27.0
+    }
+   ]
+  }
+ ],
+ "worst": {
+  "service": "Claude",
+  "scope": "session",
+  "percent": 72.0,
+  "resetsAt": "+1h52m",
+  "windowHours": 5
+ }
+}

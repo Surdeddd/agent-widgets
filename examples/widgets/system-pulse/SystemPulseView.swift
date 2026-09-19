@@ -18,6 +18,24 @@ struct SystemPulseData: Codable, Sendable {
     let batteryStatus: String
 }
 
+private struct Dial: Identifiable {
+    let id: String
+    let label: String
+    let symbol: String
+    let fraction: Double
+    let value: String
+    let detail: String
+    let status: AWStatus
+
+    var short: String {
+        String(value.dropLast())
+    }
+
+    var summary: String {
+        id == "disk" || id == "battery" ? "\(value) · \(detail)" : value
+    }
+}
+
 struct SystemPulseView: AWView {
     let entry: AWEntry<SystemPulseData>
     @Environment(\.aw) private var context
@@ -28,38 +46,20 @@ struct SystemPulseView: AWView {
 
     var body: some View {
         AWPhaseView(entry) { data in
+            let dials = dials(data)
             VStack(alignment: .leading, spacing: AWMetrics.spacing(for: context.family)) {
                 AWHeader(context.pick(en: "System", ru: "Система"), symbol: "waveform.path.ecg", entry: entry)
                 switch context.family {
                 case .small:
-                    AWText(overallLabel(data.overallStatus), .hero)
-                    AWBadge(worstDetail(data), status: status(data.overallStatus))
-                    Spacer(minLength: 0)
-                    AWSparkline(data.cpuHistory, tint: .blue)
-                        .frame(height: 28)
+                    grid(dials)
                 case .medium:
-                    HStack(alignment: .center, spacing: AWSpace.l) {
-                        VStack(alignment: .leading, spacing: AWSpace.xs) {
-                            AWText(overallLabel(data.overallStatus), .hero)
-                            AWBadge(worstDetail(data), status: status(data.overallStatus))
-                        }
-                        Spacer(minLength: 0)
-                        VStack(alignment: .trailing, spacing: AWSpace.xxs) {
-                            AWText(metricLabel("cpu"), .label)
-                                .foregroundStyle(.secondary)
-                            AWText("\(Int(data.cpuPercent.rounded()))%", .headline)
-                            AWSparkline(data.cpuHistory, tint: .blue)
-                                .frame(width: 108, height: 48)
-                        }
-                    }
+                    row(dials, side: 58)
                     Spacer(minLength: 0)
                 default:
-                    AWText(overallLabel(data.overallStatus), .hero)
-                    AWBadge(worstDetail(data), status: status(data.overallStatus))
-                    AWSparkline(data.cpuHistory, tint: .blue)
-                        .frame(height: 56)
-                    AWList(rows(data), maxRows: 4) { row in
-                        AWRow(row.label, value: row.value, detail: row.detail, status: row.status, symbol: row.symbol)
+                    row(dials, side: 60)
+                    history(data)
+                    AWList(dials, maxRows: 4) { dial in
+                        AWRow(dial.label, value: dial.summary, status: dial.status)
                     }
                     Spacer(minLength: 0)
                 }
@@ -67,113 +67,105 @@ struct SystemPulseView: AWView {
         }
     }
 
-    private struct RowItem: Identifiable {
-        let id: String
-        let label: String
-        let value: String
-        let detail: String?
-        let status: AWStatus
-        let symbol: String
+    private func grid(_ dials: [Dial]) -> some View {
+        let columns = Array(repeating: GridItem(.flexible(), spacing: AWSpace.s), count: 2)
+        return LazyVGrid(columns: columns, spacing: AWSpace.xs) {
+            ForEach(dials) { dial in
+                VStack(spacing: AWSpace.xxs) {
+                    AWRing(progress: dial.fraction, tint: dial.status.color, lineWidth: 5) {
+                        Text(dial.short)
+                            .font(.system(size: 11, weight: .semibold, design: .rounded))
+                            .monospacedDigit()
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
+                    }
+                    .frame(width: 40, height: 40)
+                    AWText(dial.label, .label)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+        .frame(maxHeight: .infinity)
     }
 
-    private func rows(_ data: SystemPulseData) -> [RowItem] {
+    private func row(_ dials: [Dial], side: CGFloat) -> some View {
+        HStack(alignment: .top, spacing: 0) {
+            ForEach(dials) { dial in
+                VStack(spacing: AWSpace.xs) {
+                    ring(dial, side: side, showsSymbol: true)
+                    AWText(dial.value, .headline)
+                        .monospacedDigit()
+                    AWText(dial.label, .label)
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity)
+            }
+        }
+    }
+
+    private func ring(_ dial: Dial, side: CGFloat, showsSymbol: Bool) -> some View {
+        AWRing(progress: dial.fraction, tint: dial.status.color, lineWidth: max(side * 0.12, 4)) {
+            if showsSymbol {
+                Image(systemName: dial.status == .ok ? dial.symbol : "exclamationmark.triangle.fill")
+                    .font(.system(size: side * 0.3, weight: .semibold))
+                    .foregroundStyle(dial.status == .ok ? Color.secondary : dial.status.tint(context))
+            }
+        }
+        .frame(width: side, height: side)
+    }
+
+    @ViewBuilder
+    private func history(_ data: SystemPulseData) -> some View {
+        if data.cpuHistory.count > 1 {
+            VStack(alignment: .leading, spacing: AWSpace.xxs) {
+                AWText(context.pick(en: "CPU, last hours", ru: "Процессор, последние часы"), .label)
+                    .foregroundStyle(.secondary)
+                AWSparkline(data.cpuHistory, tint: .blue)
+                    .frame(height: 40)
+            }
+        }
+    }
+
+    private func dials(_ data: SystemPulseData) -> [Dial] {
+        let used = max(0, 100 - data.diskFreePercent)
         var items = [
-            RowItem(
-                id: "cpu",
-                label: metricLabel("cpu"),
-                value: "\(Int(data.cpuPercent.rounded()))%",
-                detail: nil,
-                status: status(data.cpuStatus),
-                symbol: "cpu"
+            Dial(
+                id: "cpu", label: context.pick(en: "CPU", ru: "ЦП"), symbol: "cpu", fraction: data.cpuPercent / 100,
+                value: "\(Int(data.cpuPercent.rounded()))%", detail: context.pick(en: "load", ru: "загрузка"), status: status(data.cpuStatus)
             ),
-            RowItem(
-                id: "memory",
-                label: metricLabel("memory"),
-                value: "\(Int(data.memoryPercent.rounded()))%",
-                detail: nil,
-                status: status(data.memoryStatus),
-                symbol: "memorychip"
+            Dial(
+                id: "memory", label: context.pick(en: "Memory", ru: "Память"), symbol: "memorychip", fraction: data.memoryPercent / 100,
+                value: "\(Int(data.memoryPercent.rounded()))%", detail: context.pick(en: "in use", ru: "занято"), status: status(data.memoryStatus)
             ),
-            RowItem(
-                id: "disk",
-                label: metricLabel("disk"),
-                value: diskText(data.diskFreeGB),
-                detail: "\(Int(data.diskFreePercent.rounded()))% \(context.pick(en: "free", ru: "своб."))",
-                status: status(data.diskStatus),
-                symbol: "internaldrive"
+            Dial(
+                id: "disk", label: context.pick(en: "Disk", ru: "Диск"), symbol: "internaldrive", fraction: used / 100,
+                value: "\(Int(used.rounded()))%", detail: context.pick(en: "\(Int(data.diskFreeGB.rounded())) GB free", ru: "свободно \(Int(data.diskFreeGB.rounded())) ГБ"),
+                status: status(data.diskStatus)
             )
         ]
         if data.hasBattery {
-            items.append(
-                RowItem(
-                    id: "battery",
-                    label: metricLabel("battery"),
-                    value: "\(data.batteryPercent)%",
-                    detail: batteryDetail(data.batteryState),
-                    status: status(data.batteryStatus),
-                    symbol: "battery.100"
-                )
-            )
+            items.append(Dial(
+                id: "battery", label: context.pick(en: "Battery", ru: "Батарея"), symbol: data.batteryState == "charging" ? "bolt.fill" : "battery.100",
+                fraction: Double(data.batteryPercent) / 100, value: "\(data.batteryPercent)%", detail: batteryDetail(data.batteryState), status: status(data.batteryStatus)
+            ))
         }
         return items
     }
 
-    private func metricLabel(_ id: String) -> String {
-        switch id {
-        case "cpu": return context.pick(en: "CPU", ru: "Процессор")
-        case "memory": return context.pick(en: "Memory", ru: "Память")
-        case "disk": return context.pick(en: "Disk", ru: "Диск")
-        case "battery": return context.pick(en: "Battery", ru: "Батарея")
-        default: return ""
-        }
-    }
-
-    private func batteryDetail(_ state: String) -> String? {
+    private func batteryDetail(_ state: String) -> String {
         switch state {
-        case "charging": return context.pick(en: "Charging", ru: "Заряжается")
-        case "charged": return context.pick(en: "Charged", ru: "Заряжена")
-        case "discharging": return context.pick(en: "On battery", ru: "От батареи")
-        default: return nil
+        case "charging": context.pick(en: "charging", ru: "заряжается")
+        case "discharging": context.pick(en: "on battery", ru: "от батареи")
+        case "charged": context.pick(en: "charged", ru: "заряжена")
+        default: context.pick(en: "unknown", ru: "неизвестно")
         }
-    }
-
-    private func overallLabel(_ raw: String) -> String {
-        switch raw {
-        case "critical": return context.pick(en: "Critical", ru: "Критично")
-        case "warning": return context.pick(en: "Warning", ru: "Внимание")
-        default: return context.pick(en: "Good", ru: "Хорошо")
-        }
-    }
-
-    private func worstDetail(_ data: SystemPulseData) -> String {
-        let free = context.pick(en: "free", ru: "своб.")
-        switch data.worstMetric {
-        case "cpu":
-            return "\(metricLabel("cpu")) \(Int(data.cpuPercent.rounded()))%"
-        case "memory":
-            return "\(metricLabel("memory")) \(Int(data.memoryPercent.rounded()))%"
-        case "disk":
-            return "\(metricLabel("disk")) \(Int(data.diskFreePercent.rounded()))% \(free)"
-        case "battery":
-            return "\(metricLabel("battery")) \(data.batteryPercent)%"
-        default:
-            return context.pick(en: "All normal", ru: "Всё в норме")
-        }
-    }
-
-    private func diskText(_ gb: Double) -> String {
-        if gb >= 1000 {
-            return String(format: "%.1f TB", gb / 1000)
-        }
-        return String(format: "%.0f GB", gb)
     }
 
     private func status(_ raw: String) -> AWStatus {
         switch raw {
-        case "critical": return .critical
-        case "warning": return .warning
-        case "ok": return .ok
-        default: return .neutral
+        case "critical": .critical
+        case "warning": .warning
+        default: .ok
         }
     }
 }

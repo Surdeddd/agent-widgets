@@ -22,7 +22,8 @@ let package = Package(
             ]
         ),
         .testTarget(name: "AWCoreTests", dependencies: ["AWCore"], resources: [.copy("Fixtures")]),
-        .testTarget(name: "AWMCPTests", dependencies: ["AWMCP", "AWCore", .product(name: "MCP", package: "swift-sdk")])
+        .testTarget(name: "AWMCPTests", dependencies: ["AWMCP", "AWCore", .product(name: "MCP", package: "swift-sdk")]),
+        .testTarget(name: "GalleryWidgetTests")
     ],
     swiftLanguageModes: [.v5]
 )

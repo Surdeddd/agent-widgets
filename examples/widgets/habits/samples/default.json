@@ -1,8 +1,0 @@
-{
-  "habits": [
-    {"id": "water", "name": "Drink water"},
-    {"id": "meditate", "name": "Meditate"},
-    {"id": "read", "name": "Read"},
-    {"id": "stretch", "name": "Stretch"}
-  ]
-}

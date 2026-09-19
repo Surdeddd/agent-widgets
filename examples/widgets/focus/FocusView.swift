@@ -52,83 +52,129 @@ struct FocusView: AWView {
             VStack(alignment: .leading, spacing: AWMetrics.spacing(for: context.family)) {
                 AWHeader(context.pick(en: "Focus", ru: "Фокус"), symbol: "timer", entry: entry)
                 if context.isSmall {
-                    smallBody(phase, state: state, config: config)
+                    dial(phase, config: config)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    controls(phase, state: state, config: config)
+                        .frame(maxWidth: .infinity)
                 } else {
-                    mediumBody(phase, state: state, config: config)
+                    HStack(alignment: .center, spacing: AWSpace.l) {
+                        dial(phase, config: config)
+                            .frame(width: 104, height: 104)
+                        VStack(alignment: .leading, spacing: AWSpace.xs) {
+                            AWText(title(phase), .title)
+                            AWText(context.pick(en: "\(state.sessionsToday) sessions today", ru: "сессий сегодня: \(state.sessionsToday)"), .caption)
+                                .foregroundStyle(.secondary)
+                            AWText(
+                                context.pick(en: "\(config.focusMinutes)m focus · \(config.breakMinutes)m break", ru: "\(config.focusMinutes) мин фокус · \(config.breakMinutes) мин перерыв"),
+                                .caption
+                            )
+                            .foregroundStyle(.tertiary)
+                            Spacer(minLength: 0)
+                            controls(phase, state: state, config: config)
+                        }
+                    }
                 }
             }
         }
     }
 
-    @ViewBuilder
-    private func smallBody(_ phase: ResolvedPhase, state: SessionState, config: FocusConfig) -> some View {
-        hero(phase, config: config)
-        Spacer(minLength: 0)
-        todayLabel(state)
-        controls(phase, state: state, config: config)
-    }
-
-    @ViewBuilder
-    private func mediumBody(_ phase: ResolvedPhase, state: SessionState, config: FocusConfig) -> some View {
-        HStack(alignment: .center, spacing: AWSpace.m) {
-            VStack(alignment: .leading, spacing: AWSpace.xs) {
-                hero(phase, config: config)
-                todayLabel(state)
-            }
-            Spacer(minLength: AWSpace.s)
-            VStack(alignment: .trailing, spacing: AWSpace.s) {
-                AWText(context.pick(en: "\(config.breakMinutes)m break", ru: "\(config.breakMinutes) мин перерыв"), .caption)
-                    .foregroundStyle(.secondary)
-                controls(phase, state: state, config: config)
-            }
+    private func dial(_ phase: ResolvedPhase, config: FocusConfig) -> some View {
+        let total = Double(max(config.focusMinutes, 1) * 60)
+        return AWRing(progress: fraction(phase, total: total), tint: tint(phase), lineWidth: context.isSmall ? 6 : 8) {
+            face(phase, config: config)
         }
     }
 
     @ViewBuilder
-    private func hero(_ phase: ResolvedPhase, config: FocusConfig) -> some View {
+    private func face(_ phase: ResolvedPhase, config: FocusConfig) -> some View {
+        let size: CGFloat = context.isSmall ? 17 : 22
         switch phase {
         case .idle:
-            AWMetric(Self.formatDuration(config.focusMinutes * 60), label: context.isSmall ? nil : context.pick(en: "ready", ru: "готово"))
+            clock(Self.formatDuration(config.focusMinutes * 60), size: size)
         case .running(let endsAt):
-            AWCountdown(to: endsAt, label: context.isSmall ? nil : context.pick(en: "focus", ru: "фокус"))
-                .foregroundStyle(context.isVibrant ? Color.primary : Color.orange)
+            Text(endsAt, style: .timer)
+                .font(.system(size: size, weight: .semibold, design: .rounded))
+                .monospacedDigit()
+                .multilineTextAlignment(.center)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+                .frame(width: context.isSmall ? 54 : 70)
         case .paused(let remaining):
-            AWMetric(Self.formatDuration(remaining), label: context.isSmall ? nil : context.pick(en: "paused", ru: "пауза"))
+            clock(Self.formatDuration(remaining), size: size)
                 .foregroundStyle(.secondary)
         case .completed:
-            AWMetric(context.pick(en: "Done", ru: "Готово"), label: context.isSmall ? nil : context.pick(en: "great work", ru: "отличная работа"))
+            Image(systemName: "checkmark")
+                .font(.system(size: size * 1.2, weight: .bold))
+                .foregroundStyle(AWStatus.ok.tint(context))
         }
     }
 
-    @ViewBuilder
-    private func todayLabel(_ state: SessionState) -> some View {
-        AWText(context.pick(en: "Today \(state.sessionsToday)", ru: "Сегодня \(state.sessionsToday)"), .caption)
-            .foregroundStyle(.secondary)
+    private func clock(_ text: String, size: CGFloat) -> some View {
+        Text(text)
+            .font(.system(size: size, weight: .semibold, design: .rounded))
+            .monospacedDigit()
+            .lineLimit(1)
+            .minimumScaleFactor(0.6)
     }
 
-    @ViewBuilder
+    private func fraction(_ phase: ResolvedPhase, total: Double) -> Double {
+        switch phase {
+        case .idle: 1
+        case .running(let endsAt): min(max(endsAt.timeIntervalSince(entry.date) / total, 0), 1)
+        case .paused(let remaining): min(max(Double(remaining) / total, 0), 1)
+        case .completed: 1
+        }
+    }
+
+    private func tint(_ phase: ResolvedPhase) -> Color {
+        switch phase {
+        case .running: .orange
+        case .completed: .green
+        default: .secondary
+        }
+    }
+
+    private func title(_ phase: ResolvedPhase) -> String {
+        switch phase {
+        case .idle: context.pick(en: "Ready", ru: "Готов")
+        case .running: context.pick(en: "In focus", ru: "В фокусе")
+        case .paused: context.pick(en: "Paused", ru: "Пауза")
+        case .completed: context.pick(en: "Done", ru: "Готово")
+        }
+    }
+
     private func controls(_ phase: ResolvedPhase, state: SessionState, config: FocusConfig) -> some View {
         HStack(spacing: AWSpace.s) {
             switch phase {
             case .idle:
-                AWButton(.set, symbol: "play.fill", key: "session", value: Self.startValue(state: state, bonus: false, focusMinutes: config.focusMinutes, now: entry.date))
+                key("play.fill", Self.startValue(state: state, bonus: false, focusMinutes: config.focusMinutes, now: entry.date))
             case .running(let endsAt):
-                AWButton(.set, symbol: "pause.fill", key: "session", value: Self.pauseValue(endsAt: endsAt, state: state, now: entry.date))
-                AWButton(.set, symbol: "arrow.counterclockwise", key: "session", value: Self.resetValue(state: state, bonus: false))
+                key("pause.fill", Self.pauseValue(endsAt: endsAt, state: state, now: entry.date))
+                key("arrow.counterclockwise", Self.resetValue(state: state, bonus: false))
             case .paused(let remaining):
-                AWButton(.set, symbol: "play.fill", key: "session", value: Self.resumeValue(remaining: remaining, state: state, now: entry.date))
-                AWButton(.set, symbol: "arrow.counterclockwise", key: "session", value: Self.resetValue(state: state, bonus: false))
+                key("play.fill", Self.resumeValue(remaining: remaining, state: state, now: entry.date))
+                key("arrow.counterclockwise", Self.resetValue(state: state, bonus: false))
             case .completed:
-                AWButton(.set, symbol: "play.fill", key: "session", value: Self.startValue(state: state, bonus: true, focusMinutes: config.focusMinutes, now: entry.date))
-                AWButton(.set, symbol: "arrow.counterclockwise", key: "session", value: Self.resetValue(state: state, bonus: true))
+                key("play.fill", Self.startValue(state: state, bonus: true, focusMinutes: config.focusMinutes, now: entry.date))
+                key("arrow.counterclockwise", Self.resetValue(state: state, bonus: true))
             }
+        }
+    }
+
+    private func key(_ symbol: String, _ value: String) -> some View {
+        let height: CGFloat = context.isSmall ? 24 : 28
+        return AWButton(.set, key: "session", value: value) {
+            Image(systemName: symbol)
+                .font(.system(size: height * 0.44, weight: .bold))
+                .frame(width: context.isSmall ? 44 : 52, height: height)
+                .background(RoundedRectangle(cornerRadius: height * 0.3, style: .continuous).fill(Color.primary.opacity(0.12)))
         }
     }
 
     private static func resolve(_ state: SessionState, now: Date) -> ResolvedPhase {
         switch state.phase {
         case "running":
-            guard let endsAt = focusISOFormatter.date(from: state.payload) else { return .idle }
+            guard let endsAt = AWJSON.parseDate(state.payload, now: now) else { return .idle }
             return endsAt > now ? .running(endsAt) : .completed
         case "paused":
             return .paused(Int(state.payload) ?? 0)

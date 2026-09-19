@@ -1,0 +1,24 @@
+{
+  "id": "ai-limits",
+  "name": {
+    "en": "AI limits",
+    "ru": "Лимиты AI"
+  },
+  "description": {
+    "en": "How much of the Claude and Codex windows is left and when they reset.",
+    "ru": "Сколько осталось в окнах Claude и Codex и когда они сбрасываются."
+  },
+  "families": [
+    "small",
+    "medium",
+    "large",
+    "extraLarge"
+  ],
+  "view": "AiLimitsView",
+  "refresh": "15m",
+  "feed": {
+    "command": "python3 feed.py",
+    "every": "15m",
+    "timeout": "45s"
+  }
+}

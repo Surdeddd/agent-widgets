@@ -1,0 +1,112 @@
+{
+ "working": 12,
+ "waiting": 11,
+ "silent": 10,
+ "sessions": [
+  {
+   "id": "a",
+   "agent": "claude",
+   "project": "enterprise-customer-portal-frontend",
+   "branch": "feature/really-long-branch-name-for-the-migration",
+   "title": "Migrate the authentication flow to the new identity provider and update every consumer",
+   "state": "waiting",
+   "since": "-2h59m"
+  },
+  {
+   "id": "b",
+   "agent": "codex",
+   "project": "enterprise-customer-portal-backend",
+   "branch": "release/2026.09.19-hotfix-candidate",
+   "title": null,
+   "state": "waiting",
+   "since": "-1h20m"
+  },
+  {
+   "id": "c",
+   "agent": "claude",
+   "project": "internationalization-and-localization",
+   "branch": "main",
+   "title": "Проверить переводы всех строк интерфейса на русский язык",
+   "state": "silent",
+   "since": "-59m"
+  },
+  {
+   "id": "d",
+   "agent": "claude",
+   "project": "observability-platform-dashboards",
+   "branch": "chore/upgrade-everything",
+   "title": "Upgrade every dependency and fix what breaks",
+   "state": "working",
+   "since": "-58m"
+  },
+  {
+   "id": "e",
+   "agent": "codex",
+   "project": "data-warehouse-transformations",
+   "branch": "fix/partition-pruning",
+   "title": null,
+   "state": "working",
+   "since": "-31m"
+  },
+  {
+   "id": "f",
+   "agent": "claude",
+   "project": "mobile-application-release-train",
+   "branch": "release/7.12",
+   "title": "Prepare the release notes and screenshots",
+   "state": "working",
+   "since": "-9s"
+  }
+ ],
+ "today": 128,
+ "activity": [
+  {
+   "hour": "-11h",
+   "sessions": 9
+  },
+  {
+   "hour": "-10h",
+   "sessions": 14
+  },
+  {
+   "hour": "-9h",
+   "sessions": 18
+  },
+  {
+   "hour": "-8h",
+   "sessions": 22
+  },
+  {
+   "hour": "-7h",
+   "sessions": 31
+  },
+  {
+   "hour": "-6h",
+   "sessions": 27
+  },
+  {
+   "hour": "-5h",
+   "sessions": 12
+  },
+  {
+   "hour": "-4h",
+   "sessions": 19
+  },
+  {
+   "hour": "-3h",
+   "sessions": 35
+  },
+  {
+   "hour": "-2h",
+   "sessions": 41
+  },
+  {
+   "hour": "-1h",
+   "sessions": 38
+  },
+  {
+   "hour": "-1m",
+   "sessions": 22
+  }
+ ]
+}

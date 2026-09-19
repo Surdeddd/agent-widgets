@@ -1,0 +1,24 @@
+{
+  "id": "agents",
+  "name": {
+    "en": "Agents",
+    "ru": "Агенты"
+  },
+  "description": {
+    "en": "Which Claude Code and Codex sessions are working, and which one waits for you.",
+    "ru": "Какие сессии Claude Code и Codex работают, а какая ждёт тебя."
+  },
+  "families": [
+    "small",
+    "medium",
+    "large",
+    "extraLarge"
+  ],
+  "view": "AgentsView",
+  "refresh": "15m",
+  "feed": {
+    "command": "python3 feed.py",
+    "every": "1m",
+    "timeout": "20s"
+  }
+}

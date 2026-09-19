@@ -1,8 +1,0 @@
-{
-  "habits": [
-    {"id": "water", "name": "Drink eight glasses of water"},
-    {"id": "meditate", "name": "Meditate for twenty minutes"},
-    {"id": "read", "name": "Read at least thirty pages"},
-    {"id": "stretch", "name": "Stretch after waking up"}
-  ]
-}

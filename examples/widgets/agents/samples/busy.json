@@ -1,0 +1,76 @@
+{
+ "working": 2,
+ "waiting": 0,
+ "silent": 0,
+ "sessions": [
+  {
+   "id": "a",
+   "agent": "claude",
+   "project": "agent-widgets",
+   "branch": "main",
+   "title": "Ship the gallery",
+   "state": "working",
+   "since": "-3m"
+  },
+  {
+   "id": "b",
+   "agent": "codex",
+   "project": "api",
+   "branch": "main",
+   "title": null,
+   "state": "working",
+   "since": "-40s"
+  }
+ ],
+ "today": 6,
+ "activity": [
+  {
+   "hour": "-11h",
+   "sessions": 0
+  },
+  {
+   "hour": "-10h",
+   "sessions": 0
+  },
+  {
+   "hour": "-9h",
+   "sessions": 0
+  },
+  {
+   "hour": "-8h",
+   "sessions": 0
+  },
+  {
+   "hour": "-7h",
+   "sessions": 1
+  },
+  {
+   "hour": "-6h",
+   "sessions": 1
+  },
+  {
+   "hour": "-5h",
+   "sessions": 0
+  },
+  {
+   "hour": "-4h",
+   "sessions": 2
+  },
+  {
+   "hour": "-3h",
+   "sessions": 2
+  },
+  {
+   "hour": "-2h",
+   "sessions": 1
+  },
+  {
+   "hour": "-1h",
+   "sessions": 2
+  },
+  {
+   "hour": "-1m",
+   "sessions": 2
+  }
+ ]
+}

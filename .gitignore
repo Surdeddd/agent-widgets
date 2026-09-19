@@ -6,3 +6,4 @@ MEMORY_BANK/
 DerivedData/
 .DS_Store
 aw.local.json
+__pycache__/
