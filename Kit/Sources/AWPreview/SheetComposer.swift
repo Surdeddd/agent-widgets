@@ -44,6 +44,8 @@ enum SheetComposer {
         let family = rendered.job.family
         let failing = rendered.cell.issues.contains { $0.severity == .error }
         let codes = Set(rendered.cell.issues.map(\.code)).sorted().joined(separator: " ")
+        let hollow = rendered.cell.issues.contains { $0.code == IssueCode.underfilled } ? rendered.cell.emptyArea : nil
+        let empty = rendered.cell.emptyShare.map { "  empty \(Int(($0 * 100).rounded()))%" } ?? ""
         return VStack(alignment: .leading, spacing: 5) {
             Image(decorative: rendered.image, scale: 2)
                 .resizable()
@@ -52,7 +54,16 @@ enum SheetComposer {
                     RoundedRectangle(cornerRadius: AWMetrics.cornerRadius(for: family), style: .continuous)
                         .strokeBorder(failing ? Color.red : Color.clear, lineWidth: 3)
                 )
-            Text("\(family.rawValue)  ideal \(Int(rendered.cell.idealHeight))/\(Int(family.size.height))  \(codes)")
+                .overlay(alignment: .topLeading) {
+                    if let hollow, hollow.count == 4 {
+                        RoundedRectangle(cornerRadius: 6, style: .continuous)
+                            .strokeBorder(Color.yellow, style: StrokeStyle(lineWidth: 1.5, dash: [5, 4]))
+                            .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(Color.yellow.opacity(0.08)))
+                            .frame(width: family.size.width * hollow[2], height: family.size.height * hollow[3])
+                            .offset(x: family.size.width * hollow[0], y: family.size.height * hollow[1])
+                    }
+                }
+            Text("\(family.rawValue)  ideal \(Int(rendered.cell.idealHeight))/\(Int(family.size.height))\(empty)  \(codes)")
                 .font(.system(size: 11, design: .monospaced))
                 .foregroundStyle(failing ? Color.red : Color.white.opacity(0.55))
                 .lineLimit(3)

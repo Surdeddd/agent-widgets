@@ -4,6 +4,8 @@ import CoreGraphics
 import Foundation
 
 public struct PreviewScenario: Sendable {
+    public static let defaultName = "default"
+
     public var name: String
     public var data: Data?
     public var state: AWState

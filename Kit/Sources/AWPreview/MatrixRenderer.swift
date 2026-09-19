@@ -56,6 +56,12 @@ public enum MatrixRenderer {
             ))
         }
         issues += TextFitChecker.issues(for: layout.fits, scenario: job.scenario.name)
+        let overflows = issues.contains { $0.code == IssueCode.overflow }
+        let space = emptySpace(content, job: job, blocks: layout.blocks, overflows: overflows)
+        if let space, let area = space.area,
+           let issue = SpaceChecker.issue(grid: space.grid, area: area, family: job.family, scenario: job.scenario.name, language: language) {
+            issues.append(issue)
+        }
         let cell = PreviewCell(
             family: job.family,
             appearance: job.appearance,
@@ -63,9 +69,33 @@ public enum MatrixRenderer {
             scenario: job.scenario.name,
             image: job.fileName,
             idealHeight: Double(FitProbe.idealHeight(content, width: size.width)),
-            issues: issues
+            issues: issues,
+            emptyShare: space.map(\.grid.emptyShare),
+            emptyArea: space.flatMap { found in found.area.map { Self.fractions($0, in: found.grid, family: job.family) } }
         )
         return RenderedCell(job: job, cell: cell, image: image)
+    }
+
+    private static func emptySpace(
+        _ content: some View,
+        job: PreviewJob,
+        blocks: [AWBlock],
+        overflows: Bool
+    ) -> (grid: SpaceGrid, area: SpaceArea?)? {
+        let judged = job.scenario.name == PreviewScenario.defaultName && job.scenario.data != nil
+        guard judged, !overflows, !blocks.contains(where: { $0.name.hasPrefix("AWEmptyState") }) else {
+            return nil
+        }
+        return SpaceChecker.measure(content, family: job.family)
+    }
+
+    private static func fractions(_ area: SpaceArea, in grid: SpaceGrid, family: Family) -> [Double] {
+        let padding = Double(AWMetrics.padding(for: family))
+        let full = (width: Double(family.size.width), height: Double(family.size.height))
+        let cell = (width: (full.width - padding * 2) / Double(grid.columns), height: (full.height - padding * 2) / Double(grid.rows))
+        let left = (padding + cell.width * Double(area.column)) / full.width
+        let top = (padding + cell.height * Double(area.row)) / full.height
+        return [left, top, cell.width * Double(area.columns) / full.width, cell.height * Double(area.rows) / full.height]
     }
 
     private static func overflowIssue(en: String, ru: String) -> Issue {

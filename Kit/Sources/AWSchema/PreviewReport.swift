@@ -19,6 +19,9 @@ public struct PreviewCell: Codable, Equatable, Sendable {
     public var image: String
     public var idealHeight: Double
     public var issues: [Issue]
+    /// Share of the content area taken by its largest empty rectangle, and that rectangle as x, y, width, height in fractions of the widget.
+    public var emptyShare: Double?
+    public var emptyArea: [Double]?
 
     public init(
         family: Family,
@@ -27,7 +30,9 @@ public struct PreviewCell: Codable, Equatable, Sendable {
         scenario: String,
         image: String,
         idealHeight: Double,
-        issues: [Issue]
+        issues: [Issue],
+        emptyShare: Double? = nil,
+        emptyArea: [Double]? = nil
     ) {
         self.family = family
         self.appearance = appearance
@@ -36,6 +41,8 @@ public struct PreviewCell: Codable, Equatable, Sendable {
         self.image = image
         self.idealHeight = idealHeight
         self.issues = issues
+        self.emptyShare = emptyShare
+        self.emptyArea = emptyArea
     }
 }
 
