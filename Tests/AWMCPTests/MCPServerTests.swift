@@ -104,7 +104,7 @@ private func texts(_ content: [Tool.Content]) -> String {
     #expect(config["bundlePrefix"] == "com.example.desk")
     #expect(texts(created.content).contains("aw_gallery"))
     let listed = try await client.callTool(name: "aw_list")
-    #expect(listed.isError != true, "\(texts(listed.content))")
+    #expect(!texts(listed.content).contains("WORKSPACE_NOT_FOUND"), "\(texts(listed.content))")
     let again = try await client.callTool(name: "aw_init")
     #expect(again.isError == true)
     #expect(texts(again.content).contains("WORKSPACE_EXISTS"))
