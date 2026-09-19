@@ -11,17 +11,16 @@ struct Placement {
     let y: CGFloat
 }
 
-let pointSizes: [String: CGSize] = [
-    "small": CGSize(width: 155, height: 155),
-    "medium": CGSize(width: 329, height: 155),
-    "large": CGSize(width: 345, height: 345),
-    "extraLarge": CGSize(width: 715, height: 345)
-]
+let previewScale: CGFloat = 2
 
-func cell(_ workspace: URL, _ widget: String, _ family: String, appearance: String) -> CGImage? {
-    let url = workspace.appendingPathComponent(".aw/previews/\(widget)/\(family)-\(appearance)-color-default.png")
+func cell(_ workspace: URL, _ widget: String, _ family: String) -> CGImage? {
+    let url = workspace.appendingPathComponent(".aw/previews/\(widget)/\(family)-dark-color-default.png")
     guard let source = CGImageSourceCreateWithURL(url as CFURL, nil) else { return nil }
     return CGImageSourceCreateImageAtIndex(source, 0, nil)
+}
+
+func points(_ image: CGImage) -> CGSize {
+    CGSize(width: CGFloat(image.width) / previewScale, height: CGFloat(image.height) / previewScale)
 }
 
 func wallpaper(_ context: CGContext, size: CGSize, scale: CGFloat) {
@@ -47,31 +46,26 @@ func wallpaper(_ context: CGContext, size: CGSize, scale: CGFloat) {
     }
 }
 
-func place(_ image: CGImage, _ family: String, at origin: CGPoint, in context: CGContext, canvas: CGSize, scale: CGFloat) {
-    guard let points = pointSizes[family] else { return }
-    let rect = CGRect(
-        x: origin.x * scale,
-        y: canvas.height - (origin.y + points.height) * scale,
-        width: points.width * scale,
-        height: points.height * scale
-    )
+func place(_ image: CGImage, at origin: CGPoint, in context: CGContext, canvas: CGSize, scale: CGFloat) {
+    let size = points(image)
+    let rect = CGRect(x: origin.x * scale, y: canvas.height - (origin.y + size.height) * scale, width: size.width * scale, height: size.height * scale)
     context.saveGState()
     context.setShadow(offset: CGSize(width: 0, height: -10 * scale), blur: 36 * scale, color: CGColor(gray: 0, alpha: 0.5))
     context.draw(image, in: rect)
     context.restoreGState()
 }
 
-func caption(_ text: String, in context: CGContext, canvas: CGSize, scale: CGFloat) {
+func text(_ string: String, size: CGFloat, weight: NSFont.Weight, alpha: CGFloat, at point: CGPoint, in context: CGContext, fromRight: Bool = false) {
     let graphics = NSGraphicsContext(cgContext: context, flipped: false)
     NSGraphicsContext.saveGraphicsState()
     NSGraphicsContext.current = graphics
     let attributes: [NSAttributedString.Key: Any] = [
-        .font: NSFont.systemFont(ofSize: 15 * scale, weight: .medium),
-        .foregroundColor: NSColor.white.withAlphaComponent(0.62)
+        .font: NSFont.systemFont(ofSize: size, weight: weight),
+        .foregroundColor: NSColor.white.withAlphaComponent(alpha)
     ]
-    let string = NSAttributedString(string: text, attributes: attributes)
-    let size = string.size()
-    string.draw(at: CGPoint(x: canvas.width - size.width - 40 * scale, y: 30 * scale))
+    let attributed = NSAttributedString(string: string, attributes: attributes)
+    let origin = fromRight ? CGPoint(x: point.x - attributed.size().width, y: point.y) : point
+    attributed.draw(at: origin)
     NSGraphicsContext.restoreGraphicsState()
 }
 
@@ -102,68 +96,94 @@ func makeContext(_ size: CGSize) -> CGContext? {
     )
 }
 
-func hero(workspace: URL, output: URL, layout: [Placement]) throws {
+func draw(_ layout: [Placement], workspace: URL, in context: CGContext, canvas: CGSize, scale: CGFloat) {
+    for item in layout {
+        guard let image = cell(workspace, item.widget, item.family) else {
+            FileHandle.standardError.write(Data("missing \(item.widget) \(item.family)\n".utf8))
+            continue
+        }
+        place(image, at: CGPoint(x: item.x, y: item.y), in: context, canvas: canvas, scale: scale)
+    }
+}
+
+func hero(workspace: URL, output: URL) throws {
     let scale: CGFloat = 1.5
     let canvas = CGSize(width: 1600 * scale, height: 900 * scale)
     guard let context = makeContext(canvas) else { throw CocoaError(.fileWriteUnknown) }
     wallpaper(context, size: canvas, scale: scale)
-    for item in layout {
-        guard let image = cell(workspace, item.widget, item.family, appearance: "dark") else {
-            FileHandle.standardError.write(Data("missing \(item.widget) \(item.family)\n".utf8))
-            continue
-        }
-        place(image, item.family, at: CGPoint(x: item.x, y: item.y), in: context, canvas: canvas, scale: scale)
-    }
-    caption("Rendered by aw preview · every widget written by an AI agent", in: context, canvas: canvas, scale: scale)
+    let layout = [
+        Placement(widget: "ai-limits", family: "extraLarge", x: 64, y: 64),
+        Placement(widget: "agents", family: "large", x: 64, y: 428),
+        Placement(widget: "github", family: "large", x: 424, y: 428),
+        Placement(widget: "ai-spend", family: "large", x: 808, y: 64),
+        Placement(widget: "tiles", family: "large", x: 1168, y: 64),
+        Placement(widget: "system-pulse", family: "medium", x: 808, y: 428),
+        Placement(widget: "focus", family: "medium", x: 1168, y: 428),
+        Placement(widget: "agents", family: "medium", x: 808, y: 608),
+        Placement(widget: "ai-limits", family: "small", x: 1168, y: 608),
+        Placement(widget: "tiles", family: "small", x: 1348, y: 608)
+    ]
+    draw(layout, workspace: workspace, in: context, canvas: canvas, scale: scale)
+    text(
+        "Rendered by aw preview · every widget written by an AI agent",
+        size: 15 * scale, weight: .medium, alpha: 0.62,
+        at: CGPoint(x: canvas.width - 64 * scale, y: 44 * scale), in: context, fromRight: true
+    )
+    try write(context, to: output)
+}
+
+func social(workspace: URL, output: URL) throws {
+    let canvas = CGSize(width: 1280, height: 640)
+    guard let context = makeContext(canvas) else { throw CocoaError(.fileWriteUnknown) }
+    wallpaper(context, size: canvas, scale: 0.8)
+    text("agent-widgets", size: 58, weight: .bold, alpha: 1, at: CGPoint(x: 64, y: 500), in: context)
+    text("Native macOS widgets, built by your AI agent", size: 27, weight: .medium, alpha: 0.78, at: CGPoint(x: 66, y: 452), in: context)
+    text("aw CLI · SwiftUI kit · layout-checked previews · MCP", size: 19, weight: .regular, alpha: 0.55, at: CGPoint(x: 66, y: 416), in: context)
+    let layout = [
+        Placement(widget: "ai-limits", family: "extraLarge", x: 64, y: 264),
+        Placement(widget: "agents", family: "large", x: 808, y: 40),
+        Placement(widget: "github", family: "medium", x: 808, y: 412)
+    ]
+    draw(layout, workspace: workspace, in: context, canvas: canvas, scale: 1)
     try write(context, to: output)
 }
 
 func strip(workspace: URL, widget: String, output: URL) throws {
-    let families = ["small", "medium", "large", "extraLarge"].filter { cell(workspace, widget, $0, appearance: "dark") != nil }
+    let cells = ["small", "medium", "large", "extraLarge"].compactMap { cell(workspace, widget, $0) }
     let gap: CGFloat = 28
     let margin: CGFloat = 36
-    let width = families.compactMap { pointSizes[$0]?.width }.reduce(0, +) + gap * CGFloat(max(families.count - 1, 0)) + margin * 2
-    let height = (families.compactMap { pointSizes[$0]?.height }.max() ?? 155) + margin * 2
+    let width = cells.map { points($0).width }.reduce(0, +) + gap * CGFloat(max(cells.count - 1, 0)) + margin * 2
+    let height = (cells.map { points($0).height }.max() ?? 164) + margin * 2
     let scale: CGFloat = 2
     let canvas = CGSize(width: width * scale, height: height * scale)
     guard let context = makeContext(canvas) else { throw CocoaError(.fileWriteUnknown) }
     wallpaper(context, size: canvas, scale: scale * 0.5)
     var x = margin
-    for family in families {
-        guard let image = cell(workspace, widget, family, appearance: "dark"), let size = pointSizes[family] else { continue }
-        place(image, family, at: CGPoint(x: x, y: margin), in: context, canvas: canvas, scale: scale)
-        x += size.width + gap
+    for image in cells {
+        place(image, at: CGPoint(x: x, y: margin), in: context, canvas: canvas, scale: scale)
+        x += points(image).width + gap
     }
     try write(context, to: output)
 }
 
 let arguments = CommandLine.arguments
 guard arguments.count >= 4 else {
-    print("usage: swift scripts/make-hero.swift hero <workspace> <out.png>\n       swift scripts/make-hero.swift strip <workspace> <widget> <out.png>")
+    print("""
+    usage: swift scripts/make-hero.swift hero <workspace> <out.jpg>
+           swift scripts/make-hero.swift social <workspace> <out.png>
+           swift scripts/make-hero.swift strip <workspace> <widget> <out.jpg>
+    """)
     exit(2)
 }
 let workspace = URL(fileURLWithPath: arguments[2], isDirectory: true)
 do {
-    if arguments[1] == "strip", arguments.count >= 5 {
+    switch arguments[1] {
+    case "strip" where arguments.count >= 5:
         try strip(workspace: workspace, widget: arguments[3], output: URL(fileURLWithPath: arguments[4]))
-    } else {
-        let layout = [
-            Placement(widget: "weather", family: "large", x: 80, y: 80),
-            Placement(widget: "fx", family: "medium", x: 80, y: 445),
-            Placement(widget: "github", family: "medium", x: 80, y: 620),
-            Placement(widget: "world-clock", family: "medium", x: 449, y: 80),
-            Placement(widget: "system-pulse", family: "small", x: 449, y: 255),
-            Placement(widget: "focus", family: "small", x: 623, y: 255),
-            Placement(widget: "flashcards", family: "large", x: 449, y: 430),
-            Placement(widget: "habits", family: "large", x: 818, y: 80),
-            Placement(widget: "system-pulse", family: "medium", x: 818, y: 445),
-            Placement(widget: "focus", family: "medium", x: 818, y: 620),
-            Placement(widget: "world-clock", family: "small", x: 1187, y: 80),
-            Placement(widget: "github", family: "small", x: 1361, y: 80),
-            Placement(widget: "weather", family: "medium", x: 1187, y: 255),
-            Placement(widget: "fx", family: "large", x: 1187, y: 430)
-        ]
-        try hero(workspace: workspace, output: URL(fileURLWithPath: arguments[3]), layout: layout)
+    case "social":
+        try social(workspace: workspace, output: URL(fileURLWithPath: arguments[3]))
+    default:
+        try hero(workspace: workspace, output: URL(fileURLWithPath: arguments[3]))
     }
 } catch {
     print("failed: \(error)")

@@ -228,7 +228,7 @@ struct AiLimitsView: AWView {
         if left.count > 3 {
             AWText(trendLabel(AiLimitsPace.span(points, now: entry.date)), .label)
                 .foregroundStyle(.secondary)
-            AWSparkline(left, tint: .green)
+            AWSparkline(left, tint: .green, range: 0...100)
                 .frame(maxHeight: .infinity)
         } else {
             Spacer(minLength: 0)
@@ -295,7 +295,7 @@ struct AiLimitsView: AWView {
     private func resetMoment(_ resetsAt: Date?) -> some View {
         if let resetsAt, resetsAt > entry.date {
             if resetsAt.timeIntervalSince(entry.date) > 86400 {
-                Text(resetsAt, format: .dateTime.weekday(.abbreviated).hour().minute().locale(context.locale))
+                Text(resetsAt, format: .dateTime.weekday(.abbreviated).hour().minute())
                     .font(AWType.font(.caption, context.family))
                     .foregroundStyle(.tertiary)
                     .lineLimit(1)
@@ -314,10 +314,11 @@ struct AiLimitsView: AWView {
     @ViewBuilder
     private func resetLine(_ resetsAt: Date?) -> some View {
         if let resetsAt, resetsAt > entry.date {
+            let far = resetsAt.timeIntervalSince(entry.date) > 20 * 3600
             HStack(spacing: AWSpace.xs) {
-                AWText(context.pick(en: "resets in", ru: "сброс через"), .caption)
+                AWText(far ? context.pick(en: "resets", ru: "сброс") : context.pick(en: "resets in", ru: "сброс через"), .caption)
                     .foregroundStyle(.secondary)
-                Text(resetsAt, style: .timer)
+                (far ? moment(resetsAt) : Text(resetsAt, style: .timer))
                     .font(AWType.font(.caption, context.family))
                     .monospacedDigit()
                     .lineLimit(1)
@@ -332,13 +333,19 @@ struct AiLimitsView: AWView {
                 Image(systemName: "chart.line.downtrend.xyaxis")
                     .font(.system(size: AWType.size(.caption, context.family), weight: .semibold))
                     .foregroundStyle(AWStatus.warning.tint(context))
-                AWText(context.pick(en: "runs out at", ru: "кончится в"), .caption)
+                AWText(context.pick(en: "runs out", ru: "кончится"), .caption)
                     .foregroundStyle(.secondary)
-                Text(runsOut, style: .time)
+                moment(runsOut)
                     .font(AWType.font(.caption, context.family))
                     .monospacedDigit()
             }
         }
+    }
+
+    private func moment(_ date: Date) -> Text {
+        date.timeIntervalSince(entry.date) > 20 * 3600
+            ? Text(date, format: .dateTime.weekday(.abbreviated).hour().minute())
+            : Text(date, style: .time)
     }
 
     private func elapsedShare(_ window: AiLimitsWindow) -> Double? {

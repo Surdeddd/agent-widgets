@@ -89,6 +89,7 @@ public struct AWFrame<Content: View>: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             .padding(AWMetrics.padding(for: context.family))
             .environment(\.aw, context)
+            .environment(\.locale, context.locale)
     }
 }
 

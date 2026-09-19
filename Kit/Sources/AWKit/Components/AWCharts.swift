@@ -13,23 +13,37 @@ public struct AWSparkline: View {
     private let tint: Color
     private let style: AWSparklineStyle
     private let showsLastPoint: Bool
+    private let range: ClosedRange<Double>?
 
-    public init(_ values: [Double], tint: Color = .accentColor, style: AWSparklineStyle = .area, showsLastPoint: Bool = true) {
+    /// `range` pins the vertical scale, for example `0...100` for a percentage, so a small move does not look like a cliff.
+    public init(
+        _ values: [Double],
+        tint: Color = .accentColor,
+        style: AWSparklineStyle = .area,
+        showsLastPoint: Bool = true,
+        range: ClosedRange<Double>? = nil
+    ) {
         self.values = values
         self.tint = tint
         self.style = style
         self.showsLastPoint = showsLastPoint
+        self.range = range
+    }
+
+    static func domain(of values: [Double], range: ClosedRange<Double>?) -> ClosedRange<Double> {
+        let low = range?.lowerBound ?? values.min() ?? 0
+        let high = range?.upperBound ?? values.max() ?? 1
+        let pad = max((high - low) * (range == nil ? 0.12 : 0.03), 0.0001)
+        return (low - pad)...(high + pad)
     }
 
     public var body: some View {
         let color = context.isVibrant ? Color.primary : tint
-        let low = values.min() ?? 0
-        let high = values.max() ?? 1
-        let pad = max((high - low) * 0.12, 0.0001)
+        let domain = Self.domain(of: values, range: range)
         Chart {
             ForEach(Array(values.enumerated()), id: \.offset) { index, value in
                 if style == .area {
-                    AreaMark(x: .value("i", index), yStart: .value("low", low - pad), yEnd: .value("v", value))
+                    AreaMark(x: .value("i", index), yStart: .value("low", domain.lowerBound), yEnd: .value("v", value))
                         .interpolationMethod(.catmullRom)
                         .foregroundStyle(LinearGradient(colors: [color.opacity(0.32), color.opacity(0.02)], startPoint: .top, endPoint: .bottom))
                 }
@@ -47,7 +61,7 @@ public struct AWSparkline: View {
         .chartXAxis(.hidden)
         .chartYAxis(.hidden)
         .chartLegend(.hidden)
-        .chartYScale(domain: (low - pad)...(high + pad))
+        .chartYScale(domain: domain)
         .widgetAccentable()
         .awBlock("AWSparkline")
     }

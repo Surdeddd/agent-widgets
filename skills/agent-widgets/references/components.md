@@ -33,7 +33,7 @@ Everything here comes from `import AWKit`. Every component reads `@Environment(\
 | `AWRing(progress:tint:lineWidth:)` | ring without a center |
 | `AWGauge(value: Double, in: ClosedRange<Double> = 0...1, valueText: String? = nil, label: String? = nil, tint: Color = .accentColor)` | a 270° gauge with the value inside |
 | `AWBar(progress: Double, tint: Color = .accentColor, height: CGFloat? = nil)` | a horizontal progress bar |
-| `AWSparkline(_ values: [Double], tint: Color = .accentColor, style: AWSparklineStyle = .area, showsLastPoint: Bool = true)` | a trend line; give it a height |
+| `AWSparkline(_ values: [Double], tint: Color = .accentColor, style: AWSparklineStyle = .area, showsLastPoint: Bool = true, range: ClosedRange<Double>? = nil)` | a trend line; give it a height. The scale hugs the values unless `range` pins it — pass `0...100` for a percentage, or a 5 % move draws as a cliff |
 | `AWBarChart(_ items: [AWBarItem], tint: Color = .accentColor, showsLabels: Bool = true)` | small bar charts |
 | `AWBarItem(_ label: String, _ value: Double, highlighted: Bool = false, id: String? = nil)` | one bar |
 
