@@ -1,13 +1,14 @@
 <p align="center">
-  <img src=".github/assets/hero.jpg" alt="Виджеты рабочего стола, собранные AI-агентами через aw" width="100%">
+  <img src=".github/assets/hero.jpg" alt="Семь виджетов рабочего стола macOS, собранных AI-агентами: лимиты AI, агенты, GitHub, расход AI, 2048, пульс системы и фокус" width="100%">
 </p>
 
 <h1 align="center">agent-widgets</h1>
 
-<p align="center"><b>Нативные виджеты рабочего стола macOS, которые делают AI-агенты.</b></p>
+<p align="center"><b>Нативные виджеты рабочего стола macOS, которые делает твой AI-агент.</b></p>
 
 <p align="center">
   <a href="https://github.com/Surdeddd/agent-widgets/releases"><img src="https://img.shields.io/github/v/release/Surdeddd/agent-widgets" alt="Release"></a>
+  <a href="https://www.npmjs.com/package/agent-widgets"><img src="https://img.shields.io/npm/v/agent-widgets" alt="npm"></a>
   <a href="https://github.com/Surdeddd/agent-widgets/actions/workflows/ci.yml"><img src="https://github.com/Surdeddd/agent-widgets/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <img src="https://img.shields.io/badge/macOS-14%2B-black" alt="macOS 14+">
   <img src="https://img.shields.io/badge/Swift-6-orange" alt="Swift 6">
@@ -16,188 +17,195 @@
 
 <p align="center"><a href="README.md">English version</a></p>
 
-Агенты хорошо пишут SwiftUI, но не видят WidgetKit. **agent-widgets** даёт им глаза и руки. Агент пишет только своё — Codable-модель, SwiftUI-вьюху и, если нужны живые данные, маленький feed-скрипт. Остальное делает CLI `aw`: рендерит все размеры и темы на один лист с проверками вёрстки, собирает и подписывает приложение, ставит его, показывает виджет в dev-слоте на твоём столе и снимает настоящее окно, чтобы агент на него посмотрел.
+Скажи, что хочешь видеть на рабочем столе. Твой агент — Claude Code, Codex, Cursor, Claude Desktop — пишет маленькую SwiftUI-вьюху и feed-скрипт, а `aw` превращает их в настоящий виджет WidgetKit: рендерит все размеры и темы с проверками вёрстки, собирает и подписывает приложение, ставит его и показывает агенту снимок настоящего стола, чтобы тот исправил увиденное.
+
+А можно ничего не писать: семь виджетов готовы к установке.
+
+## Лимиты AI на столе за минуту
+
+<p align="center">
+  <img src=".github/assets/gallery-demo.ru.gif" alt="aw gallery, aw gallery add ai-limits, aw feed run, aw ship — и виджет стоит на настоящем столе в четырёх размерах" width="100%">
+</p>
+
+```sh
+brew install surdeddd/tap/agent-widgets     # или: npm install -g agent-widgets
+aw init ~/Widgets && cd ~/Widgets
+aw gallery add ai-limits && aw feed run ai-limits && aw ship ai-limits
+```
+
+Или скажи агенту: *«хочу видеть лимиты Claude и Codex на рабочем столе»* — с подключённым MCP-сервером он сам найдёт галерею.
+
+## Галерея
+
+`aw gallery` показывает список, `aw gallery add <id>` копирует виджет в твой workspace вместе с feed, сэмплами и тестами. Каждый виджет — обычные SwiftUI и Python, которые можно читать и менять. Картинки — рендеры `aw preview`; лимиты AI, GitHub и пульс системы показывают живые данные, остальные — свои сэмплы.
+
+**[ai-limits](examples/widgets/ai-limits)** — сколько осталось в окнах Claude и Codex, когда они сбросятся, как быстро ты их расходуешь относительно ровного темпа, когда лимит кончится при таком темпе, и история за неделю. Спрашивает у Anthropic твой собственный расход тем входом, который уже есть у Claude Code, а лимиты Codex читает из его локальных логов — никаких третьих сторон и лишних ключей.
+
+<img src=".github/assets/gallery/ai-limits.jpg" alt="ai-limits в размерах small, medium, large и extra large" width="100%">
+
+**[agents](examples/widgets/agents)** — какие сессии Claude Code и Codex ждут тебя, затихли или работают, с живыми таймерами и сессиями за последние часы.
+
+<img src=".github/assets/gallery/agents.jpg" alt="agents в размерах small, medium, large и extra large" width="100%">
+
+**[github](examples/widgets/github)** — твой год вкладов, серия, очередь ревью и последние 14 дней — через `gh`, которым ты и так пользуешься.
+
+<img src=".github/assets/gallery/github.jpg" alt="github в размерах small, medium, large и extra large" width="100%">
+
+**[ai-spend](examples/widgets/ai-spend)** — сколько стоили бы твои токены Claude Code по ценам API: сегодня, за неделю, за месяц, по моделям, и во сколько раз окупается подписка.
+
+<img src=".github/assets/gallery/ai-spend.jpg" alt="ai-spend в размерах small, medium и large" width="81%">
+
+**[tiles](examples/widgets/tiles)** — 2048 прямо на рабочем столе: каждая стрелка — полный ход, приложение не открывается.
+
+<img src=".github/assets/gallery/tiles.jpg" alt="2048 в размерах small, medium и large" width="81%">
+
+**[system-pulse](examples/widgets/system-pulse)** — процессор, память, диск и батарея с предупреждением, которое читается и без цвета.
+
+<img src=".github/assets/gallery/system-pulse.jpg" alt="system-pulse в размерах small, medium и large" width="81%">
+
+**[focus](examples/widgets/focus)** — помодоро-таймер, который запускается, ставится на паузу и сбрасывается с виджета.
+
+<img src=".github/assets/gallery/focus.jpg" alt="focus в размерах small и medium" width="50%">
+
+## Собери свой
+
+Агенты хорошо пишут SwiftUI, но не видят WidgetKit. `aw` даёт им глаза и руки. Агент пишет только своё — Codable-модель, вьюху и, если нужны живые данные, feed — и получает ответ, с которым можно работать.
 
 <p align="center">
   <img src=".github/assets/agent-loop.ru.gif" alt="aw preview ловит обрезанную подпись, агент правит вьюху, следующее превью чистое" width="100%">
 </p>
 
-## Что внутри
-
 - **Превью, которому агент может верить.** Каждый размер × светлая / тёмная тема / стол без фокуса / прозрачное стекло Tahoe × сэмпл, в настоящих размерах виджетов этого мака, примерно за секунду, с проверками `OVERFLOW`, `TRUNCATION`, `DECODE` и другими. У каждой проблемы есть подсказка, `aw explain` расскажет подробнее.
+- **Большие виджеты, которые оправдывают свой размер.** Превью измеряет наибольшую пустую область в каждом размере и предупреждает кодом `UNDERFILLED`; скилл учит лестнице — каждый размер отвечает на вопрос побольше — вместо одной раскладки, растянутой на четыре размера. На одном и том же брифе свежий агент прошёл путь от 71 % пустоты в extra large до 15 %.
 - **Настоящий WidgetKit, а не макет.** `aw ship` собирает подписанное приложение, подменяет его в `/Applications` с бэкапом, направляет dev-слот на виджет и снимает реальное окно.
-- **Живые данные.** Feed на любом языке печатает JSON; `aw` сверяет его с моделью, публикует только настоящие изменения и запускает по расписанию через LaunchAgent.
-- **Интерактивные виджеты.** Кнопки с состоянием — вперёд, назад, переключатели, счётчики, перемешанные колоды — не тратят бюджет перезагрузок.
+- **Живые данные, которые берегут бюджет.** Feed на любом языке печатает JSON; `aw` сверяет его с моделью, публикует только настоящие изменения и запускает по расписанию через LaunchAgent. Изменение доезжает до стола примерно за секунду после публикации.
+- **Интерактивные виджеты.** Кнопки с состоянием — ходы, переключатели, счётчики, перемешанные колоды — не тратят бюджет перезагрузок.
 - **Сделано для агентов.** MCP-сервер, у которого превью возвращает лист картинкой, а длинные вызовы отдают id задания, а не обрываются по таймауту, скилл с компонентами, рецептами и граблями, и плагин Claude Code, который ставит и то и другое сразу.
-- **Двуязычно.** Каждое сообщение и каждый документ — на английском и русском.
-
-## Что нужно
-
-- macOS 14 или новее, Xcode 16.3 или новее
-- `brew install xcodegen` (Homebrew ставит его сам)
-- Сертификат Apple Development, и бесплатного Apple ID достаточно — платная подписка разработчика не нужна: Xcode → Settings → Accounts → + → Apple ID, выбери его «(Personal Team)» → Manage Certificates → + → Apple Development; в уже существующем workspace затем запусти `aw init --refresh-signing`. Сертификат нужен виджетам для App Group. `aw preview` работает без сертификата. Проверено: все виджеты в этом репозитории собраны, подписаны и установлены с бесплатной Personal Team.
-
-## Установка
-
-**Homebrew** — собирает из исходников твоим Xcode:
+- **Двуязычно.** Каждое сообщение, каждый виджет и каждый документ — на английском и русском.
 
 ```sh
-brew install surdeddd/tap/agent-widgets
-aw doctor
-```
-
-**Из исходников:**
-
-```sh
-git clone https://github.com/Surdeddd/agent-widgets
-cd agent-widgets
-make install      # ставит aw в ~/.local/bin — проверь, что он есть в PATH
-aw doctor
-```
-
-## Быстрый старт
-
-```sh
-aw init ~/Widgets && cd ~/Widgets
 aw new weather --template metric
 aw preview weather        # пишет .aw/previews/weather/sheet.png
 aw ship weather           # сборка, установка, dev-слот, настоящий снимок
 ```
 
-В первый раз добавь на стол «<Имя приложения> · Dev»: правый клик по столу → «Изменить виджеты» → найди приложение. Дальше `aw ship` и `aw dev` сами переключают этот слот на то, над чем идёт работа.
+В первый раз добавь «<Имя приложения> · Dev» на рабочий стол: правый клик по столу → «Изменить виджеты» → найди приложение. Дальше `aw ship` и `aw dev` переключают этот слот на то, что ты сейчас делаешь.
 
-## Подключить к агенту
+## Установка
 
-**Claude Code** — плагин ставит скилл и MCP-сервер:
+| | |
+|---|---|
+| **Homebrew** — собирает из исходников твоим Xcode | `brew install surdeddd/tap/agent-widgets` |
+| **npm** — готовый универсальный бинарь | `npm install -g agent-widgets` |
+| **Claude Desktop** — один файл, без терминала | скачай `agent-widgets-<версия>.mcpb` из [последнего релиза](https://github.com/Surdeddd/agent-widgets/releases/latest) и открой его |
+| **Из исходников** | `git clone https://github.com/Surdeddd/agent-widgets && cd agent-widgets && make install` |
+
+Дальше `aw doctor` проверит остальное.
+
+**Что нужно:** macOS 14 или новее, Xcode 16.3 или новее, `brew install xcodegen` и сертификат Apple Development — бесплатного Apple ID достаточно, платная подписка не нужна: Xcode → Settings → Accounts → + → Apple ID, выбери его «(Personal Team)» → Manage Certificates → + → Apple Development; в уже существующем workspace затем запусти `aw init --refresh-signing`. Сертификат нужен виджетам для App Group; `aw preview` работает и без него. Все виджеты в этом репозитории собраны, подписаны и установлены с бесплатной Personal Team.
+
+## Подключение к агенту
+
+**Claude Code** — плагин приносит и скилл, и MCP-сервер:
 
 ```text
 /plugin marketplace add Surdeddd/agent-widgets
 /plugin install agent-widgets@agent-widgets
 ```
 
-Спросит папку с виджетами (`~/Widgets` по умолчанию). Без плагина: `aw skill install` и `claude mcp add -s user agent-widgets -- aw mcp --workspace ~/Widgets`.
+Без плагина: `aw skill install` и
 
-И попроси: «сделай виджет погоды в Бангкоке на рабочий стол».
+```sh
+claude mcp add -s user agent-widgets -- npx -y agent-widgets mcp --workspace ~/Widgets
+```
 
 **Codex** — `~/.codex/config.toml`
 
 ```toml
 [mcp_servers.agent-widgets]
-command = "/Users/you/.local/bin/aw"
-args = ["mcp", "--workspace", "/Users/you/Widgets"]
+command = "npx"
+args = ["-y", "agent-widgets", "mcp", "--workspace", "/Users/you/Widgets"]
 ```
 
-**Cursor** (`~/.cursor/mcp.json`), **Claude Desktop** (`~/Library/Application Support/Claude/claude_desktop_config.json`) и **Gemini CLI** (`~/.gemini/settings.json`)
+**Cursor** (`~/.cursor/mcp.json`), **Gemini CLI** (`~/.gemini/settings.json`) и любой другой MCP-клиент
 
 ```json
 {
   "mcpServers": {
     "agent-widgets": {
-      "command": "/Users/you/.local/bin/aw",
-      "args": ["mcp", "--workspace", "/Users/you/Widgets"]
+      "command": "npx",
+      "args": ["-y", "agent-widgets", "mcp", "--workspace", "/Users/you/Widgets"]
     }
   }
 }
 ```
 
-Сборка и установка длятся дольше, чем многие клиенты ждут один вызов: Codex и Claude Desktop обрывают вызов через 60 с. Поэтому `aw_ship`, `aw_dev`, `aw_slot` и `aw_feed_run` за 45 с отвечают id задания, если ещё не закончили, а `aw_wait` подхватывает с того места. Claude Code ждёт весь вызов. `aw mcp --call-budget <seconds>` меняет лимит, `0` снимает его.
+Если `aw` поставлен через Homebrew или из исходников — пиши `"command": "aw", "args": ["mcp", "--workspace", "…"]`. Сервер есть в [реестре MCP](https://registry.modelcontextprotocol.io) под именем `io.github.Surdeddd/agent-widgets`.
 
-Агенты без MCP проходят тот же цикл из терминала; `aw skill install` ещё и линкует скилл в `~/.codex/skills` и `~/.agents/skills`, если такие папки есть.
+Папка может быть пустой: `aw_init` её подготовит, `aw_gallery` покажет готовые виджеты. Сборка и установка идут дольше, чем многие клиенты ждут один вызов, — Codex и Claude Desktop обрывают его через 60 с, — поэтому `aw_ship`, `aw_dev`, `aw_slot` и `aw_feed_run` отвечают в пределах 45 с id задания, если ещё не закончили, а `aw_wait` дожидается результата. Claude Code ждёт вызов целиком. `aw mcp --call-budget <секунды>` меняет лимит, `0` снимает его.
 
-## Примеры
-
-В workspace [`examples`](examples) восемь виджетов. Каждый написал свежий агент по одному абзацу брифа и скиллу, потом один проход дизайн-ревью. Картинки — рендер `aw preview`.
-
-**[system-pulse](examples/widgets/system-pulse)** — процессор, память, диск и батарея этого мака
-
-<img src=".github/assets/examples/system-pulse.jpg" alt="system-pulse в размерах small, medium и large" width="100%">
-
-**[weather](examples/widgets/weather)** — Бангкок сейчас и на ближайшие часы — timeline из Open-Meteo
-
-<img src=".github/assets/examples/weather.jpg" alt="weather в размерах small, medium и large" width="100%">
-
-**[github](examples/widgets/github)** — звёзды, форки и issues репозитория с трендом звёзд
-
-<img src=".github/assets/examples/github.jpg" alt="github в размерах small и medium" width="61%">
-
-**[focus](examples/widgets/focus)** — помодоро-таймер, которым управляешь прямо из виджета
-
-<img src=".github/assets/examples/focus.jpg" alt="focus в размерах small и medium" width="61%">
-
-**[habits](examples/widgets/habits)** — неделя привычек, отмечаешь прямо на столе
-
-<img src=".github/assets/examples/habits.jpg" alt="habits в размерах medium и large" width="81%">
-
-**[flashcards](examples/widgets/flashcards)** — англо-русские карточки: вперёд, назад, перемешать
-
-<img src=".github/assets/examples/flashcards.jpg" alt="flashcards в размерах small, medium и large" width="100%">
-
-**[fx](examples/widgets/fx)** — курс доллара к EUR, GBP, JPY и THB с трендом за 30 дней
-
-<img src=".github/assets/examples/fx.jpg" alt="fx в размерах small, medium и large" width="100%">
-
-**[world-clock](examples/widgets/world-clock)** — четыре города со стрелочными часами на SwiftUI
-
-<img src=".github/assets/examples/world-clock.jpg" alt="world-clock в размерах small, medium и large" width="100%">
+Агенты без MCP могут пройти тот же цикл из шелла; `aw skill install` также линкует скилл в `~/.codex/skills` и `~/.agents/skills`, если эти папки есть.
 
 ## На настоящем столе
 
-Те же демо, снятые `aw dev` со стола MacBook: настоящие окна WidgetKit, а не рендеры. Когда впереди другое приложение, macOS рисует их монохромно — ровно так, как заранее показывает строка `desktop idle` на каждом листе превью.
+Снято командой `aw ship` с рабочего стола MacBook: настоящие окна WidgetKit, не рендеры. Когда впереди другое приложение, macOS рисует их монохромными — как и предсказывает строка `desktop idle` на каждом листе превью.
 
-<img src=".github/assets/desktop.jpg" alt="Настоящие окна weather, system-pulse, fx, github, habits, world-clock и focus на столе" width="100%">
+<img src=".github/assets/desktop.jpg" alt="Настоящие окна виджета лимитов AI в четырёх размерах" width="100%">
 
-После каждого `aw ship` и `aw dev` слот кладётся рядом со своей ячейкой превью: превью, стол и наложение контуров — белое там, где совпадает, голубое только в превью, красное только на столе. Здесь погода совпадает на 96 %; другой сэмпл или состояние роняют оценку ниже 60 % и дают `SHOT_MISMATCH`.
+После каждого `aw ship` и `aw dev` слот ставится рядом со своей ячейкой превью: превью, стол и наложение контуров — белое там, где оба совпали, голубое есть только в превью, красное только на столе. Другой сэмпл или состояние роняют совпадение ниже 60 % и дают `SHOT_MISMATCH`.
 
-<img src=".github/assets/compare.jpg" alt="Превью, стол и наложение контуров виджета погоды" width="100%">
+<img src=".github/assets/compare.jpg" alt="Превью, стол и наложение контуров виджета лимитов AI" width="100%">
 
 ## Как это устроено
 
 ```mermaid
 flowchart LR
     A[Агент] -->|пишет модель, вьюху, feed| W[widgets/id]
+    G[aw gallery] -->|готовые| W
     W --> P[aw preview]
-    P -->|swiftc + готовый кит| R[рендер матрицы]
+    P -->|swiftc + собранный кит| R[рендер матрицы]
     R -->|sheet.png + report.json| A
     W --> S[aw ship]
     S -->|xcodegen + xcodebuild| APP[подписанное приложение]
     APP -->|установка с бэкапом| D[dev-слот на столе]
     D -->|screencapture| A
-    F[feed.py] -->|aw tick раз в минуту| G[App Group]
-    G --> D
+    F[feed.py] -->|aw tick каждую минуту| AG[App Group]
+    AG --> D
 ```
 
-- `aw preview` компилирует Swift-файлы виджета с заранее собранным китом и рендерит через `ImageRenderer` каждый размер, тему, режим стола и сэмпл, затем меряет вёрстку.
-- `aw ship` генерирует расширение WidgetKit (свой `Widget` на каждый виджет плюс dev-слот), собирает его Xcode, подменяет приложение в `/Applications`, направляет dev-слот на виджет и ждёт перерисовки стола, прежде чем снять окно.
-- Данные живут в App Group: feed их пишет, виджеты читают, кнопки хранят там своё состояние, а настройки виджетов, изменённые в окне приложения, лежат там же.
+- `aw preview` компилирует Swift-файлы виджета с заранее собранной копией кита и рендерит каждый размер, тему, режим стола и сэмпл через `ImageRenderer`, затем измеряет вёрстку: переполнение, обрезку и пустое место.
+- `aw ship` генерирует расширение WidgetKit (по одному `Widget` на виджет плюс dev-слот), собирает его Xcode, подменяет в `/Applications`, направляет dev-слот на виджет и ждёт перерисовки стола перед съёмкой.
+- Данные живут в App Group: feed пишет их туда, виджеты читают, кнопки держат там состояние, и настройки виджетов из окна приложения лежат там же.
 
 ## Команды
 
 | команда | что делает |
 |---|---|
 | `aw init [dir]` | создать workspace и найти подпись |
-| `aw new <id> --template t` | виджет из шаблона `metric`, `list`, `ring`, `chart`, `card`, `image`, `timer` или `blank` |
+| `aw gallery` · `aw gallery add <id>` | список готовых виджетов, копия одного из них в workspace |
+| `aw new <id> --template t` | каркас виджета из `metric`, `list`, `ring`, `chart`, `card`, `image`, `timer` или `blank` |
 | `aw preview <id>` | отрендерить лист и проверить вёрстку |
 | `aw ship <id>` | превью → сборка → установка → dev-слот → снимок |
 | `aw build` · `aw install` · `aw rollback` | собрать и поставить приложение, с бэкапами |
-| `aw dev <id>` · `aw shot` · `aw slot` · `aw geometry` | переключить dev-слот, снять реальные окна, дождаться пока человек поставит слот, замерить размеры виджетов на столе |
-| `aw feed run <id>` · `aw data set <id>` · `aw data get <id>` | прогнать feed, пушнуть данные, прочитать данные |
-| `aw tick` · `aw daemon install` · `aw logs <id>` | держать feed'ы свежими и читать их логи |
+| `aw dev <id>` · `aw shot` · `aw slot` · `aw geometry` | переключить dev-слот, снять настоящие окна, дождаться, пока человек поставит слот, измерить размеры виджетов на столе |
+| `aw feed run <id>` · `aw data set <id>` · `aw data get <id>` | запустить feed, положить данные, прочитать данные |
+| `aw tick` · `aw daemon install` · `aw logs <id>` | держать feed-ы запущенными и читать их логи |
 | `aw doctor` · `aw list` · `aw explain [CODE]` | здоровье, виджеты, коды проблем |
-| `aw mcp [--call-budget s]` · `aw skill install` | отдать агентам по MCP, поставить скилл |
+| `aw mcp [--call-budget s]` · `aw skill install` | MCP-сервер для агентов, установка скилла |
 
 Каждая команда понимает `--json` и `--lang en|ru`.
 
-## Чего WidgetKit не позволяет
+## Чего WidgetKit не разрешает
 
-- Виджет — это снимок: во вьюхе нет сети, таймеров и свободной анимации. Данные приносит feed, время двигает timeline, `Text(date, style:)` тикает сам.
-- macOS даёт виджету примерно 40–70 перезагрузок в сутки; держи feed'ы не чаще раза в 15 минут. Нажатия кнопок не считаются.
-- Поставить виджет на стол может только человек, поэтому dev-слот добавляется руками один раз.
-- macOS рисует виджет на столе, только пока он виден. За окнами dev-слот — пустая рамка, поэтому `aw` сообщает `WIDGET_HIDDEN` и просит показать рабочий стол, а не сравнивает пустой снимок.
-- Превью рисует нейтральное стекло; на настоящем столе виджеты подкрашиваются обоями.
+- Виджеты — это снимки: никакой сети, таймеров и свободной анимации во вьюхе. Данные приносит feed; движется таймлайн; тикает `Text(date, style:)`.
+- macOS даёт виджету примерно 40–70 перезагрузок в сутки. `aw` тратит одну, только когда данные действительно изменились, поэтому feed может запускаться хоть каждую минуту, если печатает тот же вывод, пока ничего не произошло. Нажатия кнопок не считаются.
+- Поставить виджет на стол может только человек, поэтому dev-слот один раз добавляется руками.
+- macOS рисует виджет на столе, только пока он на экране. За окнами dev-слот — пустая рамка, поэтому `aw` отвечает `WIDGET_HIDDEN` и просит показать стол, а не сравнивает пустой снимок.
+- Превью рисует нейтральное стекло; настоящий стол подкрашивает виджеты твоими обоями.
 
 ## Разработка
 
-Структура и правила — в [AGENTS.md](AGENTS.md). `swift test`, `swift test --package-path Kit` и `swiftlint --strict` должны оставаться зелёными.
+Раскладка и правила — в [AGENTS.md](AGENTS.md). `swift test`, `swift test --package-path Kit`, `python3 -B -m unittest discover -s Tests/Feeds` и `swiftlint --strict` должны оставаться зелёными. `scripts/package.sh` собирает npm-пакет и `.mcpb`.
 
 ## Лицензия
 

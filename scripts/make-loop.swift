@@ -38,7 +38,7 @@ let terminal = CGRect(x: 36, y: 36, width: 640, height: 648)
 let sidePanel = CGRect(x: 700, y: 36, width: 544, height: 648)
 let font = NSFont.monospacedSystemFont(ofSize: 14, weight: .regular)
 let lineHeight: CGFloat = 21
-let columns = 70
+let columns = 72
 
 func color(for line: String) -> NSColor {
     let trimmed = line.trimmingCharacters(in: .whitespaces)
