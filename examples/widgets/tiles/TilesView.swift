@@ -39,11 +39,11 @@ struct TilesView: AWView {
                 AWText("\(game.score)", .label)
             }
             board(game)
-            HStack(spacing: AWSpace.xs) {
+            HStack(spacing: 3) {
                 ForEach([TilesGame.Direction.left, .up, .down, .right], id: \.rawValue) { direction in
-                    arrow(direction, game: game, side: 24)
+                    arrow(direction, game: game, side: 24, fluid: true)
                 }
-                restart(game, side: 24)
+                restart(game, side: 24, fluid: true)
             }
         }
     }
@@ -173,29 +173,29 @@ struct TilesView: AWView {
     }
 
     @ViewBuilder
-    private func arrow(_ direction: TilesGame.Direction, game: TilesGame, side: CGFloat) -> some View {
+    private func arrow(_ direction: TilesGame.Direction, game: TilesGame, side: CGFloat, fluid: Bool = false) -> some View {
         if let next = game.moved(direction), !game.isWon {
             AWButton(.set, key: Self.boardKey, value: next.encoded) {
-                key(symbol(direction), side: side, active: true)
+                key(symbol(direction), side: side, active: true, fluid: fluid)
             }
         } else {
-            key(symbol(direction), side: side, active: false)
+            key(symbol(direction), side: side, active: false, fluid: fluid)
         }
     }
 
-    private func restart(_ game: TilesGame, side: CGFloat) -> some View {
+    private func restart(_ game: TilesGame, side: CGFloat, fluid: Bool = false) -> some View {
         let fresh = TilesGame.start(seed: game.moves &+ game.score &+ 1, best: max(game.best, game.score))
         return AWButton(.set, key: Self.boardKey, value: fresh.encoded) {
-            key("arrow.counterclockwise", side: side, active: true)
+            key("arrow.counterclockwise", side: side, active: true, fluid: fluid)
         }
     }
 
-    private func key(_ symbol: String, side: CGFloat, active: Bool) -> some View {
+    private func key(_ symbol: String, side: CGFloat, active: Bool, fluid: Bool) -> some View {
         Image(systemName: symbol)
             .font(.system(size: side * 0.46, weight: .bold))
             .foregroundStyle(active ? Color.primary : Color.primary.opacity(0.25))
             .frame(maxWidth: .infinity, minHeight: side, maxHeight: side)
-            .frame(minWidth: side)
+            .frame(minWidth: fluid ? 0 : side)
             .background(RoundedRectangle(cornerRadius: side * 0.28, style: .continuous).fill(Color.primary.opacity(active ? 0.12 : 0.05)))
     }
 

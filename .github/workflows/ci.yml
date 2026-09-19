@@ -38,8 +38,8 @@ jobs:
         working-directory: examples
         run: |
           for dir in widgets/*/; do
-            ../.build/release/aw preview "$(basename "$dir")"
-            ../.build/release/aw preview "$(basename "$dir")" --lang ru
+            ../.build/release/aw preview "$(basename "$dir")" --built-in-sizes
+            ../.build/release/aw preview "$(basename "$dir")" --built-in-sizes --lang ru
           done
 
       - name: Build the examples app without signing

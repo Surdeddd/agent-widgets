@@ -29,6 +29,15 @@ struct PreviewCommand: AWCommand {
     @Flag(help: ArgumentHelp(L10n.pick(en: "Open the sheet when done.", ru: "Открыть лист после рендера.")))
     var open = false
 
+    @Flag(
+        name: .customLong("built-in-sizes"),
+        help: ArgumentHelp(L10n.pick(
+            en: "Render at the built-in sizes instead of the ones measured on this Mac — what CI and a Mac that has not measured yet will see.",
+            ru: "Рендерить во встроенных размерах, а не в замеренных на этом маке — так увидят CI и мак, где размеры ещё не замерены."
+        ))
+    )
+    var builtInSizes = false
+
     func execute() async throws -> Int32 {
         let workspace = try global.loadWorkspace()
         let widget = try workspace.widget(id)
@@ -45,7 +54,7 @@ struct PreviewCommand: AWCommand {
             scenarios: scenario.map { $0.split(separator: ",").map(String.init) },
             full: full,
             language: global.language,
-            geometry: GeometryStore.load()
+            geometry: builtInSizes ? nil : GeometryStore.load()
         )
         let outcome = try await PreviewPipeline(workspace: workspace, cache: cache, runner: runner).run(widget, request)
         let issues = outcome.allIssues.deduplicated()

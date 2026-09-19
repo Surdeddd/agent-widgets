@@ -69,7 +69,17 @@ struct SystemPulseView: AWView {
 
     private func grid(_ dials: [Dial]) -> some View {
         let columns = Array(repeating: GridItem(.flexible(), spacing: AWSpace.s), count: 2)
-        return LazyVGrid(columns: columns, spacing: AWSpace.xs) {
+        return GeometryReader { proxy in
+            let side = max(24, min(40, ((proxy.size.height - 34) / 2).rounded(.down)))
+            LazyVGrid(columns: columns, spacing: AWSpace.xs) {
+                dialCells(dials, side: side)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+    }
+
+    private func dialCells(_ dials: [Dial], side: CGFloat) -> some View {
+        Group {
             ForEach(dials) { dial in
                 VStack(spacing: AWSpace.xxs) {
                     AWRing(progress: dial.fraction, tint: dial.status.color, lineWidth: 5) {
@@ -79,13 +89,12 @@ struct SystemPulseView: AWView {
                             .lineLimit(1)
                             .minimumScaleFactor(0.7)
                     }
-                    .frame(width: 40, height: 40)
+                    .frame(width: side, height: side)
                     AWText(dial.label, .label)
                         .foregroundStyle(.secondary)
                 }
             }
         }
-        .frame(maxHeight: .infinity)
     }
 
     private func row(_ dials: [Dial], side: CGFloat) -> some View {

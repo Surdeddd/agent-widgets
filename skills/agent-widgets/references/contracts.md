@@ -89,7 +89,7 @@ Exit codes: `0` ok, `1` checks failed, `2` usage, `3` environment, `4` build fai
 | `aw init [dir]` | new workspace with signing detected |
 | `aw gallery` / `aw gallery add <id>` | list the ready-made widgets that ship with the engine / copy one into `widgets/` with its feed and samples |
 | `aw templates` / `aw new <id> --template t [--families small,medium]` | scaffold a widget; `aw templates` shows the sizes each template is drawn for |
-| `aw preview <id> [--family f] [--scenario s] [--full] [--open] [--lang ru]` | render the matrix, check the layout, write `sheet.png` + `report.json`; `--open` opens the sheet |
+| `aw preview <id> [--family f] [--scenario s] [--full] [--built-in-sizes] [--open] [--lang ru]` | render the matrix, check the layout, write `sheet.png` + `report.json`; `--open` opens the sheet |
 | `aw ship <id> [--scenario s] [--live] [--force] [--no-shot]` | preview → build → install → dev slot → real screenshot |
 | `aw build [--no-sign]` / `aw install [--hard]` / `aw rollback` | build and install the app with backups |
 | `aw dev <id> [--scenario s] [--live] [--timeout s]` | point the dev slot at a widget, wait until the desktop redraws it, capture it and compare it with the preview |

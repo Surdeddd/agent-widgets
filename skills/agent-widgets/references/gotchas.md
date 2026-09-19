@@ -8,6 +8,7 @@ Things that look fine in code and break on the desktop. The preview catches many
 - **`@Environment(\.widgetFamily)` is empty in previews.** Read `@Environment(\.aw).family` instead; it is correct in both.
 - **Widgets are snapshots.** No `URLSession`, timers, `onAppear`, tasks or animations in views. Fetch in the feed; animate only through changes between timeline entries (the system cross-fades, ≤ 2 s).
 - **Time that ticks** must use `Text(date, style: .timer / .relative / .time)`, `AWCountdown` or `AWClock` with `AWTick` entries — reloading every second is impossible.
+- **Other Macs are a little smaller.** Previews render at the sizes measured on this Mac (164 pt for small on a MacBook); a Mac that has not measured yet and CI use the built-in 155 pt. A widget other people will install has to fit both: `aw preview <id> --built-in-sizes`. Size things from the space you get (`GeometryReader`, flexible frames), not from a constant that happened to fit.
 - **Crashes are blank widgets.** A force unwrap or an out-of-range index kills the preview (`PREVIEW_CRASHED`) and shows nothing on the desktop. Guard arrays and optionals.
 - **Spell colors out in ternaries.** `cond ? .primary : .orange` fails to compile (`.primary` is also a `HierarchicalShapeStyle`); write `Color.primary` and `Color.orange`.
 - **SF Symbols must exist on macOS 14.** A misspelled name renders nothing; check the name in the SF Symbols app.
