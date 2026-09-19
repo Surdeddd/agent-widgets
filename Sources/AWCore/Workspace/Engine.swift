@@ -19,6 +19,15 @@ public struct Engine: Sendable {
         root.appendingPathComponent("skills", isDirectory: true)
     }
 
+    /// Ready-made widgets: `gallery/` of an installed engine, `examples/widgets/` of the repository.
+    public var gallery: URL {
+        let installed = root.appendingPathComponent("gallery", isDirectory: true)
+        if FileManager.default.fileExists(atPath: installed.path) {
+            return installed
+        }
+        return root.appendingPathComponent("examples/widgets", isDirectory: true)
+    }
+
     public var version: String {
         EngineVersion.current
     }

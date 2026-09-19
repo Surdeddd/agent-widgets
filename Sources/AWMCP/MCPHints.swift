@@ -5,6 +5,8 @@ enum MCPHints {
     private static let tools: [(command: String, tool: String)] = [
         ("feed run", "aw_feed_run"),
         ("data set", "aw_data_set"),
+        ("gallery add", "aw_gallery_add"),
+        ("gallery", "aw_gallery"),
         ("preview", "aw_preview"),
         ("ship", "aw_ship"),
         ("shot", "aw_shot"),

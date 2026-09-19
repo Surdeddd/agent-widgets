@@ -36,6 +36,8 @@ private func outputSchema(_ name: String) throws -> Value {
     try Data(config.utf8).write(to: root.appendingPathComponent("aw.json"))
     let context = MCPContext(engine: { Engine(root: repoRoot) }, runner: SystemProcessRunner(), directory: root)
     let calls: [(String, [String: Value])] = [
+        ("aw_gallery", [:]),
+        ("aw_gallery_add", ["id": .string("tiles")]),
         ("aw_templates", [:]),
         ("aw_new", ["id": .string("weather"), "template": .string("metric")]),
         ("aw_list", [:]),

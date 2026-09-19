@@ -25,6 +25,7 @@ enum OutputSchema {
 
     static let job = object(["id": string, "tool": string, "stage": string, "elapsed": number], required: ["id", "tool", "stage", "elapsed"], summary: false)
 
+    static let gallery = object(["widgets": anyArray], required: ["widgets"])
     static let templates = object(["templates": anyArray], required: ["templates"])
     static let created = object(["files": strings], required: ["files"])
     static let preview = object([

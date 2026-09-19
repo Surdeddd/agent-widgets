@@ -19,7 +19,9 @@ private func rewritten(_ text: String, _ language: Language = .en) -> String {
         ("`aw explain`", "`aw_explain`"),
         ("`aw templates`", "`aw_templates`"),
         ("`aw feed run`", "`aw_feed_run`"),
-        ("`aw data set`", "`aw_data_set`")
+        ("`aw data set`", "`aw_data_set`"),
+        ("`aw gallery`", "`aw_gallery`"),
+        ("`aw gallery add ai-limits`", #"`aw_gallery_add {"id": "ai-limits"}`"#)
     ]
     for (input, expected) in rows {
         #expect(rewritten(input) == expected, "\(input)")

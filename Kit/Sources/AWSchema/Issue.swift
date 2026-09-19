@@ -36,6 +36,7 @@ public enum IssueCode {
     public static let truncation = "TRUNCATION"
     public static let decode = "DECODE"
     public static let tinyText = "TINY_TEXT"
+    public static let underfilled = "UNDERFILLED"
     public static let emptyScenario = "EMPTY"
     public static let unrenderable = "UNRENDERABLE"
     public static let manifestInvalid = "MANIFEST_INVALID"
@@ -59,6 +60,7 @@ public enum IssueCode {
     public static let widgetNotFound = "WIDGET_NOT_FOUND"
     public static let widgetIdInvalid = "WIDGET_ID_INVALID"
     public static let templateUnknown = "TEMPLATE_UNKNOWN"
+    public static let galleryUnknown = "GALLERY_UNKNOWN"
     public static let feedFailed = "FEED_FAILED"
     public static let feedTimeout = "FEED_TIMEOUT"
     public static let feedInvalidOutput = "FEED_INVALID_OUTPUT"
@@ -80,12 +82,12 @@ public enum IssueCode {
 
     public static let all: [String] = [
         keptExisting, previewCrashed,
-        overflow, truncation, decode, tinyText, emptyScenario, unrenderable,
+        overflow, truncation, decode, tinyText, underfilled, emptyScenario, unrenderable,
         manifestInvalid, duplicateKind, budgetRisk, missingDefaultSample,
         workspaceNotFound, workspaceExists, engineNotFound, invalidJSON, invalidArgument,
         signingMissing, toolMissing, compileError, buildError, installFailed,
         screenRecordingDenied, widgetNotPlaced, slotTimeout, shotUnchanged, shipUnverified, geometryUnknown,
-        widgetExists, widgetNotFound, widgetIdInvalid, templateUnknown, scenarioNotFound,
+        widgetExists, widgetNotFound, widgetIdInvalid, templateUnknown, galleryUnknown, scenarioNotFound,
         feedFailed, feedTimeout, feedInvalidOutput, staleData, daemonMissing,
         shotMismatch, feedCommandNotFound, feedSecretMissing, secretsInConfig, sampleNotLocalized, jobUnknown, widgetHidden
     ]

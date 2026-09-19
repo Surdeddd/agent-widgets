@@ -4,7 +4,7 @@ import Foundation
 import MCP
 
 enum AWTools {
-    static let all: [AWTool] = [templates, create, preview, ship, shot, slot, dev, wait, doctor, list, dataSet, feedRun, explain]
+    static let all: [AWTool] = [gallery, galleryAdd, templates, create, preview, ship, shot, slot, dev, wait, doctor, list, dataSet, feedRun, explain]
 
     static let templates = AWTool(
         "aw_templates",

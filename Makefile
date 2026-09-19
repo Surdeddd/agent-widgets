@@ -7,6 +7,7 @@ build:
 	swift build -c release --product aw
 
 test:
+	/usr/bin/python3 -B -m unittest discover -s Tests/Feeds
 	swift test
 	cd Kit && swift test
 
@@ -19,6 +20,7 @@ install: build
 	ditto Templates "$(LIBDIR)/Templates"
 	if [ -d skills ]; then ditto skills "$(LIBDIR)/skills"; fi
 	rsync -a --delete --exclude .build --exclude .swiftpm Kit/ "$(LIBDIR)/Kit/"
+	rsync -a --delete --exclude __pycache__ examples/widgets/ "$(LIBDIR)/gallery/"
 	ln -sf "$(LIBDIR)/bin/aw" "$(PREFIX)/bin/aw"
 
 uninstall:

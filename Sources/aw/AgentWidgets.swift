@@ -13,6 +13,7 @@ struct AgentWidgets: AsyncParsableCommand {
         version: EngineVersion.current,
         subcommands: [
             InitCommand.self,
+            GalleryCommand.self,
             NewCommand.self,
             PreviewCommand.self,
             ShipCommand.self,

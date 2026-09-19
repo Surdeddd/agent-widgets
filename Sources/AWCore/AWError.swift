@@ -10,6 +10,7 @@ public enum AWError: Error, Equatable, Sendable {
     case widgetIdInvalid(String)
     case widgetExists(String)
     case templateUnknown(String, [String])
+    case galleryUnknown(String, [String])
     case toolFailed(tool: String, status: Int32, output: String)
     case installFailed(String)
     case scenarioNotFound(widget: String, scenario: String, available: [String])
@@ -42,6 +43,13 @@ public enum AWError: Error, Equatable, Sendable {
                 code: IssueCode.templateUnknown,
                 severity: .error,
                 message: L10n.pick(en: "Unknown template \"\(name)\"", ru: "Нет шаблона \"\(name)\""),
+                hint: L10n.pick(en: "Available: \(available.joined(separator: ", "))", ru: "Есть: \(available.joined(separator: ", "))")
+            )
+        case .galleryUnknown(let name, let available):
+            Issue(
+                code: IssueCode.galleryUnknown,
+                severity: .error,
+                message: L10n.pick(en: "No gallery widget \"\(name)\"", ru: "В галерее нет виджета \"\(name)\""),
                 hint: L10n.pick(en: "Available: \(available.joined(separator: ", "))", ru: "Есть: \(available.joined(separator: ", "))")
             )
         case .workspaceNotFound(let path):

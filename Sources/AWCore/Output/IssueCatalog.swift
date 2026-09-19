@@ -85,6 +85,27 @@ private let catalogEntries: [IssueExplanation] = [
         example: nil
     ),
     IssueExplanation(
+        code: IssueCode.underfilled,
+        title: text("A size is mostly empty", "Размер почти пуст"),
+        cause: text(
+            "One empty rectangle takes a big part of the widget: a quarter of large and extraLarge, a third of medium, almost half of small. "
+                + "It is usually a smaller layout stretched onto a bigger size, or content pushed into a corner. A gap between a label and its value "
+                + "inside one row does not count, and empty states are not judged. The sheet outlines the area.",
+            "Один пустой прямоугольник занимает заметную часть виджета: четверть large и extraLarge, треть medium, почти половину small. "
+                + "Обычно это раскладка поменьше, растянутая на больший размер, или содержимое, прижатое в угол. Промежуток между подписью и значением "
+                + "в одной строке не считается, пустые состояния не оцениваются. На листе область обведена."
+        ),
+        fix: text(
+            "Give the size something only it can hold: small is one number, medium adds context, large adds a breakdown or a trend, extraLarge is two "
+                + "columns of large. Or make the hero bigger so it owns the space. Or drop the size from \"families\" in widget.json: "
+                + "not offering a size beats offering a hollow one. Moving the content to another edge does not fix it.",
+            "Дай размеру то, что влезает только в него: small — одно число, medium — плюс контекст, large — плюс разбивка или тренд, extraLarge — две "
+                + "колонки large. Либо укрупни главное, чтобы оно заняло место. Либо убери размер из \"families\" в widget.json: "
+                + "лучше не предлагать размер, чем предлагать пустой. Перенос содержимого к другому краю ничего не исправляет."
+        ),
+        example: nil
+    ),
+    IssueExplanation(
         code: IssueCode.emptyScenario,
         title: text("The empty state is broken", "Пустое состояние сломано"),
         cause: text(
@@ -374,6 +395,13 @@ private let catalogEntries: [IssueExplanation] = [
         title: text("No such template", "Нет такого шаблона"),
         cause: text("The template name is not in the engine's Templates folder.", "Такого шаблона нет в папке Templates движка."),
         fix: text("aw templates lists them: metric, list, ring, chart, card, image, timer, blank.", "aw templates покажет список: metric, list, ring, chart, card, image, timer, blank."),
+        example: nil
+    ),
+    IssueExplanation(
+        code: IssueCode.galleryUnknown,
+        title: text("No such gallery widget", "Нет такого виджета в галерее"),
+        cause: text("The id is not among the ready-made widgets that ship with the engine.", "Такого id нет среди готовых виджетов, которые идут с движком."),
+        fix: text("aw gallery lists them; aw gallery add <id> copies one into widgets/.", "aw gallery покажет список; aw gallery add <id> скопирует виджет в widgets/."),
         example: nil
     ),
     IssueExplanation(
