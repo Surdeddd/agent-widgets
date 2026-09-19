@@ -168,7 +168,7 @@ struct AiLimitsView: AWView {
         return AWRing(progress: left / 100, tint: status(left).color, lineWidth: lineWidth) {
             VStack(spacing: 0) {
                 AWText(percentText(left), .display)
-                AWText(context.pick(en: "left", ru: "осталось"), .label)
+                AWText(context.pick(en: "left", ru: context.isSmall ? "запас" : "осталось"), .label)
                     .foregroundStyle(.secondary)
             }
         }
@@ -199,7 +199,7 @@ struct AiLimitsView: AWView {
             } else {
                 HStack(alignment: .top, spacing: AWSpace.m) {
                     windowRow(context.pick(en: "5h", ru: "5 ч"), window: service.session, paced: false)
-                    windowRow(context.pick(en: "week", ru: "неделя"), window: service.week, paced: false)
+                    windowRow(context.pick(en: "week", ru: "нед"), window: service.week, paced: false)
                 }
             }
         }

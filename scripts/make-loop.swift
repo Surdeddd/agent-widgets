@@ -1,8 +1,6 @@
 import AppKit
 import CoreGraphics
 import Foundation
-import ImageIO
-import UniformTypeIdentifiers
 
 enum Palette {
     static let background = NSColor(red: 0.055, green: 0.06, blue: 0.08, alpha: 1)
@@ -15,14 +13,29 @@ enum Palette {
     static let blue = NSColor(red: 0.55, green: 0.72, blue: 1, alpha: 1)
 }
 
+struct Step: Decodable {
+    var type: String?
+    var emit: [String]?
+    var emitFile: String?
+    var image: String?
+    var label: String?
+    var clear: Bool?
+    var hold: Int?
+}
+
+struct StoryFile: Decodable {
+    var steps: [Step]
+}
+
 struct Frame {
     let lines: [String]
     let image: NSImage?
+    let label: String
 }
 
 let canvas = CGSize(width: 1280, height: 720)
 let terminal = CGRect(x: 36, y: 36, width: 640, height: 648)
-let sheetPanel = CGRect(x: 700, y: 36, width: 544, height: 648)
+let sidePanel = CGRect(x: 700, y: 36, width: 544, height: 648)
 let font = NSFont.monospacedSystemFont(ofSize: 14, weight: .regular)
 let lineHeight: CGFloat = 21
 let columns = 70
@@ -55,36 +68,32 @@ func wrap(_ line: String) -> [String] {
     return rows
 }
 
-func transcript(_ url: URL, label: String) -> [String] {
-    let text = (try? String(contentsOf: url, encoding: .utf8)) ?? ""
-    return text.split(separator: "\n").map { line in
-        guard line.contains("sheet: ") || line.contains("лист: ") else { return String(line) }
-        return "  \(label): .aw/previews/weather/sheet.png"
-    }
-}
-
 final class Story {
     private(set) var frames: [Frame] = []
     private var screen: [String] = []
     var image: NSImage?
+    var label = ""
 
     func hold(_ count: Int) {
         for _ in 0..<count {
-            frames.append(Frame(lines: screen, image: image))
+            frames.append(Frame(lines: screen, image: image, label: label))
         }
     }
 
     func type(_ command: String) {
         for count in stride(from: 1, through: command.count, by: 2) {
-            frames.append(Frame(lines: screen + ["$ " + String(command.prefix(count))], image: image))
+            frames.append(Frame(lines: screen + ["$ " + String(command.prefix(count))], image: image, label: label))
         }
         screen.append("$ " + command)
         hold(3)
     }
 
-    func emit(_ lines: [String], hold count: Int) {
+    func emit(_ lines: [String]) {
         screen += lines.flatMap(wrap)
-        hold(count)
+    }
+
+    func clear() {
+        screen = []
     }
 }
 
@@ -116,7 +125,7 @@ func render(_ frame: Frame, to url: URL) throws {
     NSRect(origin: .zero, size: canvas).fill()
     Palette.panel.setFill()
     NSBezierPath(roundedRect: terminal, xRadius: 14, yRadius: 14).fill()
-    NSBezierPath(roundedRect: sheetPanel, xRadius: 14, yRadius: 14).fill()
+    NSBezierPath(roundedRect: sidePanel, xRadius: 14, yRadius: 14).fill()
     for (index, dot) in [Palette.red, Palette.yellow, Palette.green].enumerated() {
         dot.setFill()
         NSBezierPath(ovalIn: CGRect(x: terminal.minX + 18 + CGFloat(index) * 20, y: terminal.minY + 16, width: 12, height: 12)).fill()
@@ -126,11 +135,11 @@ func render(_ frame: Frame, to url: URL) throws {
         draw(line, at: CGPoint(x: terminal.minX + 22, y: terminal.minY + 48 + CGFloat(index) * lineHeight), color: color(for: line))
     }
     if let image = frame.image {
-        draw("sheet.png", at: CGPoint(x: sheetPanel.minX + 18, y: sheetPanel.minY + 14), color: Palette.dim)
-        let box = sheetPanel.insetBy(dx: 16, dy: 16).offsetBy(dx: 0, dy: 14)
+        draw(frame.label, at: CGPoint(x: sidePanel.minX + 18, y: sidePanel.minY + 14), color: Palette.dim)
+        let box = sidePanel.insetBy(dx: 16, dy: 16).offsetBy(dx: 0, dy: 14)
         let ratio = min(box.width / image.size.width, (box.height - 14) / image.size.height)
         let size = CGSize(width: image.size.width * ratio, height: image.size.height * ratio)
-        image.draw(in: CGRect(x: box.midX - size.width / 2, y: box.minY, width: size.width, height: size.height))
+        image.draw(in: CGRect(x: box.midX - size.width / 2, y: box.minY + (box.height - 14 - size.height) / 2, width: size.width, height: size.height))
     }
     NSGraphicsContext.restoreGraphicsState()
     guard let png = bitmap.representation(using: .png, properties: [:]) else {
@@ -140,33 +149,41 @@ func render(_ frame: Frame, to url: URL) throws {
 }
 
 let arguments = CommandLine.arguments
-guard arguments.count >= 4 else {
-    print("usage: swift scripts/make-loop.swift <input-dir> <en|ru> <frames-dir>")
-    print("input: broken.<lang>.txt, fixed.<lang>.txt, broken.<lang>.png, fixed.<lang>.png from aw preview")
+guard arguments.count >= 3 else {
+    print("""
+    usage: swift scripts/make-loop.swift <story.json> <frames-dir>
+    story: {"steps": [{"type": "aw preview weather"}, {"emitFile": "out.txt", "image": "sheet.png", "label": "sheet.png", "hold": 30},
+            {"emit": ["# a note"], "hold": 6}, {"clear": true}]} — paths are relative to the story file
+    then:  ffmpeg -framerate 12 -i <frames-dir>/%04d.png -vf "split[a][b];[a]palettegen[p];[b][p]paletteuse" out.gif
+    """)
     exit(2)
 }
-let input = URL(fileURLWithPath: arguments[1], isDirectory: true)
-let lang = arguments[2]
-let label = lang == "ru" ? "лист" : "sheet"
-let output = URL(fileURLWithPath: arguments[3], isDirectory: true)
-let command = "aw preview weather --scenario default" + (lang == "ru" ? " --lang ru" : "")
-let story = Story()
-story.hold(4)
-story.type(command)
-story.image = NSImage(contentsOf: input.appendingPathComponent("broken.\(lang).png"))
-story.emit(transcript(input.appendingPathComponent("broken.\(lang).txt"), label: label), hold: 30)
-story.emit(["", lang == "ru" ? "# агент читает отчёт и правит вьюху" : "# the agent reads the report and fixes the view"], hold: 6)
-story.emit([
-    "- AWMetric(temp, unit: \"°C\", label: condition)",
-    "+ AWMetric(temp, unit: \"°C\")",
-    "+ AWText(condition, .caption, lines: 2)",
-    "+ hourColumns.fixedSize()"
-], hold: 22)
-story.emit([""], hold: 0)
-story.type(command)
-story.image = NSImage(contentsOf: input.appendingPathComponent("fixed.\(lang).png"))
-story.emit(transcript(input.appendingPathComponent("fixed.\(lang).txt"), label: label), hold: 40)
+let storyURL = URL(fileURLWithPath: arguments[1])
+let base = storyURL.deletingLastPathComponent()
+let output = URL(fileURLWithPath: arguments[2], isDirectory: true)
 do {
+    let file = try JSONDecoder().decode(StoryFile.self, from: Data(contentsOf: storyURL))
+    let story = Story()
+    for step in file.steps {
+        if step.clear == true {
+            story.clear()
+        }
+        if let command = step.type {
+            story.type(command)
+        }
+        if let image = step.image {
+            story.image = NSImage(contentsOf: base.appendingPathComponent(image))
+            story.label = step.label ?? image
+        }
+        if let name = step.emitFile {
+            let text = try String(contentsOf: base.appendingPathComponent(name), encoding: .utf8)
+            story.emit(text.split(separator: "\n", omittingEmptySubsequences: false).map(String.init))
+        }
+        if let lines = step.emit {
+            story.emit(lines)
+        }
+        story.hold(step.hold ?? 0)
+    }
     try FileManager.default.createDirectory(at: output, withIntermediateDirectories: true)
     for (index, frame) in story.frames.enumerated() {
         try render(frame, to: output.appendingPathComponent(String(format: "%04d.png", index)))

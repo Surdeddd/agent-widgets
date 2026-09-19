@@ -188,10 +188,10 @@ public struct PreviewPipeline: Sendable {
         return arguments
     }
 
-    /// A feed widget previewed in Russian without samples/default.ru.json never checks the feed's Russian text.
+    /// A feed that words its output by AW_LANG, previewed in Russian without samples/default.ru.json, never has its Russian text checked.
     static func localizationIssues(_ widget: WidgetSource, _ request: PreviewRequest) -> [Issue] {
         guard request.language == .ru, let feed = widget.manifest.feed, widget.samples["default.ru"] == nil,
-              hasText(widget.samples["default"]) else { return [] }
+              hasText(widget.samples["default"]), readsLanguage(feed, in: widget.directory) else { return [] }
         return [Issue(
             code: IssueCode.sampleNotLocalized,
             severity: .warning,
@@ -205,6 +205,21 @@ public struct PreviewPipeline: Sendable {
             ),
             file: "widgets/\(widget.id)/samples"
         )]
+    }
+
+    /// True when the feed command or a script next to the widget mentions AW_LANG; a feed that never reads it prints the same text in every language.
+    static func readsLanguage(_ feed: FeedSpec, in directory: URL) -> Bool {
+        let marker = "AW_LANG"
+        if feed.command.contains(marker) {
+            return true
+        }
+        let files = (try? FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: [.isRegularFileKey])) ?? []
+        return files.contains { file in
+            guard file.pathExtension != "swift", file.lastPathComponent != Workspace.manifestFile,
+                  (try? file.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile) == true,
+                  let text = try? String(contentsOf: file, encoding: .utf8) else { return false }
+            return text.contains(marker)
+        }
     }
 
     /// True when the sample holds any string value, which a Russian feed would word differently; a sample that cannot be read counts as text.
