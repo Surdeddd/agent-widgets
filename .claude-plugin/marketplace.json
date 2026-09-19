@@ -10,7 +10,7 @@
       "name": "agent-widgets",
       "source": "./",
       "description": "Native macOS desktop widgets built by your agent: the agent-widgets skill and the aw MCP server.",
-      "version": "0.3.0"
+      "version": "0.3.1"
     }
   ]
 }

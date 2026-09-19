@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.1 — 2026-09-19
+
+- `aw new` works when the engine sits behind a symlink — a Homebrew install always does. It used to fail with `UNEXPECTED … couldn’t be copied`: the created paths were cut at the wrong place once the symlink was resolved.
+- A widget with a running timer settles on the desktop. `aw ship` and `aw dev` compared captured frames byte by byte, so a `Text(date, style: .timer)` or an `AWCountdown`, which changes every second, never looked still: every window waited its full 30 s and the run ended `unverified` with `SHOT_UNCHANGED`. Frames are now compared as pictures: a ticking clock is neither a redraw nor a widget that keeps redrawing, and the same ticking widget is still reported as unchanged.
+
 ## 0.3.0 — 2026-09-15
 
 - Long MCP calls fit every client. `aw_ship`, `aw_dev`, `aw_slot` and `aw_feed_run` run as jobs: a call answers within its budget (none for Claude Code, 45 s for other clients, `aw mcp --call-budget`) with a job id and stage, and the new `aw_wait` returns the final result. Codex and Claude Desktop, which stop a tool call after 60 s, now get through a ship.
