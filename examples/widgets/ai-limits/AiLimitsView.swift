@@ -295,7 +295,7 @@ struct AiLimitsView: AWView {
     private func resetMoment(_ resetsAt: Date?) -> some View {
         if let resetsAt, resetsAt > entry.date {
             if resetsAt.timeIntervalSince(entry.date) > 86400 {
-                Text(resetsAt, format: .dateTime.weekday(.abbreviated).hour().minute().locale(Locale(identifier: context.language == .ru ? "ru" : "en")))
+                Text(resetsAt, format: .dateTime.weekday(.abbreviated).hour().minute().locale(context.locale))
                     .font(AWType.font(.caption, context.family))
                     .foregroundStyle(.tertiary)
                     .lineLimit(1)

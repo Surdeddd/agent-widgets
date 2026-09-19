@@ -125,7 +125,7 @@ struct WeatherView: AWView {
 
 - The view is a struct conforming to `AWView` with `let entry: AWEntry<Model>` and `init(entry:)`. `"view"` in `widget.json` names it exactly.
 - `AWPhaseView(entry) { data in … }` draws waiting, error and stale states for you.
-- `@Environment(\.aw)` gives `family`, `isSmall`, `isWide`, `isVibrant`, `language` and `pick(en:ru:)`. “Now” inside a view is `entry.date`, never `Date()`.
+- `@Environment(\.aw)` gives `family`, `isSmall`, `isWide`, `isVibrant`, `language`, `locale` and `pick(en:ru:)`. “Now” inside a view is `entry.date`, never `Date()`. Dates and numbers take `.locale(context.locale)`: the system locale may speak another language than the widget.
 - Import only `AWKit` and `SwiftUI` (`Charts` also works). No networking, timers or `onAppear` in views — widgets are snapshots; the feed fetches.
 
 ## widget.json

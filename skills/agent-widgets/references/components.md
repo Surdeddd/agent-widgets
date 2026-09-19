@@ -86,6 +86,7 @@ AWButton(.increment, key: "cups") { Label("Cup", systemImage: "plus") }
 - `AWMetrics.spacing(for: family)` (6 in small, 8 otherwise), `AWMetrics.padding(for:)`.
 - `AWStatus`: `.ok`, `.warning`, `.critical`, `.info`, `.neutral` with `.symbol`, `.color` and `.tint(context)` (monochrome when idle).
 - `context.isMonochrome` is true on the idle desktop (and in accented mode) — color is gone, so switch to weight, symbols or position; `context.isVibrant` is the same check for the idle desktop only.
+- `context.locale` — the current locale speaking the language of the widget. Format dates and numbers with it (`date.formatted(.dateTime.day().month().locale(context.locale))`), or a Russian Mac prints “16 сент.” inside an English widget.
 - `AWFormat.compact(_ value: Double) -> String` — `1234` → `"1.2K"`, `2_000_000` → `"2M"`; pass `Double(intValue)` for integers.
 - `AWFormat.freshness(_ date: Date, now: Date = Date(), language:) -> String` → “5m ago” / “5 мин назад”; `AWFormat.updated(_:)` → “updated 5m ago”.
 - `AWTick`: `.none`, `.everyMinute(count:)`, `.every(seconds:count:)` — extra timeline entries so time-based views update without reloads.

@@ -177,7 +177,7 @@ struct AgentsView: AWView {
     }
 
     private func hourLabel(_ hour: Date) -> String {
-        hour.formatted(.dateTime.hour(.twoDigits(amPM: .omitted)).locale(Locale(identifier: context.language == .ru ? "ru" : "en_GB")))
+        String(format: "%02d", Calendar.current.component(.hour, from: hour))
     }
 
     @ViewBuilder

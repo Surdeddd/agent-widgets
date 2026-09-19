@@ -150,3 +150,14 @@ private func build(
     }
     #expect(AWContext(family: .small, language: .ru).pick(en: "a", ru: "б") == "б")
 }
+
+@Test func theContextLocaleSpeaksTheWidgetLanguageAndKeepsTheRegion() {
+    let september = Date(timeIntervalSince1970: 1_789_776_000)
+    let russian = AWContext(family: .small, language: .ru).locale
+    let english = AWContext(family: .small, language: .en).locale
+    #expect(russian.language.languageCode?.identifier == "ru")
+    #expect(english.language.languageCode?.identifier == "en")
+    #expect(september.formatted(.dateTime.month(.wide).locale(russian)).lowercased().hasPrefix("сентябр"))
+    #expect(september.formatted(.dateTime.month(.wide).locale(english)) == "September")
+    #expect(russian.region == Locale.current.region)
+}
