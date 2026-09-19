@@ -51,8 +51,7 @@ public struct TemplateCatalog: Sendable {
             "__NAME_RU__": title.ru ?? title.en
         ]
         var created: [String] = []
-        for file in files(in: source) {
-            let relative = String(file.path.dropFirst(source.path.count + 1))
+        for (file, relative) in PathWalk.files(in: source) {
             guard relative != "template.json" else { continue }
             var destinationPath = relative.replacingOccurrences(of: "__TYPE__", with: type)
             if destinationPath.hasSuffix(".tmpl") {
@@ -84,13 +83,6 @@ public struct TemplateCatalog: Sendable {
     }
 
     private static let textExtensions: Set<String> = ["swift", "json", "py", "sh", "md", "txt"]
-
-    private func files(in directory: URL) -> [URL] {
-        let enumerator = FileManager.default.enumerator(at: directory, includingPropertiesForKeys: [.isRegularFileKey], options: [.skipsHiddenFiles])
-        return (enumerator?.compactMap { $0 as? URL } ?? [])
-            .filter { (try? $0.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile) == true }
-            .sorted { $0.path < $1.path }
-    }
 
     private func patchManifest(at url: URL, families: [Family]) throws {
         let manifest = try JSONDecoder().decode(JSONValue.self, from: Data(contentsOf: url))

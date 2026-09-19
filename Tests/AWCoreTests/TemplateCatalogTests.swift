@@ -24,6 +24,19 @@ private func emptyWorkspace() throws -> Workspace {
     #expect(templates.allSatisfy { !$0.summary.en.isEmpty && $0.summary.ru != nil && !$0.families.isEmpty })
 }
 
+@Test func anEngineBehindASymlinkStillCreatesTheRightPaths() throws {
+    let link = FileManager.default.temporaryDirectory.appendingPathComponent("aw-engine-link-\(UUID().uuidString)")
+    try FileManager.default.createSymbolicLink(at: link, withDestinationURL: repoRoot)
+    defer { try? FileManager.default.removeItem(at: link) }
+    let workspace = try emptyWorkspace()
+    defer { try? FileManager.default.removeItem(at: workspace.root) }
+    let created = try TemplateCatalog(engine: Engine(root: link)).instantiate("metric", id: "disk-space", in: workspace)
+    #expect(created.contains("widgets/disk-space/DiskSpaceView.swift"))
+    #expect(created.contains("widgets/disk-space/widget.json"))
+    #expect(created.allSatisfy { $0.hasPrefix("widgets/disk-space/") && !$0.contains("//") })
+    #expect(FileManager.default.fileExists(atPath: workspace.root.appendingPathComponent("widgets/disk-space/DiskSpaceView.swift").path))
+}
+
 @Test func typeNamesArePascalCase() {
     #expect(TemplateCatalog.typeName(for: "server-health") == "ServerHealth")
     #expect(TemplateCatalog.typeName(for: "weather") == "Weather")
