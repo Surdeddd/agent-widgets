@@ -67,6 +67,16 @@ class ClaudeSessions(unittest.TestCase):
         info = feed.classify_claude(entries, NOW)
         self.assertEqual((info["project"], info["branch"], info["title"]), ("agent-widgets", "feat/gallery", "Ship the gallery"))
 
+    def test_a_headless_run_that_finished_waits_for_nobody(self):
+        entries = [prompt("build it", -600, entrypoint="sdk-cli"), assistant("end_turn", -300, entrypoint="sdk-cli")]
+        self.assertIsNone(feed.classify_claude(entries, NOW))
+        interactive = [prompt("build it", -600, entrypoint="cli"), assistant("end_turn", -300, entrypoint="cli")]
+        self.assertEqual(feed.classify_claude(interactive, NOW)["state"], "waiting")
+
+    def test_a_headless_run_shows_while_it_works(self):
+        entries = [prompt("build it", -600, entrypoint="sdk-cli"), assistant("tool_use", -30, entrypoint="sdk-cli")]
+        self.assertEqual(feed.classify_claude(entries, NOW)["state"], "working")
+
     def test_nothing_to_say_about_a_transcript_without_messages(self):
         self.assertIsNone(feed.classify_claude([{"type": "attachment"}], NOW))
 

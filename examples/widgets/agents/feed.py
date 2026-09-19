@@ -15,6 +15,7 @@ WAITING_FOR = 3 * 60 * 60
 LIMIT = 6
 HOURS = 12
 ENDED = ("end_turn", "stop_sequence", "max_tokens")
+HEADLESS = "sdk-cli"
 CODEX_WORKING = ("task_started", "token_count", "agent_message", "agent_reasoning", "exec_command_begin", "exec_command_end")
 
 
@@ -80,6 +81,8 @@ def classify_claude(entries, modified):
     if last is None:
         return None
     if last["type"] == "assistant" and (last.get("message") or {}).get("stop_reason") in ENDED:
+        if any(entry.get("entrypoint") == HEADLESS for entry in chain):
+            return None
         info["state"] = "waiting"
         info["since"] = epoch(last.get("timestamp")) or modified
         return info
