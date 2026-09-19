@@ -21,6 +21,8 @@ private func rewritten(_ text: String, _ language: Language = .en) -> String {
         ("`aw feed run`", "`aw_feed_run`"),
         ("`aw data set`", "`aw_data_set`"),
         ("`aw gallery`", "`aw_gallery`"),
+        ("`aw init`", "`aw_init`"),
+        ("`aw init ~/Widgets --bundle-prefix com.me`", #"`aw_init {"bundle_prefix": "com.me", "workspace": "~/Widgets"}`"#),
         ("`aw gallery add ai-limits`", #"`aw_gallery_add {"id": "ai-limits"}`"#)
     ]
     for (input, expected) in rows {
@@ -50,14 +52,15 @@ private func rewritten(_ text: String, _ language: Language = .en) -> String {
 }
 
 @Test func MCPHintsMarksShellOnlyCommandsByLanguage() {
-    #expect(rewritten("`aw init`") == "`aw init` (in a shell)")
-    #expect(rewritten("`aw init --refresh-signing`") == "`aw init --refresh-signing` (in a shell)")
+    #expect(rewritten("`aw rollback`") == "`aw rollback` (in a shell)")
+    #expect(rewritten("`aw geometry --measure`") == "`aw geometry --measure` (in a shell)")
     #expect(rewritten("`aw daemon install`") == "`aw daemon install` (in a shell)")
-    #expect(rewritten("`aw init`", .ru) == "`aw init` (в терминале)")
+    #expect(rewritten("`aw rollback`", .ru) == "`aw rollback` (в терминале)")
     #expect(rewritten("`aw install --hard`", .ru) == "`aw install --hard` (в терминале)")
-    #expect(rewritten("`aw init` (in a shell)") == "`aw init` (in a shell)")
-    #expect(rewritten("`aw init` (в терминале)", .ru) == "`aw init` (в терминале)")
-    #expect(rewritten("`aw init` (in a shell)", .ru) == "`aw init` (in a shell)")
+    #expect(rewritten("`aw rollback` (in a shell)") == "`aw rollback` (in a shell)")
+    #expect(rewritten("`aw rollback` (в терминале)", .ru) == "`aw rollback` (в терминале)")
+    #expect(rewritten("`aw rollback` (in a shell)", .ru) == "`aw rollback` (in a shell)")
+    #expect(rewritten("`aw init --refresh-signing`") == #"`aw_init {"refresh_signing": true}`"#)
 }
 
 @Test func MCPHintsRewritesBareWorkspaceByLanguage() {
@@ -71,9 +74,9 @@ private func rewritten(_ text: String, _ language: Language = .en) -> String {
 }
 
 @Test func MCPHintsRewriteIsIdempotent() {
-    let input = "Run `aw list` or `aw new weather`. Or `aw init` and pass --workspace."
+    let input = "Run `aw list` or `aw new weather`. Or `aw rollback` and pass --workspace."
     let once = rewritten(input)
-    #expect(once == #"Run `aw_list` or `aw_new {"id": "weather"}`. Or `aw init` (in a shell) and pass the `workspace` argument."#)
+    #expect(once == #"Run `aw_list` or `aw_new {"id": "weather"}`. Or `aw rollback` (in a shell) and pass the `workspace` argument."#)
     #expect(rewritten(once) == once)
     let russian = rewritten(input, .ru)
     #expect(rewritten(russian, .ru) == russian)

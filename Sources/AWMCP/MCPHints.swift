@@ -5,6 +5,7 @@ enum MCPHints {
     private static let tools: [(command: String, tool: String)] = [
         ("feed run", "aw_feed_run"),
         ("data set", "aw_data_set"),
+        ("init", "aw_init"),
         ("gallery add", "aw_gallery_add"),
         ("gallery", "aw_gallery"),
         ("preview", "aw_preview"),
@@ -86,7 +87,7 @@ enum MCPHints {
             guard body == command || body.hasPrefix(command + " ") else { continue }
             let tokens = String(body.dropFirst(command.count)).split(whereSeparator: \.isWhitespace).map(String.init)
             guard !tokens.isEmpty else { return tool }
-            let positional = tool == "aw_explain" ? "code" : "id"
+            let positional = ["aw_explain": "code", "aw_init": "workspace"][tool] ?? "id"
             return "\(tool) \(encode(parse(tokens, positional: positional)))"
         }
         return nil

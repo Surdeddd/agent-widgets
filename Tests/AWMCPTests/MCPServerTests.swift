@@ -34,7 +34,7 @@ private func texts(_ content: [Tool.Content]) -> String {
     let client = try await connectedClient()
     let names = try await client.listTools().tools.map(\.name)
     #expect(Set(names) == [
-        "aw_gallery", "aw_gallery_add", "aw_templates", "aw_new", "aw_preview", "aw_ship", "aw_shot", "aw_slot", "aw_dev", "aw_wait",
+        "aw_init", "aw_gallery", "aw_gallery_add", "aw_templates", "aw_new", "aw_preview", "aw_ship", "aw_shot", "aw_slot", "aw_dev", "aw_wait",
         "aw_doctor", "aw_list", "aw_data_set", "aw_feed_run", "aw_explain"
     ])
 }
@@ -90,4 +90,32 @@ private func texts(_ content: [Tool.Content]) -> String {
     let result = try await client.callTool(name: "aw_list")
     #expect(result.isError == true)
     #expect(texts(result.content).contains("WORKSPACE_NOT_FOUND"))
+    #expect(texts(result.content).contains("aw_init"))
+}
+
+@Test func initToolCreatesTheWorkspaceTheServerPointsAt() async throws {
+    let root = FileManager.default.temporaryDirectory.appendingPathComponent("aw-mcp-init-\(UUID().uuidString)", isDirectory: true)
+    defer { try? FileManager.default.removeItem(at: root) }
+    let client = try await connectedClient(directory: root)
+    let created = try await client.callTool(name: "aw_init", arguments: ["name": .string("Desk Widgets"), "bundle_prefix": .string("com.example.desk")])
+    #expect(created.isError != true, "\(texts(created.content))")
+    let config = try JSONDecoder().decode([String: String].self, from: Data(contentsOf: root.appendingPathComponent("aw.json")))
+    #expect(config["name"] == "Desk Widgets")
+    #expect(config["bundlePrefix"] == "com.example.desk")
+    #expect(texts(created.content).contains("aw_gallery"))
+    let listed = try await client.callTool(name: "aw_list")
+    #expect(listed.isError != true, "\(texts(listed.content))")
+    let again = try await client.callTool(name: "aw_init")
+    #expect(again.isError == true)
+    #expect(texts(again.content).contains("WORKSPACE_EXISTS"))
+}
+
+@Test func initToolTakesAnotherFolderAsTheWorkspaceArgument() async throws {
+    let root = FileManager.default.temporaryDirectory.appendingPathComponent("aw-mcp-init-\(UUID().uuidString)", isDirectory: true)
+    defer { try? FileManager.default.removeItem(at: root) }
+    let client = try await connectedClient()
+    let created = try await client.callTool(name: "aw_init", arguments: ["workspace": .string(root.path)])
+    #expect(created.isError != true, "\(texts(created.content))")
+    #expect(FileManager.default.fileExists(atPath: root.appendingPathComponent("aw.json").path))
+    #expect(!FileManager.default.fileExists(atPath: repoRoot.appendingPathComponent("aw.json").path))
 }

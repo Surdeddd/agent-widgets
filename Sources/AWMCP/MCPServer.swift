@@ -5,8 +5,10 @@ import MCP
 public enum AWMCPServer {
     static let instructions = """
     agent-widgets builds native macOS desktop widgets (WidgetKit + SwiftUI). \
-    Loop: aw_templates → aw_new → edit widgets/<id>/*.swift and samples/*.json → aw_preview until the report has no errors \
-    and the sheet image looks right → aw_ship to install and capture the real widget. \
+    No workspace yet (WORKSPACE_NOT_FOUND) → aw_init. Ready-made widgets (AI limits, agent sessions, GitHub, AI spend, 2048, \
+    system pulse, focus) → aw_gallery, aw_gallery_add. \
+    A new one: aw_templates → aw_new → edit widgets/<id>/*.swift and samples/*.json → aw_preview until the report has no errors, \
+    no UNDERFILLED warning and the sheet image looks right → aw_ship to install and capture the real widget. \
     Long calls (aw_ship, aw_dev, aw_slot, aw_feed_run) may answer with a job id before they finish: call aw_wait with it. \
     aw_explain explains any issue code; aw_doctor checks the environment. \
     Every tool takes an optional workspace path (the folder with aw.json).

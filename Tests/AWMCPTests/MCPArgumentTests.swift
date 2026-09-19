@@ -52,7 +52,7 @@ private func text(_ result: CallTool.Result) -> String {
         try await AWTools.list.call(Arguments([:]), MCPContext(directory: empty))
     }
     #expect(text(result).contains("WORKSPACE_NOT_FOUND"))
-    #expect(text(result).contains("`aw init` (in a shell)"))
+    #expect(text(result).contains("`aw_init`"))
     #expect(text(result).contains("the `workspace` argument"))
     let invalid = try await L10n.$language.withValue(.en) {
         try await AWTools.preview.call(Arguments(["id": .int(1)]), MCPContext())

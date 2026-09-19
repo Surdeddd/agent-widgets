@@ -103,7 +103,7 @@ Exit codes: `0` ok, `1` checks failed, `2` usage, `3` environment, `4` build fai
 
 ## MCP tools
 
-`aw_gallery`, `aw_gallery_add`, `aw_templates`, `aw_new`, `aw_preview` (sheet image + report), `aw_ship` (desktop screenshots), `aw_shot`, `aw_slot`, `aw_dev`, `aw_wait`, `aw_doctor`, `aw_list`, `aw_data_set`, `aw_feed_run`, `aw_explain`. Each takes an optional `workspace` path.
+`aw_init`, `aw_gallery`, `aw_gallery_add`, `aw_templates`, `aw_new`, `aw_preview` (sheet image + report), `aw_ship` (desktop screenshots), `aw_shot`, `aw_slot`, `aw_dev`, `aw_wait`, `aw_doctor`, `aw_list`, `aw_data_set`, `aw_feed_run`, `aw_explain`. Each takes an optional `workspace` path.
 
 - **Long calls.** `aw_ship`, `aw_dev`, `aw_slot` and `aw_feed_run` run as jobs. When a call would outlast the client, it answers with `{"job": {"id", "tool", "stage", "elapsed"}}`; call `aw_wait {"job": "<id>"}` until the final result arrives — the same text, images and data the tool itself returns. The budget is none for Claude Code and 45 s for other clients (Codex and Claude Desktop stop a tool call after 60 s); `aw mcp --call-budget <s>` or `AW_MCP_CALL_BUDGET` override it, `0` means no limit. Identical calls join the running job; `JOB_UNKNOWN` means it ended more than 15 minutes ago, was cancelled or the server restarted.
 - **Progress and cancel.** A call with a progress token gets a notification for every stage (preview, build, install, redraw) and a pulse every 10 s. Cancelling a call stops its work: a build is interrupted, waits end, an install swap already under way still finishes.
